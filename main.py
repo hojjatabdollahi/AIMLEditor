@@ -1,3 +1,21 @@
+# import sys
+# from PyQt5.QtWidgets import QApplication
+
+# from GUI.EditorWindow import EditorWindow
+
+
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+
+#     wnd = EditorWindow()
+
+#     sys.exit(app.exec_())
+
+
+
+
+
+
 
 from Model.AIML import AIML
 from Model.Categories import Category
@@ -7,9 +25,9 @@ import xml.etree.ElementTree as ET
 
 
 with AIML(name="hojjat aiml") as aiml:
-    aiml.categories.append(Category(template="nice to see you again. how are you?"))
-    aiml.categories.append(Category(template="I'm happy that you are well."))
-    aiml.categories.append(Category(template="I'm sad that you are not well."))
+    id = aiml.categories.append(Category(pattern="HELLO *", template="Hi. Nice to see you again. How are you?"))
+    aiml.categories.append(Category(pattern="I AM WELL", template="I'm happy that you are well.", that="How are you?", parents=[id]))
+    aiml.categories.append(Category(pattern="I AM NOT WELL", template="I'm sad that you are not well.", that="How are you?", parents=[id]))
     with Topic("sports") as sports:
         sports.categories.append(Category(template="Sure, let's talk about sports. What sport do you like?"))
         sports.categories.append(Category(template="I like football too."))
@@ -20,20 +38,17 @@ with AIML(name="hojjat aiml") as aiml:
         arts.categories.append(Category(template="I like painting too."))
         arts.categories.append(Category(template="I like music better."))
         aiml.topics.append(arts)
+print(aiml)
+
 Storage.save('test', aiml)
 aiml2 = Storage.restore('test')
 assert isinstance(aiml2, AIML) # for intellisense purposes
 print(aiml2) 
-Storage.export('test', aiml2)
-xml = str(aiml)
-root = ET.fromstring(country_data_as_string)
 
+Storage.exportAIML('test', aiml2)
 
-tree = ET.parse("test.aiml")
-root = tree.getroot()
-for child in root:
-    print(child.tag, child.attrib)
-
+aiml4 = Storage.importAIML('test')
+print(aiml4)
 
 
 

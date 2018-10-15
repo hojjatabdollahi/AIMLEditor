@@ -12,14 +12,12 @@ class AIML():
         self.categories = Categories()
 
     def __str__(self):
-        output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n<aiml>"
+        output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n<aiml>\n"
         if debugging:
             output = "[AIML: " + self.name + "]\n"
             output += "[General Categories:]\n"
-            output += indent(str(self.categories), indentation)
-        else:
-            output += str(self.categories) # No need for indentation
-        output += str(self.topics)
+        output += indent(str(self.categories), indentation)
+        output += indent(str(self.topics), indentation)
         output += "</aiml>\n"
         return output
     
