@@ -3,17 +3,17 @@ from GUI.Node.Utils.Serializable import Serializable
 from GUI.Node.QDM.GraphicsNode import QDMGraphicsNode
 from GUI.Node.QDM.ContentWidget import QDMNodeContentWidget
 from GUI.Node.Utils.Socket import *
-
+from Model.Categories import Category
 
 DEBUG = False
 
 
 class Node(Serializable):
-    def __init__(self, scene, title="Undefined Node", inputs=[], outputs=[]):
+    def __init__(self, scene, title="Undefined Node", inputs=[], outputs=[], category=None):
         super().__init__()
         self._title = title
         self.scene = scene
-
+        self.category = category
         self.content = QDMNodeContentWidget(self)
         self.grNode = QDMGraphicsNode(self)
         self.title = title

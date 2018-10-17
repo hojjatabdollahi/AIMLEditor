@@ -7,7 +7,7 @@ from GUI.Node.Node import Node
 from GUI.Node.Scene.Scene import Scene
 from GUI.Node.Edge import Edge, EDGE_TYPE_BEZIER
 from GUI.Node.QDM.GraphicsView import QDMGraphicsView
-
+from Model.Categories import Category
 
 class EditorWidget(QWidget):
     def __init__(self, parent=None):
@@ -38,8 +38,8 @@ class EditorWidget(QWidget):
     def addNodes(self):
         node1 = Node(self.scene, "My Awesome Node 1", inputs=[0,0,0], outputs=[1])
         node2 = Node(self.scene, "My Awesome Node 2", inputs=[3,3,3], outputs=[1])
-        node3 = Node(self.scene, "My Awesome Node 3", inputs=[2,2,2], outputs=[1])
-        node4 = Node(self.scene,"Hojjat is awesome", inputs=[1,0], outputs=[1,0,3])
+        node3 = Node(self.scene, "My Awesome Node 3", inputs=[2,2,2], outputs=[1], category=Category(pattern="BYE *", template="See you later!"))
+        node4 = Node(self.scene, "A Category", inputs=[1,1], outputs=[2,2], category=Category(pattern="HELLO *", template="Hi. Nice to see you again. How are you?"))
         node1.setPos(-350, -250)
         node2.setPos(-75, 0)
         node3.setPos(200, -150)

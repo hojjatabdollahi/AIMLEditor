@@ -1,21 +1,7 @@
-# import sys
-# from PyQt5.QtWidgets import QApplication
+import sys
+from PyQt5.QtWidgets import QApplication
 
-# from GUI.EditorWindow import EditorWindow
-
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-
-#     wnd = EditorWindow()
-
-#     sys.exit(app.exec_())
-
-
-
-
-
-
+from GUI.EditorWindow import EditorWindow
 
 from Model.AIML import AIML
 from Model.Categories import Category
@@ -23,32 +9,46 @@ from Model.Topics import Topic
 import Utils.Storage as Storage
 import xml.etree.ElementTree as ET
 
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
 
-with AIML(name="hojjat aiml") as aiml:
-    id = aiml.categories.append(Category(pattern="HELLO *", template="Hi. Nice to see you again. How are you?"))
-    aiml.categories.append(Category(pattern="I AM WELL", template="I'm happy that you are well.", that="How are you?", parents=[id]))
-    aiml.categories.append(Category(pattern="I AM NOT WELL", template="I'm sad that you are not well.", that="How are you?", parents=[id]))
-    with Topic("sports") as sports:
-        sports.categories.append(Category(template="Sure, let's talk about sports. What sport do you like?"))
-        sports.categories.append(Category(template="I like football too."))
-        sports.categories.append(Category(template="I like baseball better."))
-        aiml.topics.append(sports)
-    with Topic("arts") as arts:
-        arts.categories.append(Category(template="Sure, let's talk about arts. What art do you like?"))
-        arts.categories.append(Category(template="I like painting too."))
-        arts.categories.append(Category(template="I like music better."))
-        aiml.topics.append(arts)
-print(aiml)
+    wnd = EditorWindow()
 
-Storage.save('test', aiml)
-aiml2 = Storage.restore('test')
-assert isinstance(aiml2, AIML) # for intellisense purposes
-print(aiml2) 
+    sys.exit(app.exec_())
 
-Storage.exportAIML('test', aiml2)
 
-aiml4 = Storage.importAIML('test')
-print(aiml4)
+
+
+
+
+
+
+
+# with AIML(name="hojjat aiml") as aiml:
+#     id = aiml.categories.append(Category(pattern="HELLO *", template="Hi. Nice to see you again. How are you?"))
+#     aiml.categories.append(Category(pattern="I AM WELL", template="I'm happy that you are well.", that="How are you?", parents=[id]))
+#     aiml.categories.append(Category(pattern="I AM NOT WELL", template="I'm sad that you are not well.", that="How are you?", parents=[id]))
+#     with Topic("sports") as sports:
+#         sports.categories.append(Category(template="Sure, let's talk about sports. What sport do you like?"))
+#         sports.categories.append(Category(template="I like football too."))
+#         sports.categories.append(Category(template="I like baseball better."))
+#         aiml.topics.append(sports)
+#     with Topic("arts") as arts:
+#         arts.categories.append(Category(template="Sure, let's talk about arts. What art do you like?"))
+#         arts.categories.append(Category(template="I like painting too."))
+#         arts.categories.append(Category(template="I like music better."))
+#         aiml.topics.append(arts)
+# print(aiml)
+
+# Storage.save('test', aiml)
+# aiml2 = Storage.restore('test')
+# assert isinstance(aiml2, AIML) # for intellisense purposes
+# print(aiml2) 
+
+# Storage.exportAIML('test', aiml2)
+
+# aiml4 = Storage.importAIML('test')
+# print(aiml4)
 
 
 
@@ -59,7 +59,8 @@ print(aiml4)
 #!! How to add everything from a folder: use: from x import *
 
 #!! How to save and restore? (Actually, how to serialize?): use: pickle
-#?? Exporting is easy, but can we import?
+#!! Exporting is easy, but can we import?: yes
+
 
 
 
