@@ -9,8 +9,8 @@ def save(filename,aiml):
     with open(filename+'.aib', 'wb') as output:
         pickle.dump(aiml, output, pickle.HIGHEST_PROTOCOL)
 
-def restore(filename) -> AIML:
-    with open('test.aib', 'rb') as input:
+def restore(filename):
+    with open(filename+'.aib', 'rb') as input:
        aiml2 = pickle.load(input)
     return aiml2
 
