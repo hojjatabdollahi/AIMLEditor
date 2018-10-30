@@ -13,15 +13,10 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     wnd = EditorWindow()
-
-    sys.exit(app.exec_())
-
-
-
-
-
-
-
+    try:
+        sys.exit(app.exec_())
+    except:
+        pass
 
 
 # with AIML(name="hojjat aiml") as aiml:
@@ -43,13 +38,12 @@ if __name__ == '__main__':
 # Storage.save('test', aiml)
 # aiml2 = Storage.restore('test')
 # assert isinstance(aiml2, AIML) # for intellisense purposes
-# print(aiml2) 
+# print(aiml2)
 
 # Storage.exportAIML('test', aiml2)
 
 # aiml4 = Storage.importAIML('test')
 # print(aiml4)
-
 
 
 #!! How to cast the output of a function so that we can use intellisense: use:  -> after the funciton declaration
@@ -60,9 +54,6 @@ if __name__ == '__main__':
 
 #!! How to save and restore? (Actually, how to serialize?): use: pickle
 #!! Exporting is easy, but can we import?: yes
-
-
-
 
 
 # cats = Categories()

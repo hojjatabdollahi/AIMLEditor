@@ -14,7 +14,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
     def initUI(self):
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
         if self.node.category is not None:
@@ -31,14 +31,6 @@ class QDMNodeContentWidget(QWidget, Serializable):
             self.layout.addWidget(QDMTextEdit(""))
             self.layout.addWidget(QLabel("Template:"))
             self.layout.addWidget(QDMTextEdit(""))
-        
-        
-        
-        
-            
-            
-        
-        
 
     def setEditingFlag(self, value):
         self.node.scene.grScene.views()[0].editingFlag = value
@@ -50,6 +42,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
     def deserialize(self, data, hashmap={}):
         return False
+
 
 class QDMTextEdit(QTextEdit):
     def __init__(self, input):
@@ -63,3 +56,7 @@ class QDMTextEdit(QTextEdit):
     def focusOutEvent(self, event):
         self.parentWidget().setEditingFlag(False)
         super().focusOutEvent(event)
+
+
+# class CategoryEditor(QWidget):
+#     def __init__(self)
