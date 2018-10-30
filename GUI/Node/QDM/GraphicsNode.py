@@ -22,8 +22,6 @@ class QDMGraphicsNode(QGraphicsItem):
         self._title_color = Qt.white
         self._title_font = QFont("Ubuntu", 10)
 
-        self.width = 260
-        self.height = 500
         self.rect = QRectF(
             0,
             0,
@@ -127,6 +125,20 @@ class QDMGraphicsNode(QGraphicsItem):
         self._title = value
         self.title_item.setPlainText(self._title)
 
+    @property
+    def width(self): return self.rect.width()
+
+    @width.setter
+    def width(self, value):
+        self.rect.setWidth(value)
+
+    @property
+    def height(self): return self.rect.height()
+
+    @height.setter
+    def height(self, value):
+        self.rect.setheight(value)
+
     def initUI(self):
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemIsMovable)
@@ -149,6 +161,7 @@ class QDMGraphicsNode(QGraphicsItem):
             rect.setBottom(toY)
             self.rect = rect
             self.setContentGeo()
+            self.node.updateSocketPos()
             # self.setRect(self.rect)
 
         self.handle = QRectF(self.rect.right() - self.handleSize,

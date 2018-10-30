@@ -21,8 +21,9 @@ class Socket(Serializable):
         self.position = position
         self.socket_type = socket_type
 
-        if DEBUG: print("Socket -- creating with", self.index, self.position, "for node", self.node)
-
+        if DEBUG:
+            print("Socket -- creating with", self.index,
+                  self.position, "for node", self.node)
 
         self.grSocket = QDMGraphicsSocket(self, self.socket_type)
 
@@ -33,13 +34,17 @@ class Socket(Serializable):
     def __str__(self):
         return "<Socket %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
 
-
     def getSocketPosition(self):
-        if DEBUG: print("  GSP: ", self.index, self.position, "node:", self.node)
+        if DEBUG:
+            print("  GSP: ", self.index, self.position, "node:", self.node)
         res = self.node.getSocketPosition(self.index, self.position)
-        if DEBUG: print("  res", res)
+        if DEBUG:
+            print("  res", res)
         return res
 
+    def setSocketPosition(self):
+        self.grSocket.setPos(
+            *self.node.getSocketPosition(self.index, self.position))
 
     def setConnectedEdge(self, edge=None):
         self.edge = edge
@@ -56,6 +61,7 @@ class Socket(Serializable):
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
-        if restore_id: self.id = data['id']
+        if restore_id:
+            self.id = data['id']
         hashmap[data['id']] = self
         return True

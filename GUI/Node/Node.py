@@ -28,18 +28,27 @@ class Node(Serializable):
         self.outputs = []
         counter = 0
         for item in inputs:
-            socket = Socket(node=self, index=counter, position=LEFT_BOTTOM, socket_type=item)
+            socket = Socket(node=self, index=counter,
+                            position=LEFT_BOTTOM, socket_type=item)
             counter += 1
             self.inputs.append(socket)
 
         counter = 0
         for item in outputs:
-            socket = Socket(node=self, index=counter, position=RIGHT_TOP, socket_type=item)
+            socket = Socket(node=self, index=counter,
+                            position=RIGHT_TOP, socket_type=item)
             counter += 1
             self.outputs.append(socket)
 
     def __str__(self):
         return "<Node %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
+
+    def updateSocketPos(self):
+        for item in self.inputs:
+            item.setSocketPosition()
+
+        for item in self.outputs:
+            item.setSocketPosition()
 
     @property
     def pos(self):
@@ -61,38 +70,47 @@ class Node(Serializable):
 
         if position in (LEFT_BOTTOM, RIGHT_BOTTOM):
             # start from bottom
-            y = self.grNode.height - self.grNode.edge_size - self.grNode._padding - index * self.socket_spacing
-        else :
+            y = self.grNode.height - self.grNode.edge_size - \
+                self.grNode._padding - index * self.socket_spacing
+        else:
             # start from top
-            y = self.grNode.title_height + self.grNode._padding + self.grNode.edge_size + index * self.socket_spacing
+            y = self.grNode.title_height + self.grNode._padding + \
+                self.grNode.edge_size + index * self.socket_spacing
 
         return [x, y]
-
 
     def updateConnectedEdges(self):
         for socket in self.inputs + self.outputs:
             if socket.hasEdge():
                 socket.edge.updatePositions()
 
-
     def remove(self):
-        if DEBUG: print("> Removing Node", self)
-        if DEBUG: print(" - remove all edges from sockets")
+        if DEBUG:
+            print("> Removing Node", self)
+        if DEBUG:
+            print(" - remove all edges from sockets")
         for socket in (self.inputs+self.outputs):
             if socket.hasEdge():
-                if DEBUG: print("    - removing from socket:", socket, "edge:", socket.edge)
+                if DEBUG:
+                    print("    - removing from socket:",
+                          socket, "edge:", socket.edge)
                 socket.edge.remove()
-        if DEBUG: print(" - remove grNode")
+        if DEBUG:
+            print(" - remove grNode")
         self.scene.grScene.removeItem(self.grNode)
         self.grNode = None
-        if DEBUG: print(" - remove node from the scene")
+        if DEBUG:
+            print(" - remove node from the scene")
         self.scene.removeNode(self)
-        if DEBUG: print(" - everything was done.")
+        if DEBUG:
+            print(" - everything was done.")
 
     def serialize(self):
         inputs, outputs = [], []
-        for socket in self.inputs: inputs.append(socket.serialize())
-        for socket in self.outputs: outputs.append(socket.serialize())
+        for socket in self.inputs:
+            inputs.append(socket.serialize())
+        for socket in self.outputs:
+            outputs.append(socket.serialize())
         return OrderedDict([
             ('id', self.id),
             ('title', self.title),
@@ -104,14 +122,17 @@ class Node(Serializable):
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
-        if restore_id: self.id = data['id']
+        if restore_id:
+            self.id = data['id']
         hashmap[data['id']] = self
 
         self.setPos(data['pos_x'], data['pos_y'])
         self.title = data['title']
 
-        data['inputs'].sort(key=lambda socket: socket['index'] + socket['position'] * 10000 )
-        data['outputs'].sort(key=lambda socket: socket['index'] + socket['position'] * 10000 )
+        data['inputs'].sort(
+            key=lambda socket: socket['index'] + socket['position'] * 10000)
+        data['outputs'].sort(
+            key=lambda socket: socket['index'] + socket['position'] * 10000)
 
         self.inputs = []
         for socket_data in data['inputs']:
@@ -126,6 +147,5 @@ class Node(Serializable):
                                 socket_type=socket_data['socket_type'])
             new_socket.deserialize(socket_data, hashmap, restore_id)
             self.outputs.append(new_socket)
-
 
         return True
