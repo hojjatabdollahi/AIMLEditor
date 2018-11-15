@@ -26,6 +26,7 @@ class Node(Serializable):
         # create socket for inputs and outputs
         self.inputs = []
         self.outputs = []
+
         counter = 0
         for item in inputs:
             socket = Socket(node=self, index=counter,
