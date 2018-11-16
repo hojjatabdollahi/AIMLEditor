@@ -1,61 +1,72 @@
-from Model.AIML import AIML
 import pickle
-from Model.Categories import Category
-from Model.Topics import Topic
 import xml.etree.ElementTree as ET
+from Model.Data import *
 
 
-def save(filename,aiml):
+def save(filename, aiml):
     with open(filename+'.aib', 'wb') as output:
         pickle.dump(aiml, output, pickle.HIGHEST_PROTOCOL)
 
+
 def restore(filename):
-    with open(filename+'.aib', 'rb') as input:
-       aiml2 = pickle.load(input)
+    with open(filename+'.aib', 'rb') as input_file:
+        aiml2 = pickle.load(input_file)
     return aiml2
+
 
 def exportAIML(filename, aiml):
     with open(filename+'.aiml', 'w') as output:
         output.write(str(aiml))
 
-def decode_tag(child):
-    pattern = ""
-    template = ""
-    that = ""
-    try:
-        pattern = child.find("pattern").text.strip()
-    except:
-        pass
-    try:
-        template = child.find("template").text.strip()
-    except:
-        pass
-    try:
-        that = child.find("that").text.strip()
-    except:
-        pass
-    return pattern, template, that
+
+tag_list = {"category": Category,
+            "aiml": AIML,
+            "topic": Topic,
+            "category": Category,
+            "pattern": Pattern,
+            "template": Template,
+            "condition": Condition,
+            "li": ConditionItem,
+            "set": Set,
+            "think": Think,
+            "oob": Oob,
+            "robot": Robot,
+            "options": Options,
+            "option": Option}
 
 
-def recursive_decoding(head, tag): # head is the object that we are adding the categories to (either a topic, or the general aiml)
-    for child in tag:
-        if child.tag == "category":
-            pattern, template, that = decode_tag(child)
-            head.categories.append(Category(pattern=pattern, template=template, that=that))
-        if child.tag == "topic":
-            topic = Topic(child.attrib["name"])
-            head.topics.append(topic)
-            recursive_decoding(topic, child)
+def decode_tag(tag_type):
+    if tag_type in tag_list:
+        return tag_list[tag_type]()
+    return False
 
-def importAIML(filename) -> AIML:
+
+# head is the object that we are adding the categories to (either a topic, or the general aiml)
+def recursive_decoding(head, tag_xml):
+    for child in tag_xml:
+        tag_obj = decode_tag(child.tag.lower())
+        if(tag_obj != False):
+            if child.text:
+                if child.text.strip():
+                    tag_obj.append(child.text.strip())
+            tag_obj.attrib = child.attrib
+            head.append(tag_obj)
+            if child.tail:
+                if child.tail.strip():
+                    head.append(child.tail.strip())
+        else:
+            head.append(ET.tostring(child, encoding="unicode"))
+        recursive_decoding(tag_obj, child)
+
+
+def importAIML(filename):
     tree = ET.parse(filename+".aiml")
     root = tree.getroot()
     aiml3 = None
-    if root.tag != "aiml":
+    if root.tag.lower() != "aiml":
         print("This is not an AIML file.")
+        print(root.tag)
     else:
-        aiml3 =  AIML(name="hojjat aiml")
+        aiml3 = AIML()
         recursive_decoding(aiml3, root)
     return aiml3
-# xml = str(aiml)
-# root = ET.fromstring(country_data_as_string)

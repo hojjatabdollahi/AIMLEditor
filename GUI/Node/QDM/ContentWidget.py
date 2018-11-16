@@ -1,7 +1,6 @@
 from collections import OrderedDict
 from GUI.Node.Utils.Serializable import Serializable
 from PyQt5.QtWidgets import *
-from Model.Categories import Category
 from PyQt5 import QtCore
 
 
@@ -17,20 +16,12 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-        if self.node.category is not None:
-            self.wdg_label = QLabel(str(self.node.category.id))
-            self.layout.addWidget(self.wdg_label)
-            self.layout.addWidget(QLabel("Pattern:"))
-            self.layout.addWidget(QDMTextEdit(self.node.category.pattern))
-            self.layout.addWidget(QLabel("Template:"))
-            self.layout.addWidget(QDMTextEdit(self.node.category.template))
-        else:
-            self.wdg_label = QLabel("Some Title")
-            self.layout.addWidget(self.wdg_label)
-            self.layout.addWidget(QLabel("Pattern:"))
-            self.layout.addWidget(QDMTextEdit(""))
-            self.layout.addWidget(QLabel("Template:"))
-            self.layout.addWidget(QDMTextEdit(""))
+        self.wdg_label = QLabel("Some Title")
+        self.layout.addWidget(self.wdg_label)
+        self.layout.addWidget(QLabel("Pattern:"))
+        self.layout.addWidget(QDMTextEdit(""))
+        self.layout.addWidget(QLabel("Template:"))
+        self.layout.addWidget(QDMTextEdit(""))
 
     def setEditingFlag(self, value):
         self.node.scene.grScene.views()[0].editingFlag = value
