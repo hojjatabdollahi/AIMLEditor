@@ -16,11 +16,11 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-        self.wdg_label = QLabel("Some Title")
+        self.wdg_label = QLabel("Category")
         self.layout.addWidget(self.wdg_label)
-        self.layout.addWidget(QLabel("Pattern:"))
+        self.layout.addWidget(QLabel("What Ryan Hears:"))
         self.layout.addWidget(QDMTextEdit(""))
-        self.layout.addWidget(QLabel("Template:"))
+        self.layout.addWidget(QLabel("What Ryan Says:"))
         self.layout.addWidget(QDMTextEdit(""))
 
     def setEditingFlag(self, value):

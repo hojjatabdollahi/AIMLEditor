@@ -50,7 +50,7 @@ class Topic(Tag):
 class Category(Tag):
     def __init__(self):
         super().__init__("Category", acceptable_tags=[
-            Pattern, Template, Think])
+            Pattern, Template, Think, That])
 
 
 class Pattern(Tag):
@@ -62,6 +62,10 @@ class Template(Tag):
     def __init__(self):
         super().__init__("Template", acceptable_tags=[
             Think, Condition, Oob, str])
+
+class That(Tag):
+    def __init__(self):
+        super().__init__("That", acceptable_tags=[str])
 
 
 class Condition(Tag):
