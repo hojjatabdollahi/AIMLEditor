@@ -16,6 +16,7 @@ def restore(filename):
 
 def exportAIML(filename, aiml):
     with open(filename+'.aiml', 'w') as output:
+
         output.write(str(aiml))
 
 
@@ -27,12 +28,17 @@ tag_list = {"category": Category,
             "template": Template,
             "condition": Condition,
             "li": ConditionItem,
+            "random": Random,
             "set": Set,
             "think": Think,
+            "that": That,
             "oob": Oob,
             "robot": Robot,
             "options": Options,
-            "option": Option}
+            "option": Option,
+            "image": Image,
+            "video": Video,
+            "filename": Filename}
 
 
 def decode_tag(tag_type):
@@ -60,7 +66,9 @@ def recursive_decoding(head, tag_xml):
 
 
 def importAIML(filename):
-    tree = ET.parse(filename+".aiml")
+    print("parsing file into tree")
+    tree = ET.parse(filename)
+    print("getting root of the tree")
     root = tree.getroot()
     aiml3 = None
     if root.tag.lower() != "aiml":
@@ -68,5 +76,6 @@ def importAIML(filename):
         print(root.tag)
     else:
         aiml3 = AIML()
+        print("decoding file")
         recursive_decoding(aiml3, root)
     return aiml3

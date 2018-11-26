@@ -34,47 +34,53 @@ class Tag():
 
 
 class AIML(Tag):
-    def __init__(self):
-        super().__init__("AIML", acceptable_tags=[Category, Topic])
+    def __init__(self, version="2.0"):
+        super().__init__("aiml", acceptable_tags=[Category, Topic], attrib={'version': version})
 
 
 class Topic(Tag):
     def __init__(self, name=""):
         if name != "":
-            super().__init__("Topic", acceptable_tags=[
+            super().__init__("topic", acceptable_tags=[
                 Category], attrib={'name': name})
         else:
-            super().__init__("Topic", acceptable_tags=[Category])
+            super().__init__("topic", acceptable_tags=[Category])
 
 
 class Category(Tag):
     def __init__(self):
-        super().__init__("Category", acceptable_tags=[
+        super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
 
 
 class Pattern(Tag):
     def __init__(self):
-        super().__init__("Pattern", acceptable_tags=[str])
+        super().__init__("pattern", acceptable_tags=[Set, str])
 
 
 class Template(Tag):
     def __init__(self):
-        super().__init__("Template", acceptable_tags=[
-            Think, Condition, Oob, str])
+        super().__init__("template", acceptable_tags=[
+            Think, Condition, Oob, Random, str])
+
 
 class That(Tag):
     def __init__(self):
-        super().__init__("That", acceptable_tags=[str])
+        super().__init__("that", acceptable_tags=[str])
+
+
+class Random(Tag):
+    def __init__(self):
+        super().__init__("random", acceptable_tags=[ConditionItem])
 
 
 class Condition(Tag):
     def __init__(self, name=""):
         if name != "":
-            super().__init__("Condition", attrib={
+            super().__init__("condition", attrib={
                 "name": name}, acceptable_tags={ConditionItem})
         else:
-            super().__init__("Condition", acceptable_tags={ConditionItem})
+            super().__init__("condition", acceptable_tags={ConditionItem})
 
 
 class ConditionItem(Tag):
@@ -89,36 +95,51 @@ class ConditionItem(Tag):
 class Set(Tag):
     def __init__(self, name=""):
         if name != "":
-            super().__init__("Set", attrib={
+            super().__init__("set", attrib={
                 'name': name}, acceptable_tags=[str])
         else:
-            super().__init__("Set", acceptable_tags=[str])
+            super().__init__("set", acceptable_tags=[str])
 
 
 class Think(Tag):
     def __init__(self):
-        super().__init__("Think", acceptable_tags=[Set, str])
+        super().__init__("think", acceptable_tags=[Set, str])
 
 
 class Oob(Tag):
     def __init__(self):
-        super().__init__("Oob", acceptable_tags=[Robot])
+        super().__init__("oob", acceptable_tags=[Robot])
 
 
 class Robot(Tag):
     def __init__(self):
-        super().__init__("Robot", acceptable_tags=[Options])
+        super().__init__("robot", acceptable_tags=[Options, Video, Image])
 
 
 class Options(Tag):
     def __init__(self):
-        super().__init__("Options", acceptable_tags=[Option])
+        super().__init__("options", acceptable_tags=[Option])
 
 
 class Option(Tag):
     def __init__(self, value=""):
         if value != "":
-            super().__init__("Option", acceptable_tags=[str])
+            super().__init__("option", acceptable_tags=[str])
             super().append(value)
         else:
-            super().__init__("Option", acceptable_tags=[str])
+            super().__init__("option", acceptable_tags=[str])
+
+
+class Video(Tag):
+    def __init__(self):
+        super().__init__("video", acceptable_tags=[Filename])
+
+
+class Image(Tag):
+    def __init__(self):
+        super().__init__("image", acceptable_tags=[Filename])
+
+
+class Filename(Tag):
+    def __init__(self):
+        super().__init__("filename", acceptable_tags=[str])

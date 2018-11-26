@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QDockWidget, QTextEdit, \
-                            QGridLayout, QLineEdit, QWidget, QPushButton
+from PyQt5.QtWidgets import QLabel, QDockWidget, QTextEdit, \
+                            QGridLayout, QLineEdit, QWidget, QPushButton, QFrame
 from Model.Data import *
 from PyQt5.QtCore import pyqtSignal
 
@@ -10,22 +10,30 @@ class DockerWidget(QDockWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        # create the category object
+        # initialize the category object
         self.cat = None
-        # create a pattern object
+        # initialize a pattern object
         self.pattern = None
         # create template object
-        self.template = None
-        # create that object
+        self.template = Template()
+        # initialize that object
         self.that = None
-        # create think object
+        # initialize think object
         self.think = None
-        # create oob object
+        # initialize oob object
         self.oob = None
-        # create robot object
+        # initialize robot object
         self.robot = None
         # initialize "create" button
         self.create = None
+        # initialize video and image tags
+        self.image = None
+        self.video = None
+        # initialize filename tag
+        self.mediaFileName = None
+        # initialize condition and condition item
+        self.condition = None
+        self.conItem = None
 
         self.initDocker()
 
@@ -34,20 +42,32 @@ class DockerWidget(QDockWidget):
 
         # initializing content inside widget
         self.setWindowTitle("Edit Category")
-        pattern = QLabel('What Ryan Hears:')
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        pattern = QLabel('What Ryan Hears (pattern):')
         that = QLabel('That (optional):')
-        template = QLabel('What Ryan Says:')
+        template = QLabel('What Ryan Says (template):')
         think = QLabel("Think")
+        video = QLabel("Video Filename: ")
+        image = QLabel("Image Filename: ")
 
         self.create = QPushButton("Create")
-        self.star = QPushButton("Add star tag at cursor")
-        set = QPushButton("Add set tag at cursor")
-        get = QPushButton("Add get tag at cursor")
+        starTemplate = QPushButton("Add star tag in template")
+        setTemplate = QPushButton("Add set tag in template")
+        getTemplate = QPushButton("Add get tag in template")
+        starThink = QPushButton("Add star tag in think")
+        setThink = QPushButton("Add set tag in think")
+        getThink = QPushButton("Add get tag in think")
+        addCondition = QPushButton("Add a condition to template")
+        self.addConItem = QPushButton("Add li tag to your condition")
+        addGetSent = QPushButton("Add a sentiment check to your template")
 
         self.patternEdit = QLineEdit()
         self.templateEdit = QTextEdit()
         self.thatEdit = QLineEdit()
-        self.thinkEdit = QLineEdit()
+        self.thinkEdit = QTextEdit()
+        self.videoEdit = QLineEdit()
+        self.imageEdit = QLineEdit()
 
         # Setting layout
         grid = QGridLayout()
@@ -65,44 +85,95 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.thatEdit, 2, 1)
         widgetToDock.layout().addWidget(think, 3, 0)
         widgetToDock.layout().addWidget(self.thinkEdit, 3, 1)
-        widgetToDock.layout().addWidget(template, 4, 0)
-        widgetToDock.layout().addWidget(self.templateEdit, 4, 1)
-        widgetToDock.layout().addWidget(self.star, 6, 0)
-        widgetToDock.layout().addWidget(set, 5, 1)
-        widgetToDock.layout().addWidget(get, 5, 0)
-        widgetToDock.layout().addWidget(self.create, 8, 1)
+        # widgetToDock.layout().addWidget(starThink, 4, 2)
+        # widgetToDock.layout().addWidget(setThink, 4, 1)
+        # widgetToDock.layout().addWidget(getThink, 4, 0)
+        widgetToDock.layout().addWidget(template, 5, 0)
+        widgetToDock.layout().addWidget(self.templateEdit, 5, 1)
+        # widgetToDock.layout().addWidget(starTemplate, 6, 2)
+        # widgetToDock.layout().addWidget(setTemplate, 6, 1)
+        # widgetToDock.layout().addWidget(getTemplate, 6, 0)
+        # widgetToDock.layout().addWidget(addCondition, 7, 0)
+        widgetToDock.layout().addWidget(addGetSent, 7, 1)
+        widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
+        widgetToDock.layout().addWidget(self.addConItem, 9, 1)
+        widgetToDock.layout().addWidget(video, 10, 0)
+        widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
+        widgetToDock.layout().addWidget(image, 11, 0)
+        widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
+        widgetToDock.layout().addWidget(self.create, 12, 1)
+
+        # hiding elements on init
+        self.addConItem.setVisible(False)
 
         # Click events
         self.create.clicked.connect(self.createClicked)
-        set.clicked.connect(self.setClicked)
-        get.clicked.connect(self.getClicked)
-        self.star.clicked.connect(self.starClicked)
+        setTemplate.clicked.connect(self.setClickedTemplate)
+        getTemplate.clicked.connect(self.getClickedTemplate)
+        starTemplate.clicked.connect(self.starClickedTemplate)
+        setThink.clicked.connect(self.setClickedThink)
+        getThink.clicked.connect(self.getClickedThink)
+        starThink.clicked.connect(self.starClickedThink)
+        addCondition.clicked.connect(self.conditionClicked)
+        self.addConItem.clicked.connect(self.conItemClicked)
+        addGetSent.clicked.connect(self.sentimentClicked)
 
+    def setClickedTemplate(self):
+        self.templateEdit.append("<set name=\"myVar\">Value of myVar</set>")
 
-    def setClicked(self):
-        self.templateEdit.append("<set name=\"myVar\"> Value of myVar</set>")
-
-    def getClicked(self):
+    def getClickedTemplate(self):
         self.templateEdit.append("<get name=\"myVar\" />")
 
-    def starClicked(self):
+    def starClickedTemplate(self):
         self.templateEdit.append("<star index=\"1\" />")
+
+    def setClickedThink(self):
+        self.thinkEdit.append("<set name=\"myVar\">Value of myVar</set>")
+
+    def getClickedThink(self):
+        self.thinkEdit.append("<get name=\"myVar\" />")
+
+    def starClickedThink(self):
+        self.thinkEdit.append("<star index=\"1\" />")
+
+    def conditionClicked(self):
+        self.addConItem.setVisible(True)
+
+    def conItemClicked(self):
+        self.addConItem.show()
+
+    def sentimentClicked(self):
+        self.thinkEdit.append("<set name=\"data\"> <star /> </set>")
+        self.templateEdit.append("<condition name=\"getsentiment\">\n"
+                                 "<li value=\"verypositive\"></li>\n"
+                                 "<li value=\"positive\"></li>\n"
+                                 "<li value=\"neutral\"></li>\n"
+                                 "<li value=\"negative\"></li>\n"
+                                 "<li value=\"verynegative\"></li>\n"
+                                 "</condition>")
 
     def createClicked(self):
         # Initialize tag objects
         self.cat = Category()
         self.pattern = Pattern()
-        self.template = Template()
+        # self.template = Template()
         self.that = That()
         self.think = Think()
         self.oob = Oob()
         self.robot = Robot()
+        self.image = Image()
+        self.video = Video()
+        self.mediaFileName = Filename()
+        self.condition = Condition()
+        self.conItem = ConditionItem()
 
-        # add some body to the pattern object
+        # getting text from input fields
         patternText = self.patternEdit.text()
         templateText = self.templateEdit.toPlainText()
         thatText = self.thatEdit.text()
-        thinkText = self.thinkEdit.text()
+        thinkText = self.thinkEdit.toPlainText()
+        videoText = self.videoEdit.text()
+        imageText = self.imageEdit.text()
 
         # appending content into cat object
         self.pattern.append(patternText)
@@ -118,13 +189,44 @@ class DockerWidget(QDockWidget):
             self.that.append(thatText)
             self.cat.append(self.that)
 
+        if videoText != '':
+            print("appending video filename")
+            self.mediaFileName.append(videoText)
+            print("appending filename tag to video tag")
+            self.video.append(self.mediaFileName)
+            print("appending video tag to robot tag")
+            self.robot.append(self.video)
+
+        if imageText != '':
+            self.mediaFileName.append(imageText)
+            self.image.append(self.mediaFileName)
+            self.robot.append(self.image)
+
         self.oob.append(self.robot)
         self.template.append(self.oob)
         self.cat.append(self.template)
 
-
-        # print the category (For Debugging)
-        print(self.cat)
+        # clear contents inside docker widget
+        self.patternEdit.clear()
+        self.thatEdit.clear()
+        self.patternEdit.clear()
+        self.thinkEdit.clear()
+        self.templateEdit.clear()
+        self.videoEdit.clear()
+        self.imageEdit.clear()
 
         # emitting signal
         self.catCreated.emit(self.cat)
+
+        # clearing tag objects
+        self.cat = None
+        self.pattern = None
+        self.that = None
+        self.think = None
+        self.oob = None
+        self.robot = None
+        self.image = None
+        self.video = None
+        self.mediaFileName = None
+        self.condition = None
+        self.conItem = None

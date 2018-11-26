@@ -1,10 +1,11 @@
 import os
 import json
-from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, QMessageBox, QApplication, QFileDialog, QDockWidget, QTextEdit, QHBoxLayout, QVBoxLayout, \
-                            QGridLayout, QLineEdit, QWidget, QPushButton
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, QMessageBox, QApplication, QFileDialog, QTextEdit
+from PyQt5.QtCore import Qt, pyqtSlot, QFileInfo
 from GUI.EditorWidget import EditorWidget
 from GUI.DockerWidget import DockerWidget
+from Model.Data import *
+import Utils.Storage as Storage
 
 
 class EditorWindow(QMainWindow):
@@ -13,6 +14,7 @@ class EditorWindow(QMainWindow):
 
         self.filename = None
         self.editSpace = None
+        self.aiml = AIML()
 
         self.initUI()
 
@@ -31,16 +33,17 @@ class EditorWindow(QMainWindow):
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(self.createAct('&New', 'Ctrl+N', "Create new graph", self.onFileNew))
         fileMenu.addSeparator()
-        fileMenu.addAction(self.createAct('&Open', 'Ctrl+O', "Open file", self.onFileOpen))
-        fileMenu.addAction(self.createAct('&Save', 'Ctrl+S', "Save file", self.onFileSave))
-        fileMenu.addAction(self.createAct('Save &As...', 'Ctrl+Shift+S', "Save file as...", self.onFileSaveAs))
+        # fileMenu.addAction(self.createAct('&Open', 'Ctrl+O', "Open file", self.onFileOpen))
+        # fileMenu.addAction(self.createAct('&Save', 'Ctrl+S', "Save file", self.onFileSave))
+        # fileMenu.addAction(self.createAct('Save &As...', 'Ctrl+Shift+S', "Save file as...", self.onFileSaveAs))
+        fileMenu.addAction(self.createAct('&Export', 'Ctrl+Shift+E', 'Export File', self.onFileExport))
+        fileMenu.addAction(self.createAct('&Import', 'Ctrl+Shift+I', 'Import File', self.onFileImport))
         fileMenu.addSeparator()
         fileMenu.addAction(self.createAct('E&xit', 'Ctrl+Q', "Exit application", self.close))
 
         editMenu = menubar.addMenu('&Edit')
         editMenu.addAction(self.createAct('&Undo', 'Ctrl+Z', "Undo last operation", self.onEditUndo))
         editMenu.addAction(self.createAct('&Redo', 'Ctrl+Shift+Z', "Redo last operation", self.onEditRedo))
-        editMenu.addSeparator()
         editMenu.addAction(self.createAct('Cu&t', 'Ctrl+X', "Cut to clipboard", self.onEditCut))
         editMenu.addAction(self.createAct('&Copy', 'Ctrl+C', "Copy to clipboard", self.onEditCopy))
         editMenu.addAction(self.createAct('&Paste', 'Ctrl+V', "Paste from clipboard", self.onEditPaste))
@@ -48,30 +51,6 @@ class EditorWindow(QMainWindow):
         editMenu.addAction(self.createAct('&Delete', 'Del', "Delete selected items", self.onEditDelete))
         editMenu.addSeparator()
         editMenu.addAction(self.createAct('&Add a Node', 'Ctrl+A', "Add a new node", self.onEditAdd))
-
-        # Create Widget that contains fields, it get's added to dockable widget, this works, trying to move it into a new class
-        # Successfully moved this code into separate class DockerWidget
-        # pattern = QLabel('What Ryan Hears:')
-        # that = QLabel('That (optional):')
-        # template = QLabel('What Ryan Says:')
-        # create = QPushButton("Create")
-        # patternEdit = QLineEdit()
-        # templateEdit = QLineEdit()
-        # thatEdit = QLineEdit()
-        # editCats = QDockWidget("Edit Category", self)
-        # grid = QGridLayout()
-        # editCats.setLayout(grid)
-        # self.dockedWidget = QWidget(self)
-        # editCats.setWidget(self.dockedWidget)
-        # self.dockedWidget.setLayout(QGridLayout())
-        # self.dockedWidget.layout().addWidget(pattern, 1, 0)
-        # self.dockedWidget.layout().addWidget(patternEdit, 1, 1)
-        # self.dockedWidget.layout().addWidget(that, 2, 0)
-        # self.dockedWidget.layout().addWidget(thatEdit, 2, 1)
-        # self.dockedWidget.layout().addWidget(template, 3, 0)
-        # self.dockedWidget.layout().addWidget(templateEdit, 3, 1)
-        # self.dockedWidget.layout().addWidget(create, 4, 1)
-        # self.addDockWidget(Qt.LeftDockWidgetArea, editCats)
 
 
         # create dockable widget to have as place to write content in categories
@@ -110,10 +89,11 @@ class EditorWindow(QMainWindow):
         docker.catCreated.connect(self.categoryCreated)
 
     # slot function for a category being created and displaying on editSpace
+    @pyqtSlot(Tag)
     def categoryCreated(self, cat):
         print("made it to slot")
-        print(cat)
-        self.editSpace.setText(str(cat))
+        self.aiml.append(cat)
+        self.editSpace.setText(str(self.aiml))
 
     def changeTitle(self):
         title = "Node Editor - "
@@ -153,9 +133,6 @@ class EditorWindow(QMainWindow):
 
         return True
 
-    def onCreate(self, docker):
-        self.editSpace.setText(str(docker.cat))
-
     def onScenePosChanged(self, x, y):
         self.status_mouse_pos.setText("Scene Pos: [%d, %d]" % (x, y))
 
@@ -181,6 +158,20 @@ class EditorWindow(QMainWindow):
         self.centralWidget().scene.saveToFile(self.filename)
         self.statusBar().showMessage("Successfully saved %s" % self.filename)
         return True
+
+    def onFileExport(self):
+        fname, filter = QFileDialog.getSaveFileName(self, 'Export to file')
+        self.filename = QFileInfo(fname).fileName() # parsing out the filename from the path
+        Storage.exportAIML(self.filename, self.aiml)  # save as an aiml file
+
+    def onFileImport(self):
+        fname, filter = QFileDialog.getOpenFileName(self, "Import File")
+        print("fname: " + fname)
+        # fname = QFileInfo(fname).fileName() # parsing out the filename from the path
+        # self.filename = os.path.splitext(os.path.basename(fname))[0] # removing extension from filename
+        self.aiml = Storage.importAIML(fname) # import the aiml file
+        print("file import successful")
+        self.editSpace.setText(str(self.aiml))
 
     def onFileSaveAs(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Save graph to file')
