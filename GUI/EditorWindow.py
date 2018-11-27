@@ -1,11 +1,13 @@
 import os
 import json
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, QMessageBox, QApplication, QFileDialog, QTextEdit
+from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, pyqtSlot, QFileInfo
 from GUI.EditorWidget import EditorWidget
 from GUI.DockerWidget import DockerWidget
 from Model.Data import *
 import Utils.Storage as Storage
+import Utils.AIMLHighlighter as HL
 
 
 class EditorWindow(QMainWindow):
@@ -61,9 +63,7 @@ class EditorWindow(QMainWindow):
 
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QTextEdit(self)
-        self.setCentralWidget(self.editSpace)
-
-        # connecting slot for category creation
+        highlight = HL.AIMLHIghlighter(self.editSpace)
         self.make_connection(docker)
 
 
