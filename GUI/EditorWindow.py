@@ -64,6 +64,9 @@ class EditorWindow(QMainWindow):
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QTextEdit(self)
         highlight = HL.AIMLHIghlighter(self.editSpace)
+        self.setCentralWidget(self.editSpace)
+
+        # connecting slot for category creation
         self.make_connection(docker)
 
 
