@@ -34,8 +34,8 @@ STYLES = {
     'operator': format('magenta', 'bold'),
     'brace': format('red'),
     # 'defclass': format([220, 220, 255], 'bold'),
-    'string': format([20, 110, 100], 'bold'),
-    'string2': format([30, 120, 110]),
+    'string': format('darkCyan'),
+    'string2': format('darkCyan'),
     'comment': format([128, 128, 128]),
     # 'self': format([150, 85, 140], 'italic'),
     'numbers': format('green'),
@@ -95,7 +95,7 @@ class AIMLHIghlighter (QSyntaxHighlighter):
         rules = []
 
         # Keyword, operator, and brace rules
-        rules += [(r'(<|</)\b%s\b(>|/>)' % w, 0, STYLES['keyword'])
+        rules += [(r'(<|</)\b%s\b' % w, 0, STYLES['keyword'])
                   for w in AIMLHIghlighter.keywords]
         rules += [(r'%s' % o, 0, STYLES['operator'])
                   for o in AIMLHIghlighter.operators]
@@ -110,8 +110,10 @@ class AIMLHIghlighter (QSyntaxHighlighter):
             # # 'self'
             # (r'\bself\b', 0, STYLES['self']),
             #
-            # # Double-quoted string, possibly containing escape sequences
-            # (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
+
+            # Double-quoted string, possibly containing escape sequences
+            (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
+
             # # Single-quoted string, possibly containing escape sequences
             # (r"'[^'\\]*(\\.[^'\\]*)*'", 0, STYLES['string']),
             #

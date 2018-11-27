@@ -168,14 +168,11 @@ class EditorWindow(QMainWindow):
 
     def onFileExport(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Export to file')
-        self.filename = QFileInfo(fname).fileName() # parsing out the filename from the path
         Storage.exportAIML(fname, self.editSpace.aiml)  # save as an aiml file
 
     def onFileImport(self):
         fname, filter = QFileDialog.getOpenFileName(self, "Import File")
         print("fname: " + fname)
-        # fname = QFileInfo(fname).fileName() # parsing out the filename from the path
-        # self.filename = os.path.splitext(os.path.basename(fname))[0] # removing extension from filename
         self.editSpace.aiml = Storage.importAIML(fname) # import the aiml file
         print("file import successful")
         self.editSpace.setPlainText(str(self.editSpace.aiml))
