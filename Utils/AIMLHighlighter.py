@@ -30,15 +30,15 @@ def format(color, style=''):
 
 # Syntax styles that can be shared by all languages
 STYLES = {
-    'keyword': format('magenta', 'bold'),
+    'keyword': format('blue', 'bold'),
     'operator': format([150, 150, 150]),
-    'brace': format('black'),
+    'brace': format('red'),
     'defclass': format([220, 220, 255], 'bold'),
     'string': format([20, 110, 100], 'bold'),
     'string2': format([30, 120, 110]),
     'comment': format([128, 128, 128]),
     'self': format([150, 85, 140], 'italic'),
-    'numbers': format([100, 150, 190]),
+    'numbers': format('dark blue'),
 }
 
 class AIMLHIghlighter (QSyntaxHighlighter):
@@ -63,7 +63,9 @@ class AIMLHIghlighter (QSyntaxHighlighter):
         "option",
         "image",
         "video",
-        "filename"
+        "filename",
+        "get",
+        "srai"
     ]
 
     # AIML operators
@@ -117,7 +119,7 @@ class AIMLHIghlighter (QSyntaxHighlighter):
             (r'\bclass\b\s*(\w+)', 1, STYLES['defclass']),
 
             # From '#' until a newline
-            (r'#[^\n]*', 0, STYLES['comment']),
+            (r'<!--[^\n]*-->', 0, STYLES['comment']),
 
             # Numeric literals
             (r'\b[+-]?[0-9]+[lL]?\b', 0, STYLES['numbers']),

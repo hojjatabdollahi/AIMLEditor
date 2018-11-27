@@ -64,6 +64,7 @@ class EditorWindow(QMainWindow):
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QTextEdit(self)
         highlight = HL.AIMLHIghlighter(self.editSpace)
+        self.editSpace.setStyleSheet("background-color: rgb(240, 240, 240);")
         self.setCentralWidget(self.editSpace)
 
         # connecting slot for category creation
