@@ -30,7 +30,8 @@ class DockerWidget(QDockWidget):
         self.image = None
         self.video = None
         # initialize filename tag
-        self.mediaFileName = None
+        self.videoFileName = None
+        self.imageFileName = None
         # initialize condition and condition item
         self.condition = None
         self.conItem = None
@@ -156,14 +157,15 @@ class DockerWidget(QDockWidget):
         # Initialize tag objects
         self.cat = Category()
         self.pattern = Pattern()
-        # self.template = Template()
+        self.template = Template()
         self.that = That()
         self.think = Think()
         self.oob = Oob()
         self.robot = Robot()
         self.image = Image()
         self.video = Video()
-        self.mediaFileName = Filename()
+        self.videoFileName = Filename()
+        self.imageFileName = Filename()
         self.condition = Condition()
         self.conItem = ConditionItem()
 
@@ -191,15 +193,15 @@ class DockerWidget(QDockWidget):
 
         if videoText != '':
             print("appending video filename")
-            self.mediaFileName.append(videoText)
+            self.videoFileName.append(videoText)
             print("appending filename tag to video tag")
-            self.video.append(self.mediaFileName)
+            self.video.append(self.videoFileName)
             print("appending video tag to robot tag")
             self.robot.append(self.video)
 
         if imageText != '':
-            self.mediaFileName.append(imageText)
-            self.image.append(self.mediaFileName)
+            self.imageFileName.append(imageText)
+            self.image.append(self.imageFileName)
             self.robot.append(self.image)
 
         self.oob.append(self.robot)

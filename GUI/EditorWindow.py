@@ -8,6 +8,7 @@ from GUI.DockerWidget import DockerWidget
 from Model.Data import *
 import Utils.Storage as Storage
 import Utils.AIMLHighlighter as HL
+from GUI.CodeEditor import *
 
 
 class EditorWindow(QMainWindow):
@@ -62,13 +63,15 @@ class EditorWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
 
         # Setting main editing area where Files will be displayed and can be edited
-        self.editSpace = QTextEdit(self)
-        highlight = HL.AIMLHIghlighter(self.editSpace)
-        self.editSpace.setStyleSheet("background-color: rgb(240, 240, 240);")
+        self.editSpace = QCodeEditor(docker)
+        #self.editSpace = QTextEdit()
+        #highlight = HL.AIMLHIghlighter(self.editSpace)
+        #self.editSpace.setStyleSheet("background-color: rgb(240, 240, 240);")
         self.setCentralWidget(self.editSpace)
 
         # connecting slot for category creation
-        self.make_connection(docker)
+        # self.make_connection(docker)
+
 
 
         # create node editor widget (visualization of categories)
@@ -86,18 +89,18 @@ class EditorWindow(QMainWindow):
         # self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Program-R AIML Editor")
         # self.changeTitle()
-        self.show()
+        self.showMaximized()
 
-    # function to make connection with signal in DockerWidget
-    def make_connection(self, docker):
-        docker.catCreated.connect(self.categoryCreated)
-
-    # slot function for a category being created and displaying on editSpace
-    @pyqtSlot(Tag)
-    def categoryCreated(self, cat):
-        print("made it to slot")
-        self.aiml.append(cat)
-        self.editSpace.setText(str(self.aiml))
+    # # function to make connection with signal in DockerWidget
+    # def make_connection(self, docker):
+    #     docker.catCreated.connect(self.categoryCreated)
+    #
+    # # slot function for a category being created and displaying on editSpace
+    # @pyqtSlot(Tag)
+    # def categoryCreated(self, cat):
+    #     print("made it to slot")
+    #     self.aiml.append(cat)
+    #     self.editSpace.setText(str(self.aiml))
 
     def changeTitle(self):
         title = "Node Editor - "
@@ -175,7 +178,7 @@ class EditorWindow(QMainWindow):
         # self.filename = os.path.splitext(os.path.basename(fname))[0] # removing extension from filename
         self.aiml = Storage.importAIML(fname) # import the aiml file
         print("file import successful")
-        self.editSpace.setText(str(self.aiml))
+        self.editSpace.setPlainText(str(self.aiml))
 
     def onFileSaveAs(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Save graph to file')

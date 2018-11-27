@@ -61,7 +61,7 @@ class Pattern(Tag):
 class Template(Tag):
     def __init__(self):
         super().__init__("template", acceptable_tags=[
-            Think, Condition, Oob, Random, str])
+            Set, Think, Condition, Oob, Random, str])
 
 
 class That(Tag):
@@ -87,9 +87,9 @@ class ConditionItem(Tag):
     def __init__(self, value=""):
         if value != "":
             super().__init__("li", attrib={
-                "value": value}, acceptable_tags=[Oob, str])
+                "value": value}, acceptable_tags=[Oob, Set, str])
         else:
-            super().__init__("li", acceptable_tags=[Oob, str])
+            super().__init__("li", acceptable_tags=[Oob, Set, str])
 
 
 class Set(Tag):

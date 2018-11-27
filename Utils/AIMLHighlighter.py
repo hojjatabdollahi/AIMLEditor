@@ -2,7 +2,7 @@
 This code was taken from:
 https://github.com/art1415926535/PyQt5-syntax-highlighting
 
-his example is used for Python Code. I modified it for AIML (and XML variant)
+his example is used for Python Code. I modified it for AIML (an XML variant)
 """
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QFont, QTextCharFormat
@@ -31,14 +31,14 @@ def format(color, style=''):
 # Syntax styles that can be shared by all languages
 STYLES = {
     'keyword': format('blue', 'bold'),
-    'operator': format([150, 150, 150]),
+    'operator': format('magenta', 'bold'),
     'brace': format('red'),
-    'defclass': format([220, 220, 255], 'bold'),
+    # 'defclass': format([220, 220, 255], 'bold'),
     'string': format([20, 110, 100], 'bold'),
     'string2': format([30, 120, 110]),
     'comment': format([128, 128, 128]),
-    'self': format([150, 85, 140], 'italic'),
-    'numbers': format('dark blue'),
+    # 'self': format([150, 85, 140], 'italic'),
+    'numbers': format('green'),
 }
 
 class AIMLHIghlighter (QSyntaxHighlighter):
@@ -65,7 +65,8 @@ class AIMLHIghlighter (QSyntaxHighlighter):
         "video",
         "filename",
         "get",
-        "srai"
+        "srai",
+        "star"
     ]
 
     # AIML operators
@@ -86,14 +87,15 @@ class AIMLHIghlighter (QSyntaxHighlighter):
 
         # Multi-line strings (expression, flag, style)
         # FIXME: The triple-quotes in these two lines will mess up the
-        # syntax highlighting from this point onward
+        # syntax highlighting from this point onward (this is an issue if we were doing python syntax. Simply an
+        # artifact that was left from the code that this was based off of)
         self.tri_single = (QRegExp("'''"), 1, STYLES['string2'])
         self.tri_double = (QRegExp('"""'), 2, STYLES['string2'])
 
         rules = []
 
         # Keyword, operator, and brace rules
-        rules += [(r'\b%s\b' % w, 0, STYLES['keyword'])
+        rules += [(r'(<|</)\b%s\b(>|/>)' % w, 0, STYLES['keyword'])
                   for w in AIMLHIghlighter.keywords]
         rules += [(r'%s' % o, 0, STYLES['operator'])
                   for o in AIMLHIghlighter.operators]
@@ -105,18 +107,18 @@ class AIMLHIghlighter (QSyntaxHighlighter):
 
         # All other rules
         rules += [
-            # 'self'
-            (r'\bself\b', 0, STYLES['self']),
-
-            # Double-quoted string, possibly containing escape sequences
-            (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
-            # Single-quoted string, possibly containing escape sequences
-            (r"'[^'\\]*(\\.[^'\\]*)*'", 0, STYLES['string']),
-
-            # 'def' followed by an identifier
-            (r'\bdef\b\s*(\w+)', 1, STYLES['defclass']),
-            # 'class' followed by an identifier
-            (r'\bclass\b\s*(\w+)', 1, STYLES['defclass']),
+            # # 'self'
+            # (r'\bself\b', 0, STYLES['self']),
+            #
+            # # Double-quoted string, possibly containing escape sequences
+            # (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
+            # # Single-quoted string, possibly containing escape sequences
+            # (r"'[^'\\]*(\\.[^'\\]*)*'", 0, STYLES['string']),
+            #
+            # # 'def' followed by an identifier
+            # (r'\bdef\b\s*(\w+)', 1, STYLES['defclass']),
+            # # 'class' followed by an identifier
+            # (r'\bclass\b\s*(\w+)', 1, STYLES['defclass']),
 
             # From '#' until a newline
             (r'<!--[^\n]*-->', 0, STYLES['comment']),
