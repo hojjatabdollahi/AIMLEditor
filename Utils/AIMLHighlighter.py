@@ -31,8 +31,8 @@ def format(color, style=''):
 # Syntax styles that can be shared by all languages
 STYLES = {
     'keyword': format('blue', 'bold'),
-    'operator': format('magenta', 'bold'),
-    'brace': format('red'),
+    'operator': format([50, 175, 50]),
+    'brace': format('darkBlue'),
     # 'defclass': format([220, 220, 255], 'bold'),
     'string': format('darkCyan'),
     'string2': format('darkCyan'),
