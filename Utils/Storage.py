@@ -56,10 +56,13 @@ def recursive_decoding(head, tag_xml):
                 if child.text.strip():
                     tag_obj.append(child.text.strip())
             tag_obj.attrib = child.attrib
-            head.append(tag_obj)
+            try:
+                head.append(tag_obj)
+            except Exception as ex:
+                print(ex)
             if child.tail:
                 if child.tail.strip():
-                    head.append(child.tail.strip())
+                    head.append(child.tail.strip()) #TODO: remove the extra whitespaces in the text
         else:
             head.append(ET.tostring(child, encoding="unicode"))
         recursive_decoding(tag_obj, child)

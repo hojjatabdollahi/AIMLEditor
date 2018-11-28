@@ -71,7 +71,7 @@ class That(Tag):
 
 class Random(Tag):
     def __init__(self):
-        super().__init__("random", acceptable_tags=[ConditionItem])
+        super().__init__("random", acceptable_tags=[ConditionItem, Oob])
 
 
 class Condition(Tag):
