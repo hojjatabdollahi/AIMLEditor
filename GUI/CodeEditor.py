@@ -228,6 +228,8 @@ class QCodeEditor(QPlainTextEdit):
         self.aiml = AIML()
         self.make_connection(docker)
 
+        self.setReadOnly(True)
+
         if DISPLAY_LINE_NUMBERS:
             self.number_bar = self.NumberBar(self)
 

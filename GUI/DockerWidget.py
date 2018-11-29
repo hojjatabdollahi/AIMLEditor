@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QLabel, QDockWidget, QTextEdit, \
                             QGridLayout, QLineEdit, QWidget, QPushButton, QFrame
-from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage
+from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage, QTextDocument
 from Model.Data import *
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QUrl
 from GUI.ConditionIcon import *
 
 class DockerWidget(QDockWidget):
@@ -142,9 +142,19 @@ class DockerWidget(QDockWidget):
     def conditionClicked(self):
         print("condition clicked")
         conIcon = ConditionIcon()
-        #conIcon = QImage('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png')
-        self.templateEdit
-        print("icon added")
+        document = QTextDocument()
+        print("document created")
+        document.addResource(QTextDocument.ImageResource, QUrl('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png'), conIcon)
+        print("resource added")
+        cursor = self.templateEdit.textCursor()
+        print("created cursor")
+        cursor.insertImage(conIcon)
+        print("inserted image to cursor")
+        cursor.insertBlock()
+        self.templateEdit.setDocument(document)
+        # self.templateEdit.setTextCursor(cursor)
+        # print("cursor added to template edit")
+        # print("icon added")
 
         #self.addConItem.setVisible(True)
 
