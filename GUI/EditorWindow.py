@@ -1,10 +1,11 @@
 import os
 import json
-from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, QMessageBox, QApplication, QFileDialog, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, QMessageBox, QApplication, QFileDialog, QTextEdit, QVBoxLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, pyqtSlot, QFileInfo
 from GUI.EditorWidget import EditorWidget
 from GUI.DockerWidget import DockerWidget
+from GUI.ConditionTable import ConditionTable
 from Model.Data import *
 import Utils.Storage as Storage
 import Utils.AIMLHighlighter as HL
@@ -61,6 +62,12 @@ class EditorWindow(QMainWindow):
         docker = None
         docker = DockerWidget(docker)
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
+
+        # create table widget for conditions (displaying for debugging purposes
+        # table = None
+        # table = ConditionTable(table)
+        # self.layout = QVBoxLayout()
+        # self.layout.addWidget(table)
 
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QCodeEditor(docker)

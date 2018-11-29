@@ -16,7 +16,7 @@ def restore(filename):
 
 def exportAIML(filename, aiml):
     with open(filename+'.aiml', 'w') as output:
-
+        output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         output.write(str(aiml))
 
 

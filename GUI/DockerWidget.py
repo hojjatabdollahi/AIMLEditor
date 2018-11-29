@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import QLabel, QDockWidget, QTextEdit, \
                             QGridLayout, QLineEdit, QWidget, QPushButton, QFrame
+from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage
 from Model.Data import *
 from PyQt5.QtCore import pyqtSignal
+from GUI.ConditionIcon import *
 
 class DockerWidget(QDockWidget):
 
@@ -97,7 +99,7 @@ class DockerWidget(QDockWidget):
         # widgetToDock.layout().addWidget(addCondition, 7, 0)
         widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
-        widgetToDock.layout().addWidget(self.addConItem, 9, 1)
+        #widgetToDock.layout().addWidget(self.addConItem, 9, 1)
         widgetToDock.layout().addWidget(video, 10, 0)
         widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
         widgetToDock.layout().addWidget(image, 11, 0)
@@ -138,7 +140,13 @@ class DockerWidget(QDockWidget):
         self.thinkEdit.append("<star index=\"1\" />")
 
     def conditionClicked(self):
-        self.addConItem.setVisible(True)
+        print("condition clicked")
+        conIcon = ConditionIcon()
+        #conIcon = QImage('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png')
+        self.templateEdit
+        print("icon added")
+
+        #self.addConItem.setVisible(True)
 
     def conItemClicked(self):
         self.addConItem.show()
