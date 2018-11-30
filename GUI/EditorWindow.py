@@ -162,17 +162,17 @@ class EditorWindow(QMainWindow):
         print("file path: " + fname)
         self.filename = os.path.splitext(fname)[0] # removing extension from path name
         print('got file name: ' + self.filename)
-        self.aiml = Storage.restore(self.filename)  # restore the pickle
+        self.editSpace.aiml = Storage.restore(self.filename)  # restore the pickle
         print("restored pickle file")
         print("printing aiml file...")
-        print(self.aiml)
-        self.editSpace.setPlainText(str(self.aiml))
+        print(self.editSpace.aiml)
+        self.editSpace.setPlainText(str(self.editSpace.aiml))
         print("appended content to editSpace")
 
 
     def onFileSave(self):
         if self.filename is None: return self.onFileSaveAs()
-        self.centralWidget().scene.saveToFile(self.filename)
+        Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
         self.statusBar().showMessage("Successfully saved %s" % self.filename)
         return True
 
