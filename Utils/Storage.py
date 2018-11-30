@@ -1,12 +1,13 @@
 import pickle
 import xml.etree.ElementTree as ET
 from Model.Data import *
-from PyQt5.QtWidgets import QErrorMessage, QWidget
+from PyQt5.QtWidgets import QErrorMessage
 
 
 def handleError(error):
     em = QErrorMessage.qtHandler()
     em.showMessage(str(error))
+
 
 def save(filename, aiml):
     try:

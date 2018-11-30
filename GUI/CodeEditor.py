@@ -34,7 +34,7 @@ if pyQtVersion == "PyQt4":
                              QTextFormat, QTextCharFormat)
 else:
     from PyQt5.QtCore import Qt, QRect, QRegExp, pyqtSlot, QFileInfo
-    from PyQt5.QtWidgets import QWidget, QTextEdit, QPlainTextEdit
+    from PyQt5.QtWidgets import QWidget, QTextEdit, QPlainTextEdit, QErrorMessage
     from PyQt5.QtGui import (QColor, QPainter, QFont, QSyntaxHighlighter,
                              QTextFormat, QTextCharFormat)
     from Model.Data import *
@@ -119,6 +119,10 @@ else:
 #             self.setFormat(startIndex, commentLength, self.valueFormat)
 #             startIndex = self.valueStartExpression.indexIn(text, startIndex + commentLength);
 
+
+def handleError(error):
+    em = QErrorMessage.qtHandler()
+    em.showMessage(str(error))
 
 class QCodeEditor(QPlainTextEdit):
     '''
@@ -270,7 +274,21 @@ class QCodeEditor(QPlainTextEdit):
     # slot function for a category being created and displaying on editSpace
     @pyqtSlot(Tag)
     def categoryCreated(self, cat):
-        print("made it to slot")
-        self.aiml.append(cat)
-        print("appended category to AIML object")
-        self.setPlainText(str(self.aiml))
+        try:
+            print("made it to slot")
+            if self.aiml is not None:
+                print("Ok to add category")
+                self.aiml.append(cat)
+                print("appended category to AIML object")
+                self.setPlainText(str(self.aiml))
+            else:
+                print("CodeEditor is equal to None")
+                self.aiml = AIML()
+                self.clear()
+                self.aiml.append(cat)
+                print("appended category to AIML object")
+                self.setPlainText(str(self.aiml))
+        except Exception as ex:
+            handleError(ex)
+            print("exception caught!")
+            print(ex)

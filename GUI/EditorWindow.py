@@ -151,10 +151,12 @@ class EditorWindow(QMainWindow):
         self.status_mouse_pos.setText("Scene Pos: [%d, %d]" % (x, y))
 
     def onFileNew(self):
-        if self.maybeSave():
-            self.centralWidget().scene.clear()
-            self.filename = None
-            self.changeTitle()
+        self.editSpace.aiml = AIML()
+        self.editSpace.clear()
+        # if self.maybeSave():
+        #     self.centralWidget().scene.clear()
+        #     self.filename = None
+        #     self.changeTitle()
 
 
     def onFileOpen(self):
