@@ -1,16 +1,22 @@
-from PyQt5.QtGui import QImage, QPixmap, QTextCursor, QTextImageFormat
-from PyQt5.QtWidgets import QLabel
+# from PyQt5.QtGui import QImage, QPixmap, QTextCursor, QTextImageFormat
+# from PyQt5.QtWidgets import QLabel
+# import string
+#
+# class ConditionIcon(string):
+#     def __init__(self):
+#         self = "<table>" \
+#                "<tr>" \
+#                "<th>Condition</th>" \
+#                "<th>Variable</th>" \
+#                "<th>Response</th>" \
+#                "</tr>" \
+#                "</table>"
 
-
-class ConditionIcon(QImage):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.initIcon()
-
-    def initIcon(self):
-        icon = QPixmap('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png')
-        self = icon.toImage()
-
-        # imageFormat = QTextImageFormat()
-        # imageFormat.setName('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png')
+    # def initIcon(self):
+    #     self = "<table>" \
+    #            "<tr>" \
+    #            "<th>Condition</th>" \
+    #            "<th>Variable</th>" \
+    #            "<th>Response</th>" \
+    #            "</tr>" \
+    #            "</table>"

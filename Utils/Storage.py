@@ -9,9 +9,13 @@ def save(filename, aiml):
 
 
 def restore(filename):
-    with open(filename+'.aib', 'rb') as input_file:
-        aiml2 = pickle.load(input_file)
-    return aiml2
+    try:
+        with open(filename+'.aib', 'rb') as input_file:
+            aiml2 = pickle.load(input_file)
+        return aiml2
+    except Exception as ex:
+        print("exception caught!")
+        print(ex)
 
 
 def exportAIML(filename, aiml):
@@ -49,36 +53,43 @@ def decode_tag(tag_type):
 
 # head is the object that we are adding the categories to (either a topic, or the general aiml)
 def recursive_decoding(head, tag_xml):
-    for child in tag_xml:
-        tag_obj = decode_tag(child.tag.lower())
-        if(tag_obj != False):
-            if child.text:
-                if child.text.strip():
-                    tag_obj.append(child.text.strip())
-            tag_obj.attrib = child.attrib
-            try:
-                head.append(tag_obj)
-            except Exception as ex:
-                print(ex)
-            if child.tail:
-                if child.tail.strip():
-                    head.append(child.tail.strip()) #TODO: remove the extra whitespaces in the text
-        else:
-            head.append(ET.tostring(child, encoding="unicode"))
-        recursive_decoding(tag_obj, child)
+    try:
+        for child in tag_xml:
+            tag_obj = decode_tag(child.tag.lower())
+            if(tag_obj != False):
+                if child.text:
+                    if child.text.strip():
+                        tag_obj.append(child.text.strip())
+                tag_obj.attrib = child.attrib
+                try:
+                    head.append(tag_obj)
+                except Exception as ex:
+                    print(ex)
+                if child.tail:
+                    if child.tail.strip():
+                        head.append(child.tail.strip()) #TODO: remove the extra whitespaces in the text
+            else:
+                head.append(ET.tostring(child, encoding="unicode"))
+            recursive_decoding(tag_obj, child)
+    except Exception as ex:
+        print(ex)
 
 
 def importAIML(filename):
     print("parsing file into tree")
-    tree = ET.parse(filename)
-    print("getting root of the tree")
-    root = tree.getroot()
-    aiml3 = None
-    if root.tag.lower() != "aiml":
-        print("This is not an AIML file.")
-        print(root.tag)
-    else:
-        aiml3 = AIML()
-        print("decoding file")
-        recursive_decoding(aiml3, root)
-    return aiml3
+    try:
+        tree = ET.parse(filename+".aiml")
+        print("getting root of the tree")
+        root = tree.getroot()
+        aiml3 = None
+        if root.tag.lower() != "aiml":
+            print("This is not an AIML file.")
+            print(root.tag)
+        else:
+            aiml3 = AIML()
+            print("decoding file")
+            recursive_decoding(aiml3, root)
+        return aiml3
+    except Exception as ex:
+        print("exception caught!")
+        print(ex)

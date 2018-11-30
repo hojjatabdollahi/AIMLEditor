@@ -33,11 +33,9 @@ STYLES = {
     'keyword': format('blue', 'bold'),
     'operator': format([50, 175, 50]),
     'brace': format('darkBlue'),
-    # 'defclass': format([220, 220, 255], 'bold'),
     'string': format('darkCyan'),
     'string2': format('darkCyan'),
     'comment': format([128, 128, 128]),
-    # 'self': format([150, 85, 140], 'italic'),
     'numbers': format('green'),
 }
 
@@ -107,20 +105,12 @@ class AIMLHIghlighter (QSyntaxHighlighter):
 
         # All other rules
         rules += [
-            # # 'self'
-            # (r'\bself\b', 0, STYLES['self']),
-            #
 
             # Double-quoted string, possibly containing escape sequences
             (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
 
             # # Single-quoted string, possibly containing escape sequences
             # (r"'[^'\\]*(\\.[^'\\]*)*'", 0, STYLES['string']),
-            #
-            # # 'def' followed by an identifier
-            # (r'\bdef\b\s*(\w+)', 1, STYLES['defclass']),
-            # # 'class' followed by an identifier
-            # (r'\bclass\b\s*(\w+)', 1, STYLES['defclass']),
 
             # From '#' until a newline
             (r'<!--[^\n]*-->', 0, STYLES['comment']),

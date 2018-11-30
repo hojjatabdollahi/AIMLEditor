@@ -140,23 +140,10 @@ class DockerWidget(QDockWidget):
         self.thinkEdit.append("<star index=\"1\" />")
 
     def conditionClicked(self):
-        print("condition clicked")
-        conIcon = ConditionIcon()
-        document = QTextDocument()
-        print("document created")
-        document.addResource(QTextDocument.ImageResource, QUrl('C:/Users/DreamFace/AIMLEditor/GUI/Icons/condition.png'), conIcon)
-        print("resource added")
-        cursor = self.templateEdit.textCursor()
-        print("created cursor")
-        cursor.insertImage(conIcon)
-        print("inserted image to cursor")
-        cursor.insertBlock()
-        self.templateEdit.setDocument(document)
-        # self.templateEdit.setTextCursor(cursor)
-        # print("cursor added to template edit")
-        # print("icon added")
-
-        #self.addConItem.setVisible(True)
+        print('hi')
+        #conditionTable = ''
+        #conditionTable = ConditionIcon()
+        #self.templateEdit.insertHtml(conditionTable)
 
     def conItemClicked(self):
         self.addConItem.show()

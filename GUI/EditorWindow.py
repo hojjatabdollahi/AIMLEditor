@@ -37,9 +37,9 @@ class EditorWindow(QMainWindow):
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(self.createAct('&New', 'Ctrl+N', "Create new graph", self.onFileNew))
         fileMenu.addSeparator()
-        # fileMenu.addAction(self.createAct('&Open', 'Ctrl+O', "Open file", self.onFileOpen))
-        # fileMenu.addAction(self.createAct('&Save', 'Ctrl+S', "Save file", self.onFileSave))
-        # fileMenu.addAction(self.createAct('Save &As...', 'Ctrl+Shift+S', "Save file as...", self.onFileSaveAs))
+        fileMenu.addAction(self.createAct('&Open', 'Ctrl+O', "Open file", self.onFileOpen))
+        fileMenu.addAction(self.createAct('&Save', 'Ctrl+S', "Save file", self.onFileSave))
+        fileMenu.addAction(self.createAct('Save &As...', 'Ctrl+Shift+S', "Save file as...", self.onFileSaveAs))
         fileMenu.addAction(self.createAct('&Export', 'Ctrl+Shift+E', 'Export File', self.onFileExport))
         fileMenu.addAction(self.createAct('&Import', 'Ctrl+Shift+I', 'Import File', self.onFileImport))
         fileMenu.addSeparator()
@@ -63,11 +63,11 @@ class EditorWindow(QMainWindow):
         docker = DockerWidget(docker)
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
 
-        # create table widget for conditions (displaying for debugging purposes
-        table = None
-        table = ConditionTable(table)
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(table)
+        # create table widget for conditions (displaying for debugging purposes)
+        # table = None
+        # table = ConditionTable(table)
+        # self.layout = QVBoxLayout()
+        # self.layout.addWidget(table)
 
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QCodeEditor(docker)
@@ -158,14 +158,17 @@ class EditorWindow(QMainWindow):
 
 
     def onFileOpen(self):
-        if self.maybeSave():
-            fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
-            if fname == '':
-                return
-            if os.path.isfile(fname):
-                self.centralWidget().scene.loadFromFile(fname)
-                self.filename = fname
-                self.changeTitle()
+        fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
+        print("file path: " + fname)
+        self.filename = os.path.splitext(fname)[0] # removing extension from path name
+        print('got file name: ' + self.filename)
+        self.aiml = Storage.restore(self.filename)  # restore the pickle
+        print("restored pickle file")
+        print("printing aiml file...")
+        print(self.aiml)
+        self.editSpace.setPlainText(str(self.aiml))
+        print("appended content to editSpace")
+
 
     def onFileSave(self):
         if self.filename is None: return self.onFileSaveAs()
@@ -189,7 +192,8 @@ class EditorWindow(QMainWindow):
         if fname == '':
             return False
         self.filename = fname
-        self.onFileSave()
+        Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
+        # self.onFileSave()
         return True
 
     def onEditUndo(self):
