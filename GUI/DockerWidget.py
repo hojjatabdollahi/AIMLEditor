@@ -37,6 +37,8 @@ class DockerWidget(QDockWidget):
         # initialize condition and condition item
         self.condition = None
         self.conItem = None
+        # initializing table
+        self.conditionTable = None
 
         self.initDocker()
 
@@ -96,10 +98,10 @@ class DockerWidget(QDockWidget):
         # widgetToDock.layout().addWidget(starTemplate, 6, 2)
         # widgetToDock.layout().addWidget(setTemplate, 6, 1)
         # widgetToDock.layout().addWidget(getTemplate, 6, 0)
-        # widgetToDock.layout().addWidget(addCondition, 7, 0)
+        widgetToDock.layout().addWidget(addCondition, 7, 0)
         widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
-        #widgetToDock.layout().addWidget(self.addConItem, 9, 1)
+        widgetToDock.layout().addWidget(self.addConItem, 6, 0)
         widgetToDock.layout().addWidget(video, 10, 0)
         widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
         widgetToDock.layout().addWidget(image, 11, 0)
@@ -140,13 +142,14 @@ class DockerWidget(QDockWidget):
         self.thinkEdit.append("<star index=\"1\" />")
 
     def conditionClicked(self):
-        print('hi')
-        #conditionTable = ''
-        #conditionTable = ConditionIcon()
-        #self.templateEdit.insertHtml(conditionTable)
+        self.addConItem.setVisible(True)
+        self.conditionTable = ConditionIcon()
+        self.templateEdit.insertHtml(self.conditionTable.table)
 
     def conItemClicked(self):
         self.addConItem.show()
+        self.conditionTable.appendConItem()
+        self.templateEdit.setHtml(self.conditionTable.table)
 
     def sentimentClicked(self):
         self.thinkEdit.append("<set name=\"data\"> <star /> </set>")

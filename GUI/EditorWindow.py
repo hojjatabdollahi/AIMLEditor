@@ -5,7 +5,6 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, pyqtSlot, QFileInfo
 from GUI.EditorWidget import EditorWidget
 from GUI.DockerWidget import DockerWidget
-from GUI.ConditionTable import ConditionTable
 from Model.Data import *
 import Utils.Storage as Storage
 import Utils.AIMLHighlighter as HL
@@ -123,10 +122,11 @@ class EditorWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        if self.maybeSave():
-            event.accept()
-        else:
-            event.ignore()
+        print("closeEvent")
+        # if self.maybeSave():
+        #     event.accept()
+        # else:
+        #     event.ignore()
 
     def isModified(self):
         return self.centralWidget().scene.has_been_modified

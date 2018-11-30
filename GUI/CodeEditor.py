@@ -222,7 +222,7 @@ class QCodeEditor(QPlainTextEdit):
         '''
         super(QCodeEditor, self).__init__()
 
-        self.highlighter = HL.AIMLHIghlighter(self.document()) # add highlighter to textdocument
+        #self.highlighter = HL.AIMLHIghlighter(self.document()) # add highlighter to textdocument
         self.setFont(QFont("Ubuntu Mono", 11))
         self.setLineWrapMode(QPlainTextEdit.NoWrap)
 
@@ -243,8 +243,8 @@ class QCodeEditor(QPlainTextEdit):
             # self.currentLineColor = QColor("#e8e8e8")
             self.cursorPositionChanged.connect(self.highligtCurrentLine)
 
-        # if SyntaxHighlighter is not None:  # add highlighter to textdocument
-        #     self.highlighter = SyntaxHighlighter(self.document())
+        if SyntaxHighlighter is None:  # add highlighter to textdocument
+            self.highlighter = HL.AIMLHIghlighter(self.document())  # add highlighter to textdocument
 
     def resizeEvent(self, *e):
         '''overload resizeEvent handler'''
