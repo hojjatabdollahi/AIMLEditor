@@ -2,8 +2,9 @@ from PyQt5.QtWidgets import QLabel, QDockWidget, QTextEdit, \
                             QGridLayout, QLineEdit, QWidget, QPushButton, QFrame
 from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage, QTextDocument
 from Model.Data import *
-from PyQt5.QtCore import pyqtSignal, QUrl
-from GUI.ConditionIcon import *
+from PyQt5.QtCore import pyqtSignal, QUrl, pyqtSlot
+from GUI.ConditionHTML import *
+from GUI.ConditionTableWidget import *
 
 class DockerWidget(QDockWidget):
 
@@ -35,10 +36,12 @@ class DockerWidget(QDockWidget):
         self.videoFileName = None
         self.imageFileName = None
         # initialize condition and condition item
-        self.condition = None
+        self.condition = Condition()
         self.conItem = None
         # initializing table
-        self.conditionTable = None
+        self.conditionTableWidget = None
+        self.conditionTableHTML = None
+        self.conItemsDict = dict()
 
         self.initDocker()
 
@@ -64,7 +67,6 @@ class DockerWidget(QDockWidget):
         setThink = QPushButton("Add set tag in think")
         getThink = QPushButton("Add get tag in think")
         addCondition = QPushButton("Add a condition to template")
-        self.addConItem = QPushButton("Add li tag to your condition")
         addGetSent = QPushButton("Add a sentiment check to your template")
 
         self.patternEdit = QLineEdit()
@@ -101,56 +103,42 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(addCondition, 7, 0)
         widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
-        widgetToDock.layout().addWidget(self.addConItem, 6, 0)
         widgetToDock.layout().addWidget(video, 10, 0)
         widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
         widgetToDock.layout().addWidget(image, 11, 0)
         widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
         widgetToDock.layout().addWidget(self.create, 12, 1)
 
-        # hiding elements on init
-        self.addConItem.setVisible(False)
-
         # Click events
         self.create.clicked.connect(self.createClicked)
-        setTemplate.clicked.connect(self.setClickedTemplate)
-        getTemplate.clicked.connect(self.getClickedTemplate)
-        starTemplate.clicked.connect(self.starClickedTemplate)
-        setThink.clicked.connect(self.setClickedThink)
-        getThink.clicked.connect(self.getClickedThink)
-        starThink.clicked.connect(self.starClickedThink)
         addCondition.clicked.connect(self.conditionClicked)
-        self.addConItem.clicked.connect(self.conItemClicked)
         addGetSent.clicked.connect(self.sentimentClicked)
 
-    def setClickedTemplate(self):
-        self.templateEdit.append("<set name=\"myVar\">Value of myVar</set>")
+        # setTemplate.clicked.connect(self.setClickedTemplate)
+        # getTemplate.clicked.connect(self.getClickedTemplate)
+        # starTemplate.clicked.connect(self.starClickedTemplate)
+        # setThink.clicked.connect(self.setClickedThink)
+        # getThink.clicked.connect(self.getClickedThink)
+        # starThink.clicked.connect(self.starClickedThink)
 
-    def getClickedTemplate(self):
-        self.templateEdit.append("<get name=\"myVar\" />")
-
-    def starClickedTemplate(self):
-        self.templateEdit.append("<star index=\"1\" />")
-
-    def setClickedThink(self):
-        self.thinkEdit.append("<set name=\"myVar\">Value of myVar</set>")
-
-    def getClickedThink(self):
-        self.thinkEdit.append("<get name=\"myVar\" />")
-
-    def starClickedThink(self):
-        self.thinkEdit.append("<star index=\"1\" />")
-
-    def conditionClicked(self):
-        self.addConItem.setVisible(True)
-        self.conditionTable = ConditionIcon()
-        self.templateEdit.insertHtml(self.conditionTable.table)
-
-    def conItemClicked(self):
-        self.addConItem.show()
-        self.conditionTable.appendConItem()
-        self.templateEdit.setHtml(self.conditionTable.table)
-
+    # def setClickedTemplate(self):
+    #     self.templateEdit.append("<set name=\"myVar\">Value of myVar</set>")
+    #
+    # def getClickedTemplate(self):
+    #     self.templateEdit.append("<get name=\"myVar\" />")
+    #
+    # def starClickedTemplate(self):
+    #     self.templateEdit.append("<star index=\"1\" />")
+    #
+    # def setClickedThink(self):
+    #     self.thinkEdit.append("<set name=\"myVar\">Value of myVar</set>")
+    #
+    # def getClickedThink(self):
+    #     self.thinkEdit.append("<get name=\"myVar\" />")
+    #
+    # def starClickedThink(self):
+    #     self.thinkEdit.append("<star index=\"1\" />")
+    #
     def sentimentClicked(self):
         self.thinkEdit.append("<set name=\"data\"> <star /> </set>")
         self.templateEdit.append("<condition name=\"getsentiment\">\n"
@@ -160,6 +148,11 @@ class DockerWidget(QDockWidget):
                                  "<li value=\"negative\"></li>\n"
                                  "<li value=\"verynegative\"></li>\n"
                                  "</condition>")
+
+    def conditionClicked(self):
+        self.conditionTableWidget = ConditionTableWidget()
+        # making connection for a signal from ConditionTable creation
+        self.conditionTableWidget.conditionCreated.connect(self.conditionCreated)
 
     def createClicked(self):
         # Initialize tag objects
@@ -212,6 +205,18 @@ class DockerWidget(QDockWidget):
             self.image.append(self.imageFileName)
             self.robot.append(self.image)
 
+        if self.conditionTableHTML is not None:
+            self.condition = Condition()
+            self.condition.setAttrib(self.conditionTableHTML.getAttrib())
+            if self.conItemsDict is not None:
+                for k, v in self.conItemsDict.items():
+                    # creating instance of ConditionItem
+                    conItem = ConditionItem(k)
+                    conItem.append(str(v))
+                    # appending to Condition Tag object
+                    self.condition.append(conItem)
+            self.template.append(self.condition)
+
         self.oob.append(self.robot)
         self.template.append(self.oob)
         self.cat.append(self.template)
@@ -240,3 +245,27 @@ class DockerWidget(QDockWidget):
         self.mediaFileName = None
         self.condition = None
         self.conItem = None
+
+    @pyqtSlot(Tag, dict)
+    def conditionCreated(self, condition, conItems):
+        print("made it to slot")
+        # saving to model
+        self.condition = condition
+        self.conItemsDict = conItems
+
+        # creating HTML table to be displayed in template
+        self.conditionTableHTML = ConditionHTML(self.condition)
+
+        for k, v in conItems.items():
+            # creating instance of ConditionItem
+            conItem = ConditionItem(k)
+            conItem.append(str(v))
+            # appending to Condition Tag object
+            self.condition.append(conItem)
+            # adding conItems to HTML table in template
+            self.conditionTableHTML.appendConItem(k, v)
+
+        print(self.condition)
+
+        # self.template.append(self.condition)
+        self.templateEdit.insertHtml(self.conditionTableHTML.table)

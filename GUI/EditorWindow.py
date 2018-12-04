@@ -62,12 +62,6 @@ class EditorWindow(QMainWindow):
         docker = DockerWidget(docker)
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
 
-        # create table widget for conditions (displaying for debugging purposes)
-        # table = None
-        # table = ConditionTable(table)
-        # self.layout = QVBoxLayout()
-        # self.layout.addWidget(table)
-
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QCodeEditor(docker)
         #self.editSpace = QTextEdit()
