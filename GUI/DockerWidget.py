@@ -214,13 +214,30 @@ class DockerWidget(QDockWidget):
             print("templateHTML: " + templateHTML)
             root = ET.fromstring(templateHTML)
             root = root.find('body')
-            newroot = root.findall('p')
+            tempRoot = root
+            newroot = root.findall('*')
             for child in newroot:
-                self.template.append(child.text)
+                if child.tag == 'table':
+                    break
+                elif child.tag == 'p':
+                    print("child.text: " + child.text)
+                    self.template.append(child.text)
+                else:
+                    print("do nothing")
+
             root = root.find('table')
             print("root before parsing: " + root.tag)
             self.condition = self.parse(root, self.condition)
             self.template.append(self.condition)
+            tempRoot = tempRoot.findall('*')
+            shouldAppend = False
+            for child in tempRoot:
+                if child.tag == 'p':
+                    if shouldAppend is True:
+                        print("child.text: " + child.text)
+                        self.template.append(child.text)
+                if child.tag == 'table':
+                    shouldAppend == True
 
         self.oob.append(self.robot)
         self.template.append(self.oob)
