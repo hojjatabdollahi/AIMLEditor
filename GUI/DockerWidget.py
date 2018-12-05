@@ -237,7 +237,7 @@ class DockerWidget(QDockWidget):
                         print("child.text: " + child.text)
                         self.template.append(child.text)
                 if child.tag == 'table':
-                    shouldAppend == True
+                    shouldAppend = True
 
         self.oob.append(self.robot)
         self.template.append(self.oob)
