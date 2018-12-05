@@ -61,22 +61,22 @@ class RandomTableWidget(QMainWindow):
         self.mainSpace.tableWidget.setVerticalHeaderLabels(self.header)
 
     def createClicked(self):
-        self.random = Random()
-        print(self.random)
-
         try:
+            self.random = Random()
+            print(self.random)
+
             # storing condition items in a dictionary(k, v) where k = value of condition variable, and v = response
             allRows = self.mainSpace.tableWidget.rowCount()
             for row in range(0, allRows):
                 self.conItemArr.append(self.mainSpace.tableWidget.item(row, 0).text())
                 print(self.mainSpace.tableWidget.item(row, 0).text())
+
+            # emmitting signal
+            self.randomCreated.emit(self.random, self.conItemArr)
+            print("signal emitted")
+
+            # closing window
+            self.close()
         except Exception as ex:
             handleError(ex)
             print(ex)
-
-        # emmitting signal
-        self.randomCreated.emit(self.random, self.conItemArr)
-        print("signal emitted")
-
-        # closing window
-        self.close()

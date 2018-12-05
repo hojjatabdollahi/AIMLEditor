@@ -194,7 +194,7 @@ class QCodeEditor(QPlainTextEdit):
             width = self.getWidth()
             if self.width() != width:
                 self.setFixedWidth(width)
-                self.editor.setViewportMargins(width, 0, 0, 0);
+                self.editor.setViewportMargins(width, 0, 0, 0)
 
         def updateContents(self, rect, scroll):
             if scroll:
@@ -219,7 +219,6 @@ class QCodeEditor(QPlainTextEdit):
             switch on/off the current line highliting
         SyntaxHighlighter : QSyntaxHighlighter
             should be inherited from QSyntaxHighlighter
-
         '''
         super(QCodeEditor, self).__init__()
 

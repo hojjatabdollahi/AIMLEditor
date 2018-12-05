@@ -79,21 +79,22 @@ class ConditionTableWidget(QMainWindow):
         disabled.setFlags(Qt.ItemIsEditable)
 
     def createClicked(self):
-        self.condition = Condition(self.mainSpace.tableWidget.item(0, 0).text())
-        print(self.condition)
-
         try:
+            self.condition = Condition(self.mainSpace.tableWidget.item(0, 0).text())
+            print(self.condition)
+
             # storing condition items in a dictionary(k, v) where k = value of condition variable, and v = response
             allRows = self.mainSpace.tableWidget.rowCount()
             for row in range(1, allRows):
                 self.conItemDict[self.mainSpace.tableWidget.item(row, 0).text()] = self.mainSpace.tableWidget.item(row, 1).text()
                 print(self.mainSpace.tableWidget.item(row, 0).text())
+
+            # emmitting signal
+            self.conditionCreated.emit(self.condition, self.conItemDict)
+
+            # closing window
+            self.close()
         except Exception as ex:
+            print("exception caught!")
             handleError(ex)
             print(ex)
-
-        # emmitting signal
-        self.conditionCreated.emit(self.condition, self.conItemDict)
-
-        # closing window
-        self.close()
