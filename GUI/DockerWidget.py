@@ -188,7 +188,7 @@ class DockerWidget(QDockWidget):
             self.think.append(thinkText)
             self.template.append(self.think)
 
-        self.template.append(templateText)
+        #self.template.append(templateText)
         self.cat.append(self.pattern)
 
         if thatText != '':
@@ -211,9 +211,12 @@ class DockerWidget(QDockWidget):
         # checking for HTML table, if it exits, parse into condition tag object
         if self.conditionTableHTML is not None:
             self.condition.setAttrib(self.conditionTableHTML.getAttrib())
-            # print("templateHTML: " + templateHTML)
+            print("templateHTML: " + templateHTML)
             root = ET.fromstring(templateHTML)
             root = root.find('body')
+            newroot = root.findall('p')
+            for child in newroot:
+                self.template.append(child.text)
             root = root.find('table')
             print("root before parsing: " + root.tag)
             self.condition = self.parse(root, self.condition)
