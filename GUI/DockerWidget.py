@@ -188,6 +188,7 @@ class DockerWidget(QDockWidget):
         self.imageFileName = Filename()
         self.condition = Condition()
         self.conItem = ConditionItem()
+        self.random = Random()
 
         # getting text from input fields
         patternText = self.patternEdit.text()
@@ -273,10 +274,9 @@ class DockerWidget(QDockWidget):
 
             root = root.find('table')
             print("root before parsing: " + root.tag)
-            try:
-                self.random = self.parseRandom(root, self.random)
-            except Exception as ex:
-                print(ex)
+            print(self.random)
+            self.random = self.parseRandom(root, self.random)
+            print(self.random)
             self.template.append(self.random)
             tempRoot = tempRoot.findall('*')
             shouldAppend = False
@@ -349,27 +349,29 @@ class DockerWidget(QDockWidget):
 
         return condition
 
-    def parseRandom(self, root, condition):
+    def parseRandom(self, root, random):
         for child in root:
             if child.tag == "tr":
                 print("child.tag = tr")
-                self.parseRandom(child, condition)
+                self.parseRandom(child, random)
             elif child.tag == "td":
                 print("child.tag = td")
-                self.parseRandom(child, condition)
+                self.parseRandom(child, random)
             elif child.tag == "p":
                 if child.text is None:
                     print("then most likely span is a child")
                 else:
                     conItem = ConditionItem()
-                    print("Child.text: " + str(child.text))
+                    print("Child.text: " + child.text)
                     conItem.append(child.text)
-                    condition.append(conItem)
+                    random.append(conItem)
+                    print(random)
             elif child.tag == "th":
                 print("child.tag = th")
                 print("do nothing")
 
-        return condition
+        print("parsing done")
+        return random
 
 
     @pyqtSlot(Tag, dict)
