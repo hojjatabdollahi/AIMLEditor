@@ -103,7 +103,7 @@ class DockerWidget(QDockWidget):
         # widgetToDock.layout().addWidget(setTemplate, 6, 1)
         # widgetToDock.layout().addWidget(getTemplate, 6, 0)
         widgetToDock.layout().addWidget(addCondition, 7, 0)
-        widgetToDock.layout().addWidget(addGetSent, 7, 1)
+        # widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
         widgetToDock.layout().addWidget(video, 10, 0)
         widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
@@ -238,6 +238,9 @@ class DockerWidget(QDockWidget):
                         self.template.append(child.text)
                 if child.tag == 'table':
                     shouldAppend = True
+        else:
+            print("no table exists. append text")
+            self.template.append(templateText)
 
         self.oob.append(self.robot)
         self.template.append(self.oob)
@@ -265,8 +268,9 @@ class DockerWidget(QDockWidget):
         self.image = None
         self.video = None
         self.mediaFileName = None
-        self.condition = None
+        # self.condition = None
         self.conItem = None
+        self.conditionTableHTML = None
 
     def parse(self, root, condition, prevChildText=""):
         print("root.tag: " + root.tag)
@@ -292,10 +296,6 @@ class DockerWidget(QDockWidget):
                     conItem = ConditionItem(prevChildText.text)
                     conItem.append(child.text)
                     condition.append(conItem)
-
-
-            # prevChild = child
-            #print("child.tail: " + child.tail)
 
         return condition
 
