@@ -39,6 +39,7 @@ else:
                              QTextFormat, QTextCharFormat)
     from Model.Data import *
     import Utils.AIMLHighlighter as HL
+    import re
 
 
 # classes definition

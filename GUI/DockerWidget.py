@@ -5,6 +5,8 @@ from Model.Data import *
 from PyQt5.QtCore import pyqtSignal, QUrl, pyqtSlot
 from GUI.ConditionHTML import *
 from GUI.ConditionTableWidget import *
+import xml.etree.ElementTree as ET
+
 
 class DockerWidget(QDockWidget):
 
@@ -173,6 +175,7 @@ class DockerWidget(QDockWidget):
         # getting text from input fields
         patternText = self.patternEdit.text()
         templateText = self.templateEdit.toPlainText()
+        templateHTML = self.templateEdit.toHtml()
         thatText = self.thatEdit.text()
         thinkText = self.thinkEdit.toPlainText()
         videoText = self.videoEdit.text()
@@ -205,16 +208,15 @@ class DockerWidget(QDockWidget):
             self.image.append(self.imageFileName)
             self.robot.append(self.image)
 
+        # checking for HTML table, if it exits, parse into condition tag object
         if self.conditionTableHTML is not None:
-            self.condition = Condition()
             self.condition.setAttrib(self.conditionTableHTML.getAttrib())
-            if self.conItemsDict is not None:
-                for k, v in self.conItemsDict.items():
-                    # creating instance of ConditionItem
-                    conItem = ConditionItem(k)
-                    conItem.append(str(v))
-                    # appending to Condition Tag object
-                    self.condition.append(conItem)
+            # print("templateHTML: " + templateHTML)
+            root = ET.fromstring(templateHTML)
+            root = root.find('body')
+            root = root.find('table')
+            print("root before parsing: " + root.tag)
+            self.condition = self.parse(root, self.condition)
             self.template.append(self.condition)
 
         self.oob.append(self.robot)
@@ -245,6 +247,38 @@ class DockerWidget(QDockWidget):
         self.mediaFileName = None
         self.condition = None
         self.conItem = None
+
+    def parse(self, root, condition, prevChildText=""):
+        print("root.tag: " + root.tag)
+        flag = 0
+        for child in root:
+            if child.tag == "tr":
+                self.parse(child, condition)
+            elif child.tag == "table":
+                self.parse(child, condition)
+                # print("root.text: " + root.text)
+                # print("child.tail: " + child.tail)
+            elif child.tag == "td":
+                flag = flag + 1
+                if flag == 1:
+                    prevChildText = child.find('p')
+                elif flag == 2:
+                    print("second td in row")
+                    self.parse(child, condition, prevChildText)
+            elif child.tag == "p":
+                if child.text is None:
+                    print("then most likely span is a child")
+                else:
+                    conItem = ConditionItem(prevChildText.text)
+                    conItem.append(child.text)
+                    condition.append(conItem)
+
+
+            # prevChild = child
+            #print("child.tail: " + child.tail)
+
+        return condition
+
 
     @pyqtSlot(Tag, dict)
     def conditionCreated(self, condition, conItems):
