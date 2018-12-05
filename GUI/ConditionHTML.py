@@ -10,7 +10,7 @@ class ConditionHTML():
         self.initIcon(condition)
 
     def initIcon(self, condition):
-        self.table = "<table border=\"1\">" \
+        self.table = "<table name=\"condition\" border=\"1\">" \
                         "<tr>" \
                             "<th colspan=\"2\">Condition</th>" \
                         "</tr>" \

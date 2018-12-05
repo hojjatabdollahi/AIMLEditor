@@ -4,27 +4,21 @@ from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 from Model.Data import *
 from Utils.ErrorMessage import *
 
-class ConditionTableWidget(QMainWindow):
+class RandomTableWidget(QMainWindow):
 
     # initializing signal for creating condition
-    conditionCreated = pyqtSignal(Tag, dict)
+    randomCreated = pyqtSignal(Tag, list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.headers = ["Condition", "Condition Item", "Condition Item"]
-
-        # initialize aiml tag objects
-        self.condition = None
-        self.conItem = None
-
-        self.conItemDict = dict()
+        self.header = ["Random Response", "Random Response"]
+        self.conItemArr = list()
 
         self.initTable()
 
-
     def initTable(self):
-        self.setWindowTitle("Edit Condition")
+        self.setWindowTitle("Edit Random")
         self.mainSpace = QWidget()
         self.setCentralWidget(self.mainSpace)
         self.mainSpace.setLayout(QGridLayout())
@@ -32,17 +26,10 @@ class ConditionTableWidget(QMainWindow):
         # initialize table and dimensions 3x3 to start
         self.mainSpace.tableWidget = QTableWidget()
         self.mainSpace.tableWidget.setRowCount(2)
-        self.mainSpace.tableWidget.setColumnCount(2)
-
-        # disabling cell (0, 1)
-        disabled = QTableWidgetItem()
-        disabled.setBackground(QColor(0, 0, 0))
-        self.mainSpace.tableWidget.setItem(0, 1, disabled)
-        disabled.setFlags(Qt.ItemIsEditable)
+        self.mainSpace.tableWidget.setColumnCount(1)
 
         # initializing labels for the table
-        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.headers)
-        self.mainSpace.tableWidget.setHorizontalHeaderLabels(["Variable Name/Value", "Response"])
+        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.header)
 
         # adding table to main widget
         self.mainSpace.layout().addWidget(self.mainSpace.tableWidget, 0, 0)
@@ -64,36 +51,32 @@ class ConditionTableWidget(QMainWindow):
 
     def addRowClicked(self):
         self.mainSpace.tableWidget.insertRow(1)
-        self.headers.insert(1, "Condition Item")
-        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.headers)
+        self.header.insert(1, "Random Response")
+        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.header)
 
     def delRowClicked(self):
         row = self.mainSpace.tableWidget.currentRow()
         self.mainSpace.tableWidget.removeRow(row)
-        self.headers.pop()
-        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.headers)
-        # resetting disabled cell just incase first row was deleted
-        disabled = QTableWidgetItem()
-        disabled.setBackground(QColor(0, 0, 0))
-        self.mainSpace.tableWidget.setItem(0, 1, disabled)
-        disabled.setFlags(Qt.ItemIsEditable)
+        self.header.pop()
+        self.mainSpace.tableWidget.setVerticalHeaderLabels(self.header)
 
     def createClicked(self):
-        self.condition = Condition(self.mainSpace.tableWidget.item(0, 0).text())
-        print(self.condition)
+        self.random = Random()
+        print(self.random)
 
         try:
             # storing condition items in a dictionary(k, v) where k = value of condition variable, and v = response
             allRows = self.mainSpace.tableWidget.rowCount()
-            for row in range(1, allRows):
-                self.conItemDict[self.mainSpace.tableWidget.item(row, 0).text()] = self.mainSpace.tableWidget.item(row, 1).text()
+            for row in range(0, allRows):
+                self.conItemArr.append(self.mainSpace.tableWidget.item(row, 0).text())
                 print(self.mainSpace.tableWidget.item(row, 0).text())
         except Exception as ex:
             handleError(ex)
             print(ex)
 
         # emmitting signal
-        self.conditionCreated.emit(self.condition, self.conItemDict)
+        self.randomCreated.emit(self.random, self.conItemArr)
+        print("signal emitted")
 
         # closing window
         self.close()

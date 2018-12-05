@@ -4,7 +4,9 @@ from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage, QTextDocument
 from Model.Data import *
 from PyQt5.QtCore import pyqtSignal, QUrl, pyqtSlot
 from GUI.ConditionHTML import *
+from GUI.RandomHTML import *
 from GUI.ConditionTableWidget import *
+from GUI.RandomTableWidget import *
 import xml.etree.ElementTree as ET
 
 
@@ -40,10 +42,15 @@ class DockerWidget(QDockWidget):
         # initialize condition and condition item
         self.condition = Condition()
         self.conItem = None
-        # initializing table
+        # initializing Condition table
         self.conditionTableWidget = None
         self.conditionTableHTML = None
         self.conItemsDict = dict()
+        # initialize Random Table
+        self.randomTableWidget = None
+        self.randomTableHTML = None
+        self.random = Random()
+        self.conItemArr = list()
 
         self.initDocker()
 
@@ -70,6 +77,7 @@ class DockerWidget(QDockWidget):
         getThink = QPushButton("Add get tag in think")
         addCondition = QPushButton("Add a condition to template")
         addGetSent = QPushButton("Add a sentiment check to your template")
+        addRandom = QPushButton("Add random responses to template")
 
         self.patternEdit = QLineEdit()
         self.templateEdit = QTextEdit()
@@ -103,6 +111,7 @@ class DockerWidget(QDockWidget):
         # widgetToDock.layout().addWidget(setTemplate, 6, 1)
         # widgetToDock.layout().addWidget(getTemplate, 6, 0)
         widgetToDock.layout().addWidget(addCondition, 7, 0)
+        widgetToDock.layout().addWidget(addRandom, 7, 1)
         # widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
         widgetToDock.layout().addWidget(video, 10, 0)
@@ -111,10 +120,13 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
         widgetToDock.layout().addWidget(self.create, 12, 1)
 
+
+
         # Click events
         self.create.clicked.connect(self.createClicked)
         addCondition.clicked.connect(self.conditionClicked)
         addGetSent.clicked.connect(self.sentimentClicked)
+        addRandom.clicked.connect(self.randomClicked)
 
         # setTemplate.clicked.connect(self.setClickedTemplate)
         # getTemplate.clicked.connect(self.getClickedTemplate)
@@ -155,6 +167,11 @@ class DockerWidget(QDockWidget):
         self.conditionTableWidget = ConditionTableWidget()
         # making connection for a signal from ConditionTable creation
         self.conditionTableWidget.conditionCreated.connect(self.conditionCreated)
+
+    def randomClicked(self):
+        self.randomTableWidget = RandomTableWidget()
+        # making connection for a signal from RandomTable creation
+        self.randomTableWidget.randomCreated.connect(self.randomCreated)
 
     def createClicked(self):
         # Initialize tag objects
@@ -209,6 +226,7 @@ class DockerWidget(QDockWidget):
             self.robot.append(self.image)
 
         # checking for HTML table, if it exits, parse into condition tag object
+        # parse in a way where <p> before and after <table> is appended to template as text
         if self.conditionTableHTML is not None:
             self.condition.setAttrib(self.conditionTableHTML.getAttrib())
             print("templateHTML: " + templateHTML)
@@ -227,8 +245,39 @@ class DockerWidget(QDockWidget):
 
             root = root.find('table')
             print("root before parsing: " + root.tag)
-            self.condition = self.parse(root, self.condition)
+            self.condition = self.parseCondition(root, self.condition)
             self.template.append(self.condition)
+            tempRoot = tempRoot.findall('*')
+            shouldAppend = False
+            for child in tempRoot:
+                if child.tag == 'p':
+                    if shouldAppend is True:
+                        print("child.text: " + child.text)
+                        self.template.append(child.text)
+                if child.tag == 'table':
+                    shouldAppend = True
+        elif self.randomTableHTML is not None:
+            print("templateHTML: " + templateHTML)
+            root = ET.fromstring(templateHTML)
+            root = root.find('body')
+            tempRoot = root
+            newroot = root.findall('*')
+            for child in newroot:
+                if child.tag == 'table':
+                    break
+                elif child.tag == 'p':
+                    print("child.text: " + child.text)
+                    self.template.append(child.text)
+                else:
+                    print("do nothing")
+
+            root = root.find('table')
+            print("root before parsing: " + root.tag)
+            try:
+                self.random = self.parseRandom(root, self.random)
+            except Exception as ex:
+                print(ex)
+            self.template.append(self.random)
             tempRoot = tempRoot.findall('*')
             shouldAppend = False
             for child in tempRoot:
@@ -271,15 +320,16 @@ class DockerWidget(QDockWidget):
         # self.condition = None
         self.conItem = None
         self.conditionTableHTML = None
+        self.randomTableHTML = None
 
-    def parse(self, root, condition, prevChildText=""):
+    def parseCondition(self, root, condition, prevChildText=""):
         print("root.tag: " + root.tag)
         flag = 0
         for child in root:
             if child.tag == "tr":
-                self.parse(child, condition)
+                self.parseCondition(child, condition)
             elif child.tag == "table":
-                self.parse(child, condition)
+                self.parseCondition(child, condition)
                 # print("root.text: " + root.text)
                 # print("child.tail: " + child.tail)
             elif child.tag == "td":
@@ -288,7 +338,7 @@ class DockerWidget(QDockWidget):
                     prevChildText = child.find('p')
                 elif flag == 2:
                     print("second td in row")
-                    self.parse(child, condition, prevChildText)
+                    self.parseCondition(child, condition, prevChildText)
             elif child.tag == "p":
                 if child.text is None:
                     print("then most likely span is a child")
@@ -296,6 +346,28 @@ class DockerWidget(QDockWidget):
                     conItem = ConditionItem(prevChildText.text)
                     conItem.append(child.text)
                     condition.append(conItem)
+
+        return condition
+
+    def parseRandom(self, root, condition):
+        for child in root:
+            if child.tag == "tr":
+                print("child.tag = tr")
+                self.parseRandom(child, condition)
+            elif child.tag == "td":
+                print("child.tag = td")
+                self.parseRandom(child, condition)
+            elif child.tag == "p":
+                if child.text is None:
+                    print("then most likely span is a child")
+                else:
+                    conItem = ConditionItem()
+                    print("Child.text: " + str(child.text))
+                    conItem.append(child.text)
+                    condition.append(conItem)
+            elif child.tag == "th":
+                print("child.tag = th")
+                print("do nothing")
 
         return condition
 
@@ -323,3 +395,20 @@ class DockerWidget(QDockWidget):
 
         # self.template.append(self.condition)
         self.templateEdit.insertHtml(self.conditionTableHTML.table)
+
+    @pyqtSlot(Tag, list)
+    def randomCreated(self, random, conItems):
+        print("made it to the slot")
+        self.random = random
+        self.conItemArr = conItems
+
+        # creating HTML table to be displayed in template
+        self.randomTableHTML = RandomHTML()
+
+        for item in conItems:
+            conItem = ConditionItem()
+            conItem.append(str(item))
+            self.random.append(conItem)
+            self.randomTableHTML.appendConItem(str(item))
+
+        self.templateEdit.insertHtml(self.randomTableHTML.table)
