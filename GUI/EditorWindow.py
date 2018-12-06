@@ -9,9 +9,15 @@ from Model.Data import *
 import Utils.Storage as Storage
 import Utils.AIMLHighlighter as HL
 from GUI.CodeEditor import *
+from GUI.QLabel_Clickable import *
+from GUI.Node.QDM.GraphicsScene import *
 
 
 class EditorWindow(QMainWindow):
+
+    # Adding signal
+    catCreated = pyqtSignal(Tag)
+
     def __init__(self):
         super().__init__()
 
@@ -64,20 +70,17 @@ class EditorWindow(QMainWindow):
 
         # Setting main editing area where Files will be displayed and can be edited
         self.editSpace = QCodeEditor(docker)
-        #self.editSpace = QTextEdit()
-        #highlight = HL.AIMLHIghlighter(self.editSpace)
-        #self.editSpace.setStyleSheet("background-color: rgb(240, 240, 240);")
-        self.setCentralWidget(self.editSpace)
-
-        # connecting slot for category creation
-        # self.make_connection(docker)
-
+        #self.setCentralWidget(self.editSpace)
 
 
         # create node editor widget (visualization of categories)
-        # nodeeditor = EditorWidget(self)
-        # nodeeditor.scene.addHasBeenModifiedListener(self.changeTitle)
-        # self.setCentralWidget(nodeeditor)
+        self.display = EditorWidget(self)
+        self.display.scene.addHasBeenModifiedListener(self.changeTitle)
+        self.setCentralWidget(self.display)
+
+        ########## making connections to slots ################
+        docker.catCreated.connect(self.categoryCreated) # connecting signal from docker to slot
+
 
         # status bar
         self.statusBar().showMessage("")
@@ -86,21 +89,15 @@ class EditorWindow(QMainWindow):
         # nodeeditor.view.scenePosChanged.connect(self.onScenePosChanged)
 
         # set window properties
-        # self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Program-R AIML Editor")
-        # self.changeTitle()
         self.showMaximized()
 
-    # # function to make connection with signal in DockerWidget
-    # def make_connection(self, docker):
-    #     docker.catCreated.connect(self.categoryCreated)
-    #
-    # # slot function for a category being created and displaying on editSpace
-    # @pyqtSlot(Tag)
-    # def categoryCreated(self, cat):
-    #     print("made it to slot")
-    #     self.aiml.append(cat)
-    #     self.editSpace.setText(str(self.aiml))
+    # slot function for a category being created and displaying on editSpace
+    @pyqtSlot(Tag)
+    def categoryCreated(self, cat):
+        print("slot in EditorWindow")
+        print(str(cat))
+        self.catCreated.emit(cat) # emitting signal to send category received from docker to EditorWidget slot
 
     def changeTitle(self):
         title = "Node Editor - "

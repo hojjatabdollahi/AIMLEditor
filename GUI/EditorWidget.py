@@ -1,7 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QTextEdit, QGraphicsItem,\
-    QApplication, QVBoxLayout, QPushButton
+    QApplication, QVBoxLayout, QPushButton, QBoxLayout, QMainWindow
 from PyQt5.QtGui import QBrush, QPen, QFont, QColor
-from PyQt5.QtCore import QFile, Qt
+from PyQt5.QtCore import QFile, Qt, pyqtSlot, pyqtSignal
+from Utils.ErrorMessage import *
+from Model.Data import *
+from GUI.QLabel_Clickable import *
 
 from GUI.Node.Node import Node
 from GUI.Node.Scene.Scene import Scene
@@ -10,28 +13,39 @@ from GUI.Node.QDM.GraphicsView import QDMGraphicsView
 
 
 class EditorWidget(QWidget):
-    def __init__(self, parent=None):
+
+    # Adding signal
+    catCreated = pyqtSignal(Tag)
+    catClicked = pyqtSignal(Tag)
+
+    def __init__(self, window, parent=None):
         super().__init__(parent)
 
         self.stylesheet_filename = 'GUI/style/nodestyle.qss'
         self.loadStylesheet(self.stylesheet_filename)
+        self.aiml = AIML()
 
-        self.initUI()
+        self.initUI(window)
 
-    def initUI(self):
-        self.layout = QVBoxLayout()
+    def initUI(self, window):
+        self.layout = QBoxLayout(QBoxLayout.LeftToRight)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
         # crate graphics scene
         self.scene = Scene()
-        # self.grScene = self.scene.grScene
+        self.grScene = self.scene.grScene
 
-        self.addNodes()
+        ########## making connections to slots ################
+        window.catCreated.connect(self.categoryCreated)
+
+
+        # self.addNodes()
         # self.addDebugContent()
         # create graphics view
         self.view = QDMGraphicsView(self.scene.grScene, self)
         self.layout.addWidget(self.view)
+
 
     def addNodes(self):
         node1 = Node(self.scene, "My Awesome Node 1",
@@ -90,3 +104,21 @@ class EditorWidget(QWidget):
         file.open(QFile.ReadOnly | QFile.Text)
         stylesheet = file.readAll()
         QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
+
+
+    # slot function for a category being created and displaying on editSpace
+    @pyqtSlot(Tag)
+    def categoryCreated(self, cat):
+        print("slot in EditorWidget")
+        print(str(cat))
+        self.aiml.append(cat)
+        print("category id: " + str(cat.id))
+        try:
+            aNode = Node(self.scene, "Category")
+            aNode.content.wdg_label.imageLabel.setText(str(cat))
+        except Exception as ex:
+            print(ex)
+
+    @pyqtSlot(str)
+    def categoryClicked(self, str):
+        print("slot in EditorWidget")

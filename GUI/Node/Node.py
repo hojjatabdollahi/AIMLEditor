@@ -3,11 +3,15 @@ from GUI.Node.Utils.Serializable import Serializable
 from GUI.Node.QDM.GraphicsNode import QDMGraphicsNode
 from GUI.Node.QDM.ContentWidget import QDMNodeContentWidget
 from GUI.Node.Utils.Socket import *
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 
 DEBUG = False
 
 
 class Node(Serializable):
+
+    catClicked = pyqtSignal(str)
+
     def __init__(self, scene, title="Undefined Node", inputs=[], outputs=[]):
         super().__init__()
         self._title = title
@@ -24,6 +28,9 @@ class Node(Serializable):
         # create socket for inputs and outputs
         self.inputs = []
         self.outputs = []
+
+        # connecting slot to incoming signals
+        self.content.catClicked.connect(self.catClicked)
 
         counter = 0
         for item in inputs:
@@ -48,6 +55,11 @@ class Node(Serializable):
 
         for item in self.outputs:
             item.setSocketPosition()
+
+    @pyqtSlot(str)
+    def categoryClicked(self, clickType):
+        print("Slot in Node")
+        self.catClicked.emmit(clickType)
 
     @property
     def pos(self):

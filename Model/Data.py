@@ -1,6 +1,7 @@
 from textwrap import indent
 import xml.etree.ElementTree as ET
 import Model.Common as Common
+from PyQt5.QtCore import QUuid
 
 
 class Tag():
@@ -19,6 +20,21 @@ class Tag():
 
     def setAttrib(self, attrib):
         self.attrib = attrib
+
+    def find(self, id):
+        print("trying to find category with id of " + id)
+        if id.isNull is True:
+            print("Bad id, id was never generated and is currently null")
+
+        for cat in self.tags:
+            if cat.type == "category":
+                if cat.id == id:
+                    return cat
+            else:
+                print("tag type: " + cat.type)
+
+        print("No category found")
+        return None
 
     def __str__(self):
         attrib = (' ' + ' '.join('{}=\"{}\"'.format(
@@ -48,9 +64,11 @@ class Topic(Tag):
 
 
 class Category(Tag):
-    def __init__(self):
+    def __init__(self, id=""):
         super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
+        # id to distinguish categories within an AIML object
+        self.id = id
 
 
 class Pattern(Tag):

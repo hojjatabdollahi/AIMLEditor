@@ -25,8 +25,8 @@ class QDMGraphicsNode(QGraphicsItem):
         self.rect = QRectF(
             0,
             0,
-            260,
-            500
+            270,
+            310
         )
         self.edge_size = 10.0
         self.title_height = 24.0

@@ -222,7 +222,6 @@ class QCodeEditor(QPlainTextEdit):
         '''
         super(QCodeEditor, self).__init__()
 
-        #self.highlighter = HL.AIMLHIghlighter(self.document()) # add highlighter to textdocument
         self.setFont(QFont("Ubuntu Mono", 11))
         self.setLineWrapMode(QPlainTextEdit.NoWrap)
 
@@ -230,7 +229,7 @@ class QCodeEditor(QPlainTextEdit):
 
         # connecting slot for category creation
         self.aiml = AIML()
-        self.make_connection(docker)
+        # self.make_connection(docker)
 
         self.setReadOnly(True)
 
@@ -272,23 +271,23 @@ class QCodeEditor(QPlainTextEdit):
         docker.catCreated.connect(self.categoryCreated)
 
     # slot function for a category being created and displaying on editSpace
-    @pyqtSlot(Tag)
-    def categoryCreated(self, cat):
-        try:
-            print("made it to slot")
-            if self.aiml is not None:
-                print("Ok to add category")
-                self.aiml.append(cat)
-                print("appended category to AIML object")
-                self.setPlainText(str(self.aiml))
-            else:
-                print("CodeEditor is equal to None")
-                self.aiml = AIML()
-                self.clear()
-                self.aiml.append(cat)
-                print("appended category to AIML object")
-                self.setPlainText(str(self.aiml))
-        except Exception as ex:
-            handleError(ex)
-            print("exception caught!")
-            print(ex)
+    # @pyqtSlot(Tag)
+    # def categoryCreated(self, cat):
+    #     try:
+    #         print("made it to slot")
+    #         if self.aiml is not None:
+    #             print("Ok to add category")
+    #             self.aiml.append(cat)
+    #             print("appended category to AIML object")
+    #             self.setPlainText(str(self.aiml))
+    #         else:
+    #             print("CodeEditor is equal to None")
+    #             self.aiml = AIML()
+    #             self.clear()
+    #             self.aiml.append(cat)
+    #             print("appended category to AIML object")
+    #             self.setPlainText(str(self.aiml))
+    #     except Exception as ex:
+    #         handleError(ex)
+    #         print("exception caught!")
+    #         print(ex)

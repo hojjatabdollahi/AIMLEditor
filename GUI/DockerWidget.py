@@ -2,12 +2,13 @@ from PyQt5.QtWidgets import QLabel, QDockWidget, QTextEdit, \
                             QGridLayout, QLineEdit, QWidget, QPushButton, QFrame
 from PyQt5.QtGui import QTextImageFormat, QTextCursor, QImage, QTextDocument
 from Model.Data import *
-from PyQt5.QtCore import pyqtSignal, QUrl, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, QUrl, pyqtSlot, QUuid
 from GUI.ConditionHTML import *
 from GUI.RandomHTML import *
 from GUI.ConditionTableWidget import *
 from GUI.RandomTableWidget import *
 import xml.etree.ElementTree as ET
+from GUI.QLabel_Clickable import *
 
 
 class DockerWidget(QDockWidget):
@@ -102,17 +103,10 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.thatEdit, 2, 1)
         widgetToDock.layout().addWidget(think, 3, 0)
         widgetToDock.layout().addWidget(self.thinkEdit, 3, 1)
-        # widgetToDock.layout().addWidget(starThink, 4, 2)
-        # widgetToDock.layout().addWidget(setThink, 4, 1)
-        # widgetToDock.layout().addWidget(getThink, 4, 0)
         widgetToDock.layout().addWidget(template, 5, 0)
         widgetToDock.layout().addWidget(self.templateEdit, 5, 1)
-        # widgetToDock.layout().addWidget(starTemplate, 6, 2)
-        # widgetToDock.layout().addWidget(setTemplate, 6, 1)
-        # widgetToDock.layout().addWidget(getTemplate, 6, 0)
         widgetToDock.layout().addWidget(addCondition, 7, 0)
         widgetToDock.layout().addWidget(addRandom, 7, 1)
-        # widgetToDock.layout().addWidget(addGetSent, 7, 1)
         widgetToDock.layout().addWidget(line, 8, 0, 1, 3)
         widgetToDock.layout().addWidget(video, 10, 0)
         widgetToDock.layout().addWidget(self.videoEdit, 10, 1)
@@ -121,47 +115,10 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.create, 12, 1)
 
 
-
         # Click events
         self.create.clicked.connect(self.createClicked)
         addCondition.clicked.connect(self.conditionClicked)
-        addGetSent.clicked.connect(self.sentimentClicked)
         addRandom.clicked.connect(self.randomClicked)
-
-        # setTemplate.clicked.connect(self.setClickedTemplate)
-        # getTemplate.clicked.connect(self.getClickedTemplate)
-        # starTemplate.clicked.connect(self.starClickedTemplate)
-        # setThink.clicked.connect(self.setClickedThink)
-        # getThink.clicked.connect(self.getClickedThink)
-        # starThink.clicked.connect(self.starClickedThink)
-
-    # def setClickedTemplate(self):
-    #     self.templateEdit.append("<set name=\"myVar\">Value of myVar</set>")
-    #
-    # def getClickedTemplate(self):
-    #     self.templateEdit.append("<get name=\"myVar\" />")
-    #
-    # def starClickedTemplate(self):
-    #     self.templateEdit.append("<star index=\"1\" />")
-    #
-    # def setClickedThink(self):
-    #     self.thinkEdit.append("<set name=\"myVar\">Value of myVar</set>")
-    #
-    # def getClickedThink(self):
-    #     self.thinkEdit.append("<get name=\"myVar\" />")
-    #
-    # def starClickedThink(self):
-    #     self.thinkEdit.append("<star index=\"1\" />")
-    #
-    def sentimentClicked(self):
-        self.thinkEdit.append("<set name=\"data\"> <star /> </set>")
-        self.templateEdit.append("<condition name=\"getsentiment\">\n"
-                                 "<li value=\"verypositive\"></li>\n"
-                                 "<li value=\"positive\"></li>\n"
-                                 "<li value=\"neutral\"></li>\n"
-                                 "<li value=\"negative\"></li>\n"
-                                 "<li value=\"verynegative\"></li>\n"
-                                 "</condition>")
 
     def conditionClicked(self):
         self.conditionTableWidget = ConditionTableWidget()
@@ -175,7 +132,9 @@ class DockerWidget(QDockWidget):
 
     def createClicked(self):
         # Initialize tag objects
-        self.cat = Category()
+        id = QUuid()
+        id = id.createUuid()
+        self.cat = Category(id)
         self.pattern = Pattern()
         self.template = Template()
         self.that = That()
@@ -234,6 +193,7 @@ class DockerWidget(QDockWidget):
             root = ET.fromstring(templateHTML)
             root = root.find('body')
             tempRoot = root
+            # appending text before table to template
             newroot = root.findall('*')
             for child in newroot:
                 if child.tag == 'table':
@@ -244,10 +204,13 @@ class DockerWidget(QDockWidget):
                 else:
                     print("do nothing")
 
+            # parsing table contents
             root = root.find('table')
             print("root before parsing: " + root.tag)
             self.condition = self.parseCondition(root, self.condition)
             self.template.append(self.condition)
+
+            # appending text after table to template
             tempRoot = tempRoot.findall('*')
             shouldAppend = False
             for child in tempRoot:
@@ -262,6 +225,7 @@ class DockerWidget(QDockWidget):
             root = ET.fromstring(templateHTML)
             root = root.find('body')
             tempRoot = root
+            # appending text before table to template
             newroot = root.findall('*')
             for child in newroot:
                 if child.tag == 'table':
@@ -272,12 +236,15 @@ class DockerWidget(QDockWidget):
                 else:
                     print("do nothing")
 
+            # parsing table contents
             root = root.find('table')
             print("root before parsing: " + root.tag)
             print(self.random)
             self.random = self.parseRandom(root, self.random)
             print(self.random)
             self.template.append(self.random)
+
+            # appending text after table to template
             tempRoot = tempRoot.findall('*')
             shouldAppend = False
             for child in tempRoot:
@@ -304,7 +271,8 @@ class DockerWidget(QDockWidget):
         self.videoEdit.clear()
         self.imageEdit.clear()
 
-        # emitting signal
+
+        # emitting signal to EditorWindow to be sent to EditorWidget
         self.catCreated.emit(self.cat)
 
         # clearing tag objects
@@ -317,7 +285,6 @@ class DockerWidget(QDockWidget):
         self.image = None
         self.video = None
         self.mediaFileName = None
-        # self.condition = None
         self.conItem = None
         self.conditionTableHTML = None
         self.randomTableHTML = None
