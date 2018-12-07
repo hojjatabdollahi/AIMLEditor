@@ -130,15 +130,53 @@ class DockerWidget(QDockWidget):
     def categoryClicked(self, cat):
         print("slot in DockerWidget")
         print(cat)
+        root = ET.fromstring(str(cat))
         try:
-            self.populateFields(cat)
+            self.parseCategory(root)
         except Exception as ex:
             print("Error populatingFields")
             print(ex)
 
-    def populateFields(self, cat):
-        if cat.tags[Pattern] is not None:
-            self.patternEdit.setText(Pattern)
+    def parseCategory(self, root):
+        print("parsing category")
+        for child in root:
+            if child.tag == "pattern":
+                if child.find("set") is None:
+                    self.patternEdit.setText(child.text)
+                else:
+                    set = child.find("set")
+                    self.patternEdit.setText("<"+set.tag+">"+set.text+"</"+set.tag+">")
+            if child.tag == "that":
+                self.thatEdit.setText(child.text)
+            if child.tag == "template":
+                if child.findall("*") is not None:
+                    print("template contains children")
+                    self.parseCategory(child)
+                # after parsing through rest of template, print out text of template
+                self.templateEdit.setText(child.text)
+            if child.tag == "think":
+                if child.findall("*") is not None:
+                    print("think has child tags")
+                    self.parseCategory(child)
+                else:
+                    self.thinkEdit.setText(child.text)
+            if child.tag == "set":
+                self.templateEdit.setText("<"+set.tag+ " " +"name=\"" +set.attrib+"\">"+set.text+"</"+set.tag+">")
+            if child.tag == "oob":
+                print("at oob")
+                self.parseCategory(child)
+            if child.tag == "robot":
+                print("at robot")
+                self.parseCategory(child)
+            if child.tag == "video":
+                print("at video")
+                file = child.find("filename")
+                self.videoEdit.setText(file.text)
+            if child.tag == "image":
+                print("at image")
+                file = child.find("filename")
+                self.imageEdit.setText(file.text)
+
 
     def conditionClicked(self):
         self.conditionTableWidget = ConditionTableWidget()
@@ -154,6 +192,7 @@ class DockerWidget(QDockWidget):
         # Initialize tag objects
         id = QUuid()
         id = id.createUuid()
+        id = id.toString()
         self.cat = Category(id)
         self.pattern = Pattern()
         self.template = Template()

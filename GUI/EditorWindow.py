@@ -23,7 +23,8 @@ class EditorWindow(QMainWindow):
         super().__init__()
 
         self.filename = None
-        self.editSpace = None
+        self.editSpace = None # Used for displaying source code
+        self.display = None # Used for graphing out categories
         self.aiml = AIML()
 
         self.initUI()
@@ -70,18 +71,18 @@ class EditorWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
 
         # Setting main editing area where Files will be displayed and can be edited
-        self.editSpace = QCodeEditor(docker)
+        # self.editSpace = QCodeEditor(docker)
         #self.setCentralWidget(self.editSpace)
 
 
         # create node editor widget (visualization of categories)
-        self.display = EditorWidget(self)
-        self.display.scene.addHasBeenModifiedListener(self.changeTitle)
-        self.setCentralWidget(self.display)
+        self.editSpace = EditorWidget(self)
+        self.editSpace.scene.addHasBeenModifiedListener(self.changeTitle)
+        self.setCentralWidget(self.editSpace)
 
         ########## making connections to slots ################
         docker.catCreated.connect(self.categoryCreated) # connecting signal from docker to slot
-        self.display.catClicked.connect(self.categoryClicked) # connecting signal from EditorWidget to slot
+        self.editSpace.catClicked.connect(self.categoryClicked) # connecting signal from EditorWidget to slot
 
 
         # status bar
@@ -156,18 +157,30 @@ class EditorWindow(QMainWindow):
         #     self.filename = None
         #     self.changeTitle()
 
-
     def onFileOpen(self):
-        fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
-        print("file path: " + fname)
-        self.filename = os.path.splitext(fname)[0] # removing extension from path name
-        print('got file name: ' + self.filename)
-        self.editSpace.aiml = Storage.restore(self.filename)  # restore the pickle
-        print("restored pickle file")
-        print("printing aiml file...")
-        print(self.editSpace.aiml)
-        self.editSpace.setPlainText(str(self.editSpace.aiml))
-        print("appended content to editSpace")
+        # fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
+        # print("file path: " + fname)
+        # self.filename = os.path.splitext(fname)[0] # removing extension from path name
+        # print('got file name: ' + self.filename)
+        # self.editSpace.aiml = Storage.restore(self.filename)  # restore the pickle
+        # print("restored pickle file")
+        # print("printing aiml file...")
+        # print(self.editSpace.aiml)
+        # self.editSpace.setPlainText(str(self.editSpace.aiml))
+        # print("appended content to editSpace")
+        try:
+            if self.maybeSave():
+                fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
+                if fname == '':
+                    return
+                if os.path.isfile(fname):
+                    self.centralWidget().scene.loadFromFile(fname)
+                    self.filename = fname
+                    # self.changeTitle()
+        except Exception as ex:
+            handleError(ex)
+            print("Exception caught!")
+            print(ex)
 
 
     def onFileSave(self):
@@ -186,7 +199,7 @@ class EditorWindow(QMainWindow):
         self.filename = os.path.splitext(fname)[0]  # removing extension from path name
         self.editSpace.aiml = Storage.importAIML(self.filename) # import the aiml file
         print("file import successful")
-        self.editSpace.setPlainText(str(self.editSpace.aiml))
+        # self.editSpace.setPlainText(str(self.editSpace.aiml))
 
     def onFileSaveAs(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Save graph to file')

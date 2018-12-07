@@ -23,8 +23,9 @@ class Tag():
 
     def find(self, id):
         print("trying to find category with id of " + str(id))
-        if id.isNull is True:
+        if id is None:
             print("Bad id, id was never generated and is currently null")
+            return None
 
         for cat in self.tags:
             if cat.type == "category":
@@ -34,6 +35,18 @@ class Tag():
                 print("tag type: " + cat.type)
 
         print("No category found")
+        return None
+
+    """Finds first occurrence of Tag, type, in array tags of Parent Tag"""
+    def findTag(self, type):
+        if self.tags is None:
+            print("This tag has no child tags")
+            return None
+
+        for child in self.tags:
+            if child.type == type:
+                return child
+
         return None
 
     def __str__(self):
