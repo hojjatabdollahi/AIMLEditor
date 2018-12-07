@@ -11,7 +11,7 @@ DEBUG = False
 
 class Node(Serializable):
 
-    catClicked = pyqtSignal(Tag)
+    # catClicked = pyqtSignal(Tag)
 
     def __init__(self, scene, title="Undefined Node", category=None, inputs=[], outputs=[]):
         super().__init__()
@@ -58,10 +58,9 @@ class Node(Serializable):
         for item in self.outputs:
             item.setSocketPosition()
 
-
     def categoryClicked(self, clickType):
         print("Slot in Node")
-        self.catClicked.emmit(self.category) # emmiting signal to be sent up to Node
+        #self.catClicked.emmit(self.category) # emmiting signal to be sent up to Scene? or maybe Editor Widget?
 
     @property
     def pos(self):

@@ -6,9 +6,14 @@ from GUI.Node.Node import Node
 from GUI.Node.Edge import Edge
 from GUI.Node.Scene.SceneHistory import SceneHistory
 from GUI.Node.Scene.SceneClipboard import SceneClipboard
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from Model.Data import *
 
 
 class Scene(Serializable):
+
+    # catClicked = pyqtSignal(Tag)
+
     def __init__(self):
         super().__init__()
         self.nodes = []
@@ -48,7 +53,13 @@ class Scene(Serializable):
         self.grScene.setGrScene(self.scene_width, self.scene_height)
 
     def addNode(self, node):
+        # node.catClicked.connect(self.categoryClicked) # connecting node added to scene to signals coming from LabelClickable
         self.nodes.append(node)
+
+    # @pyqtSlot(Tag)
+    # def categoryClicked(self, cat):
+    #     self.catClicked.emmit(cat)  # emmiting signal to be sent up to Scene? or maybe Editor Widget?
+
 
     def addEdge(self, edge):
         self.edges.append(edge)
