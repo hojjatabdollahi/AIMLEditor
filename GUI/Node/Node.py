@@ -3,22 +3,24 @@ from GUI.Node.Utils.Serializable import Serializable
 from GUI.Node.QDM.GraphicsNode import QDMGraphicsNode
 from GUI.Node.QDM.ContentWidget import QDMNodeContentWidget
 from GUI.Node.Utils.Socket import *
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QObject
+from Model.Data import *
 
 DEBUG = False
 
 
 class Node(Serializable):
 
-    catClicked = pyqtSignal(str)
+    catClicked = pyqtSignal(Tag)
 
-    def __init__(self, scene, title="Undefined Node", inputs=[], outputs=[]):
+    def __init__(self, scene, title="Undefined Node", category=None, inputs=[], outputs=[]):
         super().__init__()
         self._title = title
         self.scene = scene
         self.content = QDMNodeContentWidget(self)
         self.grNode = QDMGraphicsNode(self)
         self.title = title
+        self.category = category
 
         self.scene.addNode(self)
         self.scene.grScene.addItem(self.grNode)
@@ -30,7 +32,7 @@ class Node(Serializable):
         self.outputs = []
 
         # connecting slot to incoming signals
-        self.content.catClicked.connect(self.catClicked)
+        self.content.wdg_label.imageLabel.catClicked.connect(self.categoryClicked) # signal from ContentWidget to be sent to EditorWidget
 
         counter = 0
         for item in inputs:
@@ -56,10 +58,10 @@ class Node(Serializable):
         for item in self.outputs:
             item.setSocketPosition()
 
-    @pyqtSlot(str)
+
     def categoryClicked(self, clickType):
         print("Slot in Node")
-        self.catClicked.emmit(clickType)
+        self.catClicked.emmit(self.category) # emmiting signal to be sent up to Node
 
     @property
     def pos(self):

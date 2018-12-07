@@ -57,7 +57,7 @@ class LabelClickable(QDialog):
         # self.imageLabel.setAlignment(Qt.AlignCenter)
 
         # connecting signal from QLabelClickable
-        # self.imageLabel.clicked.connect(self.Click)
+        self.imageLabel.catClicked.connect(self.Click)
 
 
     def Click(self, action):

@@ -25,6 +25,7 @@ class EditorWidget(QWidget):
         self.loadStylesheet(self.stylesheet_filename)
         self.aiml = AIML()
 
+
         self.initUI(window)
 
     def initUI(self, window):
@@ -36,8 +37,11 @@ class EditorWidget(QWidget):
         self.scene = Scene()
         self.grScene = self.scene.grScene
 
+        # create a Node for signaling purposes
+        # self.tempNode = Node(self.scene, "Temp")
+
         ########## making connections to slots ################
-        window.catCreated.connect(self.categoryCreated)
+        window.catCreated.connect(self.categoryCreated) # connecting signal from Editor Window that is sending created category
 
 
         # self.addNodes()
@@ -114,11 +118,14 @@ class EditorWidget(QWidget):
         self.aiml.append(cat)
         print("category id: " + str(cat.id))
         try:
-            aNode = Node(self.scene, "Category")
+            aNode = Node(self.scene, "Category", cat)
             aNode.content.wdg_label.imageLabel.setText(str(cat))
+            aNode.catClicked.connect(self.categoryClicked)
         except Exception as ex:
             print(ex)
 
-    @pyqtSlot(str)
-    def categoryClicked(self, str):
+
+    def categoryClicked(self, cat):
         print("slot in EditorWidget")
+        cat = self.aiml.find(cat.id)
+        self.catClicked.emmit(cat) # emmitting signal to be sent to EditorWindow
