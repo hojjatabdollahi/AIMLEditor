@@ -10,6 +10,7 @@ from GUI.Node.Node import Node
 from GUI.Node.Scene.Scene import Scene
 from GUI.Node.Edge import Edge, EDGE_TYPE_BEZIER
 from GUI.Node.QDM.GraphicsView import QDMGraphicsView
+from GUI.Node.QDM.GraphicsNode import *
 
 
 class EditorWidget(QWidget):
@@ -125,7 +126,7 @@ class EditorWidget(QWidget):
             this line is throwing error: Node cannot be converted to PyQt5.QtCore.QObject in this context
             try connecting signal through scene rather than node
             """
-            aNode.content.catClicked.connect(self.categoryClicked)
+            aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:
             print(ex)
 

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox
 class QLabelClickable(QLabel):
 
     # initializing signal for click or double click events
-    catClicked = pyqtSignal(str)
+    catClicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super(QLabelClickable, self).__init__(parent)
@@ -19,7 +19,7 @@ class QLabelClickable(QLabel):
             QTimer.singleShot(QApplication.instance().doubleClickInterval(), self.performSingleClickAction)
         else:
             # emmit to Editor Widget, Editor Widget sends cat to Window then to Docker
-            self.catClicked.emit(self.last)
+            self.catClicked.emit()
 
     def mouseDoubleClickEvent(self, event):
         self.last = "Double Click"
@@ -27,7 +27,7 @@ class QLabelClickable(QLabel):
     def performSingleClickAction(self):
         if self.last == "Click":
             # emmit to Editor Widget, Editor Widget sends cat to Window then to Docker
-            self.catClicked.emit(self.last)
+            self.catClicked.emit()
 
 
 
@@ -60,6 +60,6 @@ class LabelClickable(QDialog):
         self.imageLabel.catClicked.connect(self.Click)
 
 
-    def Click(self, action):
+    def Click(self):
         print("clicked label")
-        QMessageBox.information(self, "Type of click", "you did: {}".format(action))
+        QMessageBox.information(self, "Type of click", "you clicked me!")#.format(action))

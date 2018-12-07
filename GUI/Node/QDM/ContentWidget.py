@@ -1,9 +1,11 @@
 from collections import OrderedDict
 from GUI.Node.Utils.Serializable import Serializable
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt, py
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt, pyqtBoundSignal
 from GUI.QLabel_Clickable import *
 from Model.Data import *
+from GUI.Node.Node import *
+from PyQt5 import QtCore
 
 
 class QDMNodeContentWidget(QWidget, Serializable):
@@ -44,11 +46,11 @@ class QDMNodeContentWidget(QWidget, Serializable):
     def deserialize(self, data, hashmap={}):
         return False
 
-    @pyqtSlot(str)
-    def categoryClicked(self, clickType):
+    @pyqtSlot()
+    def categoryClicked(self):
         print("slot in Content Widget")
         try:
-            self.catClicked.emmit(self.node.category) # emitting signal up to Editor Widget
+            self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
         except Exception as ex:
             print("exception caught in Content Widget Slot")
             print(ex)
