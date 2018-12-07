@@ -137,7 +137,7 @@ class DockerWidget(QDockWidget):
             print("Error populatingFields")
             print(ex)
 
-    def parseCategory(self, root, table=""):
+    def parseCategory(self, root):
         print("parsing category")
         for child in root:
             if child.tag == "pattern":
@@ -178,11 +178,17 @@ class DockerWidget(QDockWidget):
                 file = child.find("filename")
                 self.imageEdit.setText(file.text)
             if child.tag == "random":
-                self.randomTableHTML= RandomHTML()
+                self.randomTableHTML = RandomHTML()
                 responses = child.findall("li")
                 for item in responses:
                     self.randomTableHTML.appendConItem(item.text)
                 self.templateEdit.insertHtml(self.randomTableHTML.table)
+            if child.tag == "condition":
+                self.conditionTableHTML = ConditionHTML(self.condition)
+                responses = child.findall("li")
+                for item in responses:
+                    self.conditionTableHTML.appendConItem(item.get("value"), item.text)
+                self.templateEdit.insertHtml(self.conditionTableHTML.table)
 
 
     def conditionClicked(self):
