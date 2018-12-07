@@ -22,7 +22,7 @@ class Tag():
         self.attrib = attrib
 
     def find(self, id):
-        print("trying to find category with id of " + id)
+        print("trying to find category with id of " + str(id))
         if id.isNull is True:
             print("Bad id, id was never generated and is currently null")
 

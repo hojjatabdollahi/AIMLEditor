@@ -38,13 +38,8 @@ class EditorWidget(QWidget):
         self.scene = Scene()
         self.grScene = self.scene.grScene
 
-        # create a Node for signaling purposes
-        # self.tempNode = Node(self.scene, "Temp")
-
         ########## making connections to slots ################
         window.catCreated.connect(self.categoryCreated) # connecting signal from Editor Window that is sending created category
-        # TODO: make a connection from scene for incoming signals from Nodes
-        # self.scene.catClicked.connect(self.categoryClicked)
 
         # self.addNodes()
         # self.addDebugContent()
@@ -122,10 +117,6 @@ class EditorWidget(QWidget):
         try:
             aNode = Node(self.scene, "Category", cat)
             aNode.content.wdg_label.imageLabel.setText(str(cat))
-            """ 
-            this line is throwing error: Node cannot be converted to PyQt5.QtCore.QObject in this context
-            try connecting signal through scene rather than node
-            """
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:
             print(ex)
@@ -133,5 +124,6 @@ class EditorWidget(QWidget):
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
         print("slot in EditorWidget")
-        # cat = self.aiml.find(cat.id)
-        # self.catClicked.emmit(cat) # emmitting signal to be sent to EditorWindow
+        cat = self.aiml.find(cat.id)
+        print(cat)
+        self.catClicked.emit(cat) # emmitting signal to be sent to EditorWindow

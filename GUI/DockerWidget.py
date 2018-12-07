@@ -9,14 +9,14 @@ from GUI.ConditionTableWidget import *
 from GUI.RandomTableWidget import *
 import xml.etree.ElementTree as ET
 from GUI.QLabel_Clickable import *
-
+from GUI.EditorWindow import *
 
 class DockerWidget(QDockWidget):
 
     # Adding signal
     catCreated = pyqtSignal(Tag)
 
-    def __init__(self, parent=None):
+    def __init__(self, window=None, parent=None):
         super().__init__(parent)
         # initialize the category object
         self.cat = None
@@ -52,6 +52,9 @@ class DockerWidget(QDockWidget):
         self.randomTableHTML = None
         self.random = Random()
         self.conItemArr = list()
+
+        # window that owns docker. Necessary for sending signals back and forth
+        self.window = window
 
         self.initDocker()
 
@@ -114,11 +117,28 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
         widgetToDock.layout().addWidget(self.create, 12, 1)
 
+        # Making connection to incoming signals
+        self.window.catClicked.connect(self.categoryClicked)
+
 
         # Click events
         self.create.clicked.connect(self.createClicked)
         addCondition.clicked.connect(self.conditionClicked)
         addRandom.clicked.connect(self.randomClicked)
+
+    @pyqtSlot(Tag)
+    def categoryClicked(self, cat):
+        print("slot in DockerWidget")
+        print(cat)
+        try:
+            self.populateFields(cat)
+        except Exception as ex:
+            print("Error populatingFields")
+            print(ex)
+
+    def populateFields(self, cat):
+        if cat.tags[Pattern] is not None:
+            self.patternEdit.setText(Pattern)
 
     def conditionClicked(self):
         self.conditionTableWidget = ConditionTableWidget()

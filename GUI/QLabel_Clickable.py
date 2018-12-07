@@ -30,9 +30,6 @@ class QLabelClickable(QLabel):
             self.catClicked.emit()
 
 
-
-
-
 class LabelClickable(QDialog):
     def __init__(self, parent=None):
         super(LabelClickable, self).__init__(parent)
@@ -52,14 +49,3 @@ class LabelClickable(QDialog):
 
         self.imageLabel.setStyleSheet("QLabel {background-color: white; color: black; border: 1px solid "
                                        "#01DFD7; border-radius: 5px;}")
-
-        # self.imageLabel.setText("Category")
-        # self.imageLabel.setAlignment(Qt.AlignCenter)
-
-        # connecting signal from QLabelClickable
-        self.imageLabel.catClicked.connect(self.Click)
-
-
-    def Click(self):
-        print("clicked label")
-        QMessageBox.information(self, "Type of click", "you clicked me!")#.format(action))

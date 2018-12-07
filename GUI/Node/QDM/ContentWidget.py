@@ -48,7 +48,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
     @pyqtSlot()
     def categoryClicked(self):
-        print("slot in Content Widget")
+        print("slot in ContentWidget")
         try:
             self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
         except Exception as ex:

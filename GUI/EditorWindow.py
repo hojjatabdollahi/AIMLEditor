@@ -17,6 +17,7 @@ class EditorWindow(QMainWindow):
 
     # Adding signal
     catCreated = pyqtSignal(Tag)
+    catClicked = pyqtSignal(Tag)
 
     def __init__(self):
         super().__init__()
@@ -65,7 +66,7 @@ class EditorWindow(QMainWindow):
         # create dockable widget to have as place to write content in categories
         # Creating docker that can create categories
         docker = None
-        docker = DockerWidget(docker)
+        docker = DockerWidget(self)
         self.addDockWidget(Qt.LeftDockWidgetArea, docker)
 
         # Setting main editing area where Files will be displayed and can be edited
@@ -80,6 +81,7 @@ class EditorWindow(QMainWindow):
 
         ########## making connections to slots ################
         docker.catCreated.connect(self.categoryCreated) # connecting signal from docker to slot
+        self.display.catClicked.connect(self.categoryClicked) # connecting signal from EditorWidget to slot
 
 
         # status bar
@@ -98,6 +100,11 @@ class EditorWindow(QMainWindow):
         print("slot in EditorWindow")
         print(str(cat))
         self.catCreated.emit(cat) # emitting signal to send category received from docker to EditorWidget slot
+
+    @pyqtSlot(Tag)
+    def categoryClicked(self, cat):
+        print("slot in EditorWindow")
+        self.catClicked.emit(cat) # emmiting signal to send category to docker to repopulate fields
 
     def changeTitle(self):
         title = "Node Editor - "
