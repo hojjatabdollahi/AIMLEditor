@@ -73,6 +73,7 @@ class DockerWidget(QDockWidget):
         image = QLabel("Image Filename: ")
 
         self.create = QPushButton("Create")
+        self.update = QPushButton("Update")
         starTemplate = QPushButton("Add star tag in template")
         setTemplate = QPushButton("Add set tag in template")
         getTemplate = QPushButton("Add get tag in template")
@@ -116,13 +117,16 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(image, 11, 0)
         widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
         widgetToDock.layout().addWidget(self.create, 12, 1)
+        widgetToDock.layout().addWidget(self.update, 12, 1)
+
+        self.update.setVisible(False)
 
         # Making connection to incoming signals
         self.window.catClicked.connect(self.categoryClicked)
 
-
         # Click events
         self.create.clicked.connect(self.createClicked)
+        # self.update.clicked.connect(self.updateClicked) #TODO: Write the function updateClicked
         addCondition.clicked.connect(self.conditionClicked)
         addRandom.clicked.connect(self.randomClicked)
 
@@ -131,6 +135,7 @@ class DockerWidget(QDockWidget):
         print("slot in DockerWidget")
         print(cat)
         root = ET.fromstring(str(cat))
+        self.update.setVisible(True)
         try:
             self.parseCategory(root)
         except Exception as ex:
@@ -153,8 +158,6 @@ class DockerWidget(QDockWidget):
                     print("template contains children")
                     self.templateEdit.append(child.text)
                     self.parseCategory(child)
-                # after parsing through rest of template, print out text of template
-                self.templateEdit.append(child.text)
             if child.tag == "think":
                 if child.findall("*") is not None:
                     print("think has child tags")
@@ -162,7 +165,7 @@ class DockerWidget(QDockWidget):
                 else:
                     self.thinkEdit.setText(child.text)
             if child.tag == "set":
-                self.templateEdit.setText("<"+set.tag+ " " +"name=\"" +set.attrib+"\">"+set.text+"</"+set.tag+">")
+                self.templateEdit.setText("<"+set.tag+" "+"name=\""+set.attrib+"\">"+set.text+"</"+set.tag+">")
             if child.tag == "oob":
                 print("at oob")
                 self.parseCategory(child)
@@ -183,12 +186,14 @@ class DockerWidget(QDockWidget):
                 for item in responses:
                     self.randomTableHTML.appendConItem(item.text)
                 self.templateEdit.insertHtml(self.randomTableHTML.table)
+                self.templateEdit.append(child.tail)
             if child.tag == "condition":
                 self.conditionTableHTML = ConditionHTML(self.condition)
                 responses = child.findall("li")
                 for item in responses:
                     self.conditionTableHTML.appendConItem(item.get("value"), item.text)
                 self.templateEdit.insertHtml(self.conditionTableHTML.table)
+                self.templateEdit.append(child.tail)
 
 
     def conditionClicked(self):
