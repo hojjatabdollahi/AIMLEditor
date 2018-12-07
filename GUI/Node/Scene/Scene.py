@@ -11,9 +11,6 @@ from Model.Data import *
 
 
 class Scene(Serializable):
-
-    # catClicked = pyqtSignal(Tag)
-
     def __init__(self):
         super().__init__()
         self.nodes = []
@@ -53,17 +50,10 @@ class Scene(Serializable):
         self.grScene.setGrScene(self.scene_width, self.scene_height)
 
     def addNode(self, node):
-        # node.catClicked.connect(self.categoryClicked) # connecting node added to scene to signals coming from LabelClickable
         self.nodes.append(node)
-
-    # @pyqtSlot(Tag)
-    # def categoryClicked(self, cat):
-    #     self.catClicked.emmit(cat)  # emmiting signal to be sent up to Scene? or maybe Editor Widget?
-
 
     def addEdge(self, edge):
         self.edges.append(edge)
-
 
     def removeNode(self, node):
         self.nodes.remove(node)
@@ -71,13 +61,11 @@ class Scene(Serializable):
     def removeEdge(self, edge):
         self.edges.remove(edge)
 
-
     def clear(self):
         while len(self.nodes) > 0:
             self.nodes[0].remove()
 
         self.has_been_modified = False
-
 
     def saveToFile(self, filename):
         with open(filename, "w") as file:
@@ -93,7 +81,6 @@ class Scene(Serializable):
             self.deserialize(data)
 
             self.has_been_modified = False
-
 
     def serialize(self):
         nodes, edges = [], []

@@ -10,9 +10,6 @@ DEBUG = False
 
 
 class Node(Serializable):
-
-    # catClicked = pyqtSignal(Tag)
-
     def __init__(self, scene, title="Undefined Node", category=None, inputs=[], outputs=[]):
         super().__init__()
         self._title = title
@@ -30,9 +27,6 @@ class Node(Serializable):
         # create socket for inputs and outputs
         self.inputs = []
         self.outputs = []
-
-        # connecting slot to incoming signals
-        # self.content.wdg_label.imageLabel.catClicked.connect(self.categoryClicked) # signal from ContentWidget to be sent to EditorWidget
 
         counter = 0
         for item in inputs:
@@ -57,10 +51,6 @@ class Node(Serializable):
 
         for item in self.outputs:
             item.setSocketPosition()
-
-    # def categoryClicked(self, clickType):
-    #     print("Slot in Node")
-        #self.catClicked.emmit(self.category) # emmiting signal to be sent up to Scene? or maybe Editor Widget?
 
     @property
     def pos(self):
