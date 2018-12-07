@@ -137,7 +137,7 @@ class DockerWidget(QDockWidget):
             print("Error populatingFields")
             print(ex)
 
-    def parseCategory(self, root):
+    def parseCategory(self, root, table=""):
         print("parsing category")
         for child in root:
             if child.tag == "pattern":
@@ -151,9 +151,10 @@ class DockerWidget(QDockWidget):
             if child.tag == "template":
                 if child.findall("*") is not None:
                     print("template contains children")
+                    self.templateEdit.append(child.text)
                     self.parseCategory(child)
                 # after parsing through rest of template, print out text of template
-                self.templateEdit.setText(child.text)
+                self.templateEdit.append(child.text)
             if child.tag == "think":
                 if child.findall("*") is not None:
                     print("think has child tags")
@@ -176,6 +177,12 @@ class DockerWidget(QDockWidget):
                 print("at image")
                 file = child.find("filename")
                 self.imageEdit.setText(file.text)
+            if child.tag == "random":
+                self.randomTableHTML= RandomHTML()
+                responses = child.findall("li")
+                for item in responses:
+                    self.randomTableHTML.appendConItem(item.text)
+                self.templateEdit.insertHtml(self.randomTableHTML.table)
 
 
     def conditionClicked(self):
