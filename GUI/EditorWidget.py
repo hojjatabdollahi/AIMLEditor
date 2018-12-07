@@ -125,12 +125,12 @@ class EditorWidget(QWidget):
             this line is throwing error: Node cannot be converted to PyQt5.QtCore.QObject in this context
             try connecting signal through scene rather than node
             """
-            # aNode.catClicked.connect(self.categoryClicked)
+            aNode.content.catClicked.connect(self.categoryClicked)
         except Exception as ex:
             print(ex)
 
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
         print("slot in EditorWidget")
-        cat = self.aiml.find(cat.id)
-        self.catClicked.emmit(cat) # emmitting signal to be sent to EditorWindow
+        # cat = self.aiml.find(cat.id)
+        # self.catClicked.emmit(cat) # emmitting signal to be sent to EditorWindow

@@ -1,13 +1,14 @@
 from collections import OrderedDict
 from GUI.Node.Utils.Serializable import Serializable
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt, py
 from GUI.QLabel_Clickable import *
+from Model.Data import *
 
 
 class QDMNodeContentWidget(QWidget, Serializable):
 
-    catClicked = pyqtSignal(str)
+    catClicked = pyqtSignal(Tag)
 
     def __init__(self, node, parent=None):
         self.node = node
@@ -25,7 +26,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.layout.addWidget(self.wdg_label)
 
         # connecting label to allow signals to be sent to slot
-        # self.wdg_label.imageLabel.catClicked.connect(self.categoryClicked)
+        self.wdg_label.imageLabel.catClicked.connect(self.categoryClicked)
 
         # self.layout.addWidget(QLabel("What Ryan Hears:"))
         # self.layout.addWidget(QDMTextEdit(""))
@@ -46,7 +47,11 @@ class QDMNodeContentWidget(QWidget, Serializable):
     @pyqtSlot(str)
     def categoryClicked(self, clickType):
         print("slot in Content Widget")
-        self.catClicked.emmit(clickType) # emitting signal up to Node
+        try:
+            self.catClicked.emmit(self.node.category) # emitting signal up to Editor Widget
+        except Exception as ex:
+            print("exception caught in Content Widget Slot")
+            print(ex)
 
 
 class QDMTextEdit(QTextEdit):
