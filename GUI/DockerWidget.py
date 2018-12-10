@@ -77,6 +77,7 @@ class DockerWidget(QDockWidget):
 
         self.create = QPushButton("Create")
         self.update = QPushButton("Update")
+        self.cancel = QPushButton("Cancel")
         starTemplate = QPushButton("Add star tag in template")
         setTemplate = QPushButton("Add set tag in template")
         getTemplate = QPushButton("Add get tag in template")
@@ -121,6 +122,7 @@ class DockerWidget(QDockWidget):
         widgetToDock.layout().addWidget(self.imageEdit, 11, 1)
         widgetToDock.layout().addWidget(self.create, 12, 1)
         widgetToDock.layout().addWidget(self.update, 12, 1)
+        widgetToDock.layout().addWidget(self.cancel, 12, 0)
 
         self.update.setVisible(False)
 
@@ -129,9 +131,23 @@ class DockerWidget(QDockWidget):
 
         # Click events
         self.create.clicked.connect(self.createClicked)
-        self.update.clicked.connect(self.updateClicked) #TODO: Write the function updateClicked
+        self.update.clicked.connect(self.updateClicked)
         addCondition.clicked.connect(self.conditionClicked)
         addRandom.clicked.connect(self.randomClicked)
+        self.cancel.clicked.connect(self.cancelClicked)
+
+    def cancelClicked(self):
+        # clear contents inside docker widget
+        self.patternEdit.clear()
+        self.thatEdit.clear()
+        self.patternEdit.clear()
+        self.thinkEdit.clear()
+        self.templateEdit.clear()
+        self.videoEdit.clear()
+        self.imageEdit.clear()
+
+        if self.update.isVisible() is True:
+            self.update.setVisible(False)
 
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
