@@ -113,6 +113,7 @@ class EditorWindow(QMainWindow):
     def categoryUpdated(self, cat):
         print("slot in EditorWindow")
         try:
+            self.aiml.update(cat)
             self.catUpdated.emit(cat) # emitting signal to send to EditorWidget to update Node displaying category
         except Exception as ex:
             print("exception caught")
@@ -185,9 +186,12 @@ class EditorWindow(QMainWindow):
                 if fname == '':
                     return
                 if os.path.isfile(fname):
-                    self.centralWidget().scene.loadFromFile(fname)
-                    self.filename = fname
-                    # self.changeTitle()
+                    self.filename = os.path.splitext(fname)[0]  # removing extension from path name
+                    restoredAIML = Storage.restore(self.filename)
+                    print(restoredAIML)
+                    self.editSpace.aiml = restoredAIML
+                    self.editSpace.scene.loadFromFile(self.filename)
+                    print("Opened file successfully")
         except Exception as ex:
             handleError(ex)
             print("Exception caught!")

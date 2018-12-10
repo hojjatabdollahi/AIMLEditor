@@ -136,6 +136,9 @@ class EditorWidget(QWidget):
     def categoryUpdated(self, cat):
         print("slot in EditorWidget")
         try:
+            updatedCat = self.aiml.update(cat)
+            print("updated category\n")
+            print(str(updatedCat))
             self.updateNode(cat)
         except Exception as ex:
             print("Exception caught trying to update Node in EditorWidget")

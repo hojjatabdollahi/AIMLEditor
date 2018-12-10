@@ -164,7 +164,6 @@ class DockerWidget(QDockWidget):
 
     def updateClicked(self):
         print("update button clicked")
-        catToUpdate = self.aiml.update(self.cat)
 
         # initializing tag objects
         self.cat = Category(self.cat.id)
@@ -183,6 +182,8 @@ class DockerWidget(QDockWidget):
         self.random = Random()
 
         self.categoryCreation()
+
+        self.aiml.update(self.cat)
 
         print("updated category\n" + str(self.cat))
 

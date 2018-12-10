@@ -69,16 +69,15 @@ class Scene(Serializable):
     def saveToFile(self, filename):
         with open(filename, "w") as file:
             file.write( json.dumps( self.serialize(), indent=4 ) )
-            print("saving to", filename, "was successfull.")
+            print("saving to ", filename, " was successful.")
 
             self.has_been_modified = False
 
     def loadFromFile(self, filename):
-        with open(filename, "r") as file:
+        with open(filename+'.aib', "r") as file:
             raw_data = file.read()
             data = json.loads(raw_data, encoding='utf-8')
             self.deserialize(data)
-
             self.has_been_modified = False
 
     def serialize(self):

@@ -42,13 +42,16 @@ class Tag():
             print("Bad id, id was never generated and is currently null")
             return None
 
+        index = 0
         for cat in self.tags:
             if cat.type == "category":
                 if cat.id == newCat.id:
-                    cat = newCat
+                    self.tags[index] = newCat
+                    # cat = newCat
                     return cat
             else:
                 print("tag type: " + cat.type)
+            index = index + 1
 
         print("No category found with id of: " + newCat.id)
         return None
