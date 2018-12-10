@@ -18,6 +18,7 @@ class EditorWindow(QMainWindow):
     # Adding signal
     catCreated = pyqtSignal(Tag)
     catClicked = pyqtSignal(Tag)
+    catUpdated = pyqtSignal(Tag)
 
     def __init__(self):
         super().__init__()
@@ -82,6 +83,7 @@ class EditorWindow(QMainWindow):
 
         ########## making connections to slots ################
         docker.catCreated.connect(self.categoryCreated) # connecting signal from docker to slot
+        docker.catUpdated.connect(self.categoryUpdated) # connecting signal from docker
         self.editSpace.catClicked.connect(self.categoryClicked) # connecting signal from EditorWidget to slot
 
 
@@ -105,7 +107,16 @@ class EditorWindow(QMainWindow):
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
         print("slot in EditorWindow")
-        self.catClicked.emit(cat) # emmiting signal to send category to docker to repopulate fields
+        self.catClicked.emit(cat) # emitting signal to send category to docker to repopulate fields
+
+    @pyqtSlot(Tag)
+    def categoryUpdated(self, cat):
+        print("slot in EditorWindow")
+        try:
+            self.catUpdated.emit(cat) # emitting signal to send to EditorWidget to update Node displaying category
+        except Exception as ex:
+            print("exception caught")
+            print(ex)
 
     def changeTitle(self):
         title = "Node Editor - "
@@ -181,7 +192,6 @@ class EditorWindow(QMainWindow):
             handleError(ex)
             print("Exception caught!")
             print(ex)
-
 
     def onFileSave(self):
         if self.filename is None: return self.onFileSaveAs()

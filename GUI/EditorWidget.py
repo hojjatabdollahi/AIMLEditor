@@ -40,6 +40,7 @@ class EditorWidget(QWidget):
 
         ########## making connections to slots ################
         window.catCreated.connect(self.categoryCreated) # connecting signal from Editor Window that is sending created category
+        window.catUpdated.connect(self.categoryUpdated) # connecting signal from EditorWindow to update Node
 
         # self.addNodes()
         # self.addDebugContent()
@@ -69,6 +70,15 @@ class EditorWidget(QWidget):
     def addNode(self, title, inputs, outputs, posx, posy):
         node1 = Node(self.scene, title=title, inputs=inputs, outputs=outputs)
         node1.setPos(posx, posy)
+
+    def updateNode(self, cat):
+        for node in self.scene.nodes:
+            if node.category.id == cat.id:
+                print("found node to update")
+                node.category = cat
+                print(str(node.category))
+                node.content.wdg_label.imageLabel.clear()
+                node.content.wdg_label.imageLabel.setText(str(cat))
 
     def addDebugContent(self):
         greenBrush = QBrush(Qt.green)
@@ -112,6 +122,7 @@ class EditorWidget(QWidget):
     def categoryCreated(self, cat):
         print("slot in EditorWidget")
         # print(str(cat))
+        print("new category, create a node")
         self.aiml.append(cat)
         print("category id: " + str(cat.id))
         try:
@@ -119,6 +130,15 @@ class EditorWidget(QWidget):
             aNode.content.wdg_label.imageLabel.setText(str(cat))
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:
+            print(ex)
+
+    @pyqtSlot(Tag)
+    def categoryUpdated(self, cat):
+        print("slot in EditorWidget")
+        try:
+            self.updateNode(cat)
+        except Exception as ex:
+            print("Exception caught trying to update Node in EditorWidget")
             print(ex)
 
     @pyqtSlot(Tag)

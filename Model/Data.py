@@ -37,6 +37,22 @@ class Tag():
         print("No category found")
         return None
 
+    def update(self, newCat):
+        if id is None:
+            print("Bad id, id was never generated and is currently null")
+            return None
+
+        for cat in self.tags:
+            if cat.type == "category":
+                if cat.id == newCat.id:
+                    cat = newCat
+                    return cat
+            else:
+                print("tag type: " + cat.type)
+
+        print("No category found with id of: " + newCat.id)
+        return None
+
     """Finds first occurrence of Tag, type, in array tags of Parent Tag"""
     def findTag(self, type):
         if self.tags is None:

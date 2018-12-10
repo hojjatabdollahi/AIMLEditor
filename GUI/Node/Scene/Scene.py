@@ -41,7 +41,6 @@ class Scene(Serializable):
 
         self._has_been_modified = value
 
-
     def addHasBeenModifiedListener(self, callback):
         self._has_been_modified_listeners.append(callback)
 

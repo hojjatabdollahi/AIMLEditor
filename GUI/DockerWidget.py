@@ -15,9 +15,12 @@ class DockerWidget(QDockWidget):
 
     # Adding signal
     catCreated = pyqtSignal(Tag)
+    catUpdated = pyqtSignal(Tag)
 
     def __init__(self, window=None, parent=None):
         super().__init__(parent)
+        # initialize AIML object
+        self.aiml = AIML()
         # initialize the category object
         self.cat = None
         # initialize a pattern object
@@ -126,7 +129,7 @@ class DockerWidget(QDockWidget):
 
         # Click events
         self.create.clicked.connect(self.createClicked)
-        # self.update.clicked.connect(self.updateClicked) #TODO: Write the function updateClicked
+        self.update.clicked.connect(self.updateClicked) #TODO: Write the function updateClicked
         addCondition.clicked.connect(self.conditionClicked)
         addRandom.clicked.connect(self.randomClicked)
 
@@ -136,11 +139,62 @@ class DockerWidget(QDockWidget):
         print(cat)
         root = ET.fromstring(str(cat))
         self.update.setVisible(True)
+        self.cat = cat
         try:
             self.parseCategory(root)
         except Exception as ex:
             print("Error populatingFields")
             print(ex)
+
+    def updateClicked(self):
+        print("update button clicked")
+        catToUpdate = self.aiml.update(self.cat)
+
+        # initializing tag objects
+        self.cat = Category(self.cat.id)
+        self.pattern = Pattern()
+        self.template = Template()
+        self.that = That()
+        self.think = Think()
+        self.oob = Oob()
+        self.robot = Robot()
+        self.image = Image()
+        self.video = Video()
+        self.videoFileName = Filename()
+        self.imageFileName = Filename()
+        self.condition = Condition()
+        self.conItem = ConditionItem()
+        self.random = Random()
+
+        self.categoryCreation()
+
+        print("updated category\n" + str(self.cat))
+
+        self.catUpdated.emit(self.cat) # emitting signal to EditorWindow
+        self.update.setVisible(False)
+
+        # clear contents inside docker widget
+        self.patternEdit.clear()
+        self.thatEdit.clear()
+        self.patternEdit.clear()
+        self.thinkEdit.clear()
+        self.templateEdit.clear()
+        self.videoEdit.clear()
+        self.imageEdit.clear()
+
+        # clearing tag objects
+        self.cat = None
+        self.pattern = None
+        self.that = None
+        self.think = None
+        self.oob = None
+        self.robot = None
+        self.image = None
+        self.video = None
+        self.mediaFileName = None
+        self.conItem = None
+        self.conditionTableHTML = None
+        self.randomTableHTML = None
 
     def parseCategory(self, root):
         print("parsing category")
@@ -158,7 +212,6 @@ class DockerWidget(QDockWidget):
                     print("template contains children")
                     self.templateEdit.append(child.text)
                     self.parseCategory(child)
-                # self.templateEdit.setText(child.text)
             if child.tag == "think":
                 if child.find("set") is not None:
                     print("think has child tags")
@@ -228,118 +281,7 @@ class DockerWidget(QDockWidget):
         self.conItem = ConditionItem()
         self.random = Random()
 
-        # getting text from input fields
-        patternText = self.patternEdit.text()
-        templateText = self.templateEdit.toPlainText()
-        templateHTML = self.templateEdit.toHtml()
-        thatText = self.thatEdit.text()
-        thinkText = self.thinkEdit.toPlainText()
-        videoText = self.videoEdit.text()
-        imageText = self.imageEdit.text()
-
-        # appending content into cat object
-        self.pattern.append(patternText)
-
-        if thinkText != '':
-            self.think.append(thinkText)
-            self.template.append(self.think)
-
-        #self.template.append(templateText)
-        self.cat.append(self.pattern)
-
-        if thatText != '':
-            self.that.append(thatText)
-            self.cat.append(self.that)
-
-        if videoText != '':
-            print("appending video filename")
-            self.videoFileName.append(videoText)
-            print("appending filename tag to video tag")
-            self.video.append(self.videoFileName)
-            print("appending video tag to robot tag")
-            self.robot.append(self.video)
-
-        if imageText != '':
-            self.imageFileName.append(imageText)
-            self.image.append(self.imageFileName)
-            self.robot.append(self.image)
-
-        # checking for HTML table, if it exits, parse into condition tag object
-        # parse in a way where <p> before and after <table> is appended to template as text
-        if self.conditionTableHTML is not None:
-            self.condition.setAttrib(self.conditionTableHTML.getAttrib())
-            print("templateHTML: " + templateHTML)
-            root = ET.fromstring(templateHTML)
-            root = root.find('body')
-            tempRoot = root
-            # appending text before table to template
-            newroot = root.findall('*')
-            for child in newroot:
-                if child.tag == 'table':
-                    break
-                elif child.tag == 'p':
-                    print("child.text: " + child.text)
-                    self.template.append(child.text)
-                else:
-                    print("do nothing")
-
-            # parsing table contents
-            root = root.find('table')
-            print("root before parsing: " + root.tag)
-            self.condition = self.parseCondition(root, self.condition)
-            self.template.append(self.condition)
-
-            # appending text after table to template
-            tempRoot = tempRoot.findall('*')
-            shouldAppend = False
-            for child in tempRoot:
-                if child.tag == 'p':
-                    if shouldAppend is True:
-                        print("child.text: " + child.text)
-                        self.template.append(child.text)
-                if child.tag == 'table':
-                    shouldAppend = True
-        elif self.randomTableHTML is not None:
-            print("templateHTML: " + templateHTML)
-            root = ET.fromstring(templateHTML)
-            root = root.find('body')
-            tempRoot = root
-            # appending text before table to template
-            newroot = root.findall('*')
-            for child in newroot:
-                if child.tag == 'table':
-                    break
-                elif child.tag == 'p':
-                    print("child.text: " + child.text)
-                    self.template.append(child.text)
-                else:
-                    print("do nothing")
-
-            # parsing table contents
-            root = root.find('table')
-            print("root before parsing: " + root.tag)
-            print(self.random)
-            self.random = self.parseRandom(root, self.random)
-            print(self.random)
-            self.template.append(self.random)
-
-            # appending text after table to template
-            tempRoot = tempRoot.findall('*')
-            shouldAppend = False
-            for child in tempRoot:
-                if child.tag == 'p':
-                    if shouldAppend is True:
-                        print("child.text: " + child.text)
-                        self.template.append(child.text)
-                if child.tag == 'table':
-                    shouldAppend = True
-        else:
-            print("no table exists. append text")
-            self.template.append(templateText)
-
-        self.oob.append(self.robot)
-        self.template.append(self.oob)
-        self.cat.append(self.template)
+        self.categoryCreation()
 
         # clear contents inside docker widget
         self.patternEdit.clear()
@@ -350,6 +292,7 @@ class DockerWidget(QDockWidget):
         self.videoEdit.clear()
         self.imageEdit.clear()
 
+        self.aiml.append(self.cat)
 
         # emitting signal to EditorWindow to be sent to EditorWidget
         self.catCreated.emit(self.cat)
@@ -460,3 +403,117 @@ class DockerWidget(QDockWidget):
             self.randomTableHTML.appendConItem(str(item))
 
         self.templateEdit.insertHtml(self.randomTableHTML.table)
+
+    def categoryCreation(self):
+        # getting text from input fields
+        patternText = self.patternEdit.text()
+        templateText = self.templateEdit.toPlainText()
+        templateHTML = self.templateEdit.toHtml()
+        thatText = self.thatEdit.text()
+        thinkText = self.thinkEdit.toPlainText()
+        videoText = self.videoEdit.text()
+        imageText = self.imageEdit.text()
+
+        # appending content into cat object
+        self.pattern.append(patternText)
+
+        if thinkText != '':
+            self.think.append(thinkText)
+            self.template.append(self.think)
+
+        # self.template.append(templateText)
+        self.cat.append(self.pattern)
+
+        if thatText != '':
+            self.that.append(thatText)
+            self.cat.append(self.that)
+
+        if videoText != '':
+            print("appending video filename")
+            self.videoFileName.append(videoText)
+            print("appending filename tag to video tag")
+            self.video.append(self.videoFileName)
+            print("appending video tag to robot tag")
+            self.robot.append(self.video)
+
+        if imageText != '':
+            self.imageFileName.append(imageText)
+            self.image.append(self.imageFileName)
+            self.robot.append(self.image)
+
+        # checking for HTML table, if it exits, parse into condition tag object
+        # parse in a way where <p> before and after <table> is appended to template as text
+        if self.conditionTableHTML is not None:
+            self.condition.setAttrib(self.conditionTableHTML.getAttrib())
+            print("templateHTML: " + templateHTML)
+            root = ET.fromstring(templateHTML)
+            root = root.find('body')
+            tempRoot = root
+            # appending text before table to template
+            newroot = root.findall('*')
+            for child in newroot:
+                if child.tag == 'table':
+                    break
+                elif child.tag == 'p':
+                    print("child.text: " + child.text)
+                    self.template.append(child.text)
+                else:
+                    print("do nothing")
+
+            # parsing table contents
+            root = root.find('table')
+            print("root before parsing: " + root.tag)
+            self.condition = self.parseCondition(root, self.condition)
+            self.template.append(self.condition)
+
+            # appending text after table to template
+            tempRoot = tempRoot.findall('*')
+            shouldAppend = False
+            for child in tempRoot:
+                if child.tag == 'p':
+                    if shouldAppend is True:
+                        print("child.text: " + child.text)
+                        self.template.append(child.text)
+                if child.tag == 'table':
+                    shouldAppend = True
+        elif self.randomTableHTML is not None:
+            print("templateHTML: " + templateHTML)
+            root = ET.fromstring(templateHTML)
+            root = root.find('body')
+            tempRoot = root
+            # appending text before table to template
+            newroot = root.findall('*')
+            for child in newroot:
+                if child.tag == 'table':
+                    break
+                elif child.tag == 'p':
+                    print("child.text: " + child.text)
+                    self.template.append(child.text)
+                else:
+                    print("do nothing")
+
+            # parsing table contents
+            root = root.find('table')
+            print("root before parsing: " + root.tag)
+            print(self.random)
+            self.random = self.parseRandom(root, self.random)
+            print(self.random)
+            self.template.append(self.random)
+
+            # appending text after table to template
+            tempRoot = tempRoot.findall('*')
+            shouldAppend = False
+            for child in tempRoot:
+                if child.tag == 'p':
+                    if shouldAppend is True:
+                        print("child.text: " + child.text)
+                        self.template.append(child.text)
+                if child.tag == 'table':
+                    shouldAppend = True
+        else:
+            print("no table exists. append text")
+            self.template.append(templateText)
+
+        self.oob.append(self.robot)
+        self.template.append(self.oob)
+        self.cat.append(self.template)
