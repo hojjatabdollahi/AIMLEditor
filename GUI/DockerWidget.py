@@ -158,12 +158,14 @@ class DockerWidget(QDockWidget):
                     print("template contains children")
                     self.templateEdit.append(child.text)
                     self.parseCategory(child)
+                # self.templateEdit.setText(child.text)
             if child.tag == "think":
-                if child.findall("*") is not None:
+                if child.find("set") is not None:
                     print("think has child tags")
                     self.parseCategory(child)
                 else:
                     self.thinkEdit.setText(child.text)
+                    self.templateEdit.append(child.tail)
             if child.tag == "set":
                 self.templateEdit.setText("<"+set.tag+" "+"name=\""+set.attrib+"\">"+set.text+"</"+set.tag+">")
             if child.tag == "oob":
