@@ -170,26 +170,14 @@ class EditorWindow(QMainWindow):
         #     self.changeTitle()
 
     def onFileOpen(self):
-        # fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
-        # print("file path: " + fname)
-        # self.filename = os.path.splitext(fname)[0] # removing extension from path name
-        # print('got file name: ' + self.filename)
-        # self.editSpace.aiml = Storage.restore(self.filename)  # restore the pickle
-        # print("restored pickle file")
-        # print("printing aiml file...")
-        # print(self.editSpace.aiml)
-        # self.editSpace.setPlainText(str(self.editSpace.aiml))
-        # print("appended content to editSpace")
         try:
             if self.maybeSave():
                 fname, filter = QFileDialog.getOpenFileName(self, 'Open graph from file')
                 if fname == '':
                     return
                 if os.path.isfile(fname):
+                    print("found file")
                     self.filename = os.path.splitext(fname)[0]  # removing extension from path name
-                    restoredAIML = Storage.restore(self.filename)
-                    print(restoredAIML)
-                    self.editSpace.aiml = restoredAIML
                     self.editSpace.scene.loadFromFile(self.filename)
                     print("Opened file successfully")
         except Exception as ex:
@@ -199,7 +187,8 @@ class EditorWindow(QMainWindow):
 
     def onFileSave(self):
         if self.filename is None: return self.onFileSaveAs()
-        Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
+        self.editSpace.scene.saveToFile(self.filename)
+        # Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
         self.statusBar().showMessage("Successfully saved %s" % self.filename)
         return True
 
@@ -220,8 +209,8 @@ class EditorWindow(QMainWindow):
         if fname == '':
             return False
         self.filename = fname
-        Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
-        # self.onFileSave()
+        # Storage.save(self.filename, self.editSpace.scene)  # save as a pickle file
+        self.onFileSave()
         return True
 
     def onEditUndo(self):

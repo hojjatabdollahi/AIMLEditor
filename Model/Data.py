@@ -47,8 +47,7 @@ class Tag():
             if cat.type == "category":
                 if cat.id == newCat.id:
                     self.tags[index] = newCat
-                    # cat = newCat
-                    return cat
+                    return newCat
             else:
                 print("tag type: " + cat.type)
             index = index + 1
