@@ -1,6 +1,6 @@
 class Serializable():
     def __init__(self):
-        self.id = id(self)
+        self.objId = id(self)
 
     def serialize(self):
         raise NotImplemented()

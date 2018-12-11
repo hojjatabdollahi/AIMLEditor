@@ -54,7 +54,7 @@ class Socket(Serializable):
 
     def serialize(self):
         return OrderedDict([
-            ('id', self.id),
+            ('id', self.objId),
             ('index', self.index),
             ('position', self.position),
             ('socket_type', self.socket_type),
@@ -62,6 +62,6 @@ class Socket(Serializable):
 
     def deserialize(self, data, hashmap={}, restore_id=True):
         if restore_id:
-            self.id = data['id']
+            self.objId = data['id']
         hashmap[data['id']] = self
         return True

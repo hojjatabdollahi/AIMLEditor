@@ -78,14 +78,16 @@ class Scene(Serializable):
             raw_data = file.read()
             data = json.loads(raw_data, encoding='utf-8')
             self.deserialize(data)
+            
             self.has_been_modified = False
 
     def serialize(self):
+        print("Serializing Scene")
         nodes, edges = [], []
         for node in self.nodes: nodes.append(node.serialize())
         for edge in self.edges: edges.append(edge.serialize())
         return OrderedDict([
-            ('id', self.id),
+            ('id', self.objId),
             ('scene_width', self.scene_width),
             ('scene_height', self.scene_height),
             ('nodes', nodes),
@@ -96,7 +98,7 @@ class Scene(Serializable):
         self.clear()
         hashmap = {}
 
-        if restore_id: self.id = data['id']
+        if restore_id: self.objId = data['id']
 
         # create nodes
         for node_data in data['nodes']:

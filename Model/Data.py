@@ -2,14 +2,55 @@ from textwrap import indent
 import xml.etree.ElementTree as ET
 import Model.Common as Common
 from PyQt5.QtCore import QUuid
+from GUI.Node.Utils.Serializable import Serializable
+from collections import OrderedDict
 
 
-class Tag():
+class Tag(Serializable):
     def __init__(self, type, acceptable_tags=[], attrib={}):
         self.type = type
         self.tags = []
         self.acceptable_tags = acceptable_tags
         self.attrib = attrib
+
+    def serialize(self):
+        try:
+            print("attempting to serialize tag")
+            tags = []
+            acceptable_tags = []
+            for tag in self.tags: tags.append(tag)
+            print("created tags array")
+            for tag in self.acceptable_tags: acceptable_tags.append(tag)
+            print("created acceptable tags array")
+            return OrderedDict([
+                ('id', self.objId),
+                ('type', self.type),
+                ('tags', tags),
+                ('acceptable_tags', acceptable_tags),
+                ('attrib', self.attrib)
+            ])
+        except Exception as ex:
+            print(ex)
+
+    def deserialize(self, data, hashmap={}, restore_id=True):
+        try:
+            print("attempting to deserialize tag")
+            if restore_id: self.objId = data['id']
+
+            self.type = data['type']
+            self.attrib = data['attrib']
+
+            for tag in data['tags']:
+                tag.deserialize(data, hashmap, restore_id)
+                self.tags.append(tag)
+
+            for acceptable_tag in data['acceptable_tags']:
+                # acceptable_tag.deserialize(data, hashmap, restore_id)
+                self.acceptable_tags.append(acceptable_tag)
+
+            return True
+        except Exception as ex:
+            print(ex)
 
     def append(self, tag):
         if type(tag) in self.acceptable_tags:

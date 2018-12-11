@@ -186,11 +186,16 @@ class EditorWindow(QMainWindow):
             print(ex)
 
     def onFileSave(self):
-        if self.filename is None: return self.onFileSaveAs()
-        self.editSpace.scene.saveToFile(self.filename)
-        # Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
-        self.statusBar().showMessage("Successfully saved %s" % self.filename)
-        return True
+        try:
+            if self.filename is None: return self.onFileSaveAs()
+            self.editSpace.scene.saveToFile(self.filename)
+            # Storage.save(self.filename, self.editSpace.aiml)  # save as a pickle file
+            self.statusBar().showMessage("Successfully saved %s" % self.filename)
+            return True
+        except Exception as ex:
+            print("Exception caught trying to save to file")
+            print(ex)
+            handleError(ex)
 
     def onFileExport(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Export to file')

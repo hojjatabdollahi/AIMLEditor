@@ -108,28 +108,31 @@ class Node(Serializable):
             print(" - everything was done.")
 
     def serialize(self):
+        print("Serializing Node")
         inputs, outputs = [], []
         for socket in self.inputs:
             inputs.append(socket.serialize())
         for socket in self.outputs:
             outputs.append(socket.serialize())
         return OrderedDict([
-            ('id', self.id),
+            ('id', self.objId),
             ('title', self.title),
             ('pos_x', self.grNode.scenePos().x()),
             ('pos_y', self.grNode.scenePos().y()),
             ('inputs', inputs),
             ('outputs', outputs),
             ('content', self.content.serialize()),
+            ('category', self.category.serialize()),
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
         if restore_id:
-            self.id = data['id']
+            self.objId = data['id']
         hashmap[data['id']] = self
 
         self.setPos(data['pos_x'], data['pos_y'])
         self.title = data['title']
+        self.category = data['category']
 
         data['inputs'].sort(
             key=lambda socket: socket['index'] + socket['position'] * 10000)
