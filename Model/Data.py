@@ -78,9 +78,10 @@ class Tag(Serializable):
                     aTag = self.decode_tag(tag['type'])
                     print(aTag)
                     self.tags.append(aTag)
-                    aTag.deserialize(tag['tags'])
+                    aTag.deserialize(tag)
                 except:
-                    self.tags.append(str(tag))
+                    print("appending text between tags")
+                    self.tags.append(tag)
             return True
         except Exception as ex:
             print(ex)
@@ -173,7 +174,11 @@ class Category(Tag):
         super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
         # id to distinguish categories within an AIML object
-        self.id = id
+        if id=="":
+            newId = QUuid.createUuid()
+            self.id = newId.toString()
+        else:
+            self.id = id
 
 
 class Pattern(Tag):

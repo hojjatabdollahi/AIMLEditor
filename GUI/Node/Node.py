@@ -137,6 +137,8 @@ class Node(Serializable):
         print(self.category)
         self.category.deserialize(data['category'])
 
+        self.content.node = self
+        self.content.node.category = self.category
         self.content.wdg_label.imageLabel.setText(str(self.category))
 
         data['inputs'].sort(
