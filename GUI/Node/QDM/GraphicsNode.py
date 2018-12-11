@@ -93,7 +93,6 @@ class QDMGraphicsNode(QGraphicsItem):
         super().mousePressEvent(mouseEvent)
 
     def mouseMoveEvent(self, event):
-
         # optimize me! just update the selected nodes
         for node in self.scene().scene.nodes:
             if node.grNode.isSelected():
@@ -106,16 +105,20 @@ class QDMGraphicsNode(QGraphicsItem):
             super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        super().mouseReleaseEvent(event)
+        print("mouse released")
+        try:
+            super().mouseReleaseEvent(event)
 
-        if self.wasMoved:
-            self.wasMoved = False
-            self.node.scene.history.storeHistory(
-                "Node moved", setModified=True)
-        self.handleSelected = None
-        self.mousePressPos = None
-        self.mousePressRect = None
-        self.update()
+            if self.wasMoved:
+                self.wasMoved = False
+                self.node.scene.history.storeHistory(
+                    "Node moved", setModified=True)
+            self.handleSelected = None
+            self.mousePressPos = None
+            self.mousePressRect = None
+            self.update()
+        except Exception as ex:
+            print(ex)
 
     @property
     def title(self): return self._title

@@ -135,7 +135,7 @@ class Topic(Tag):
             super().__init__("topic", acceptable_tags=[Category])
 
 
-class Category(Tag):
+class Category(Tag, Serializable):
     def __init__(self, id=""):
         super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
