@@ -14,11 +14,35 @@ class Tag(Serializable):
         self.acceptable_tags = acceptable_tags
         self.attrib = attrib
 
+        self.tag_list = {"aiml": AIML,
+                    "topic": Topic,
+                    "category": Category,
+                    "pattern": Pattern,
+                    "template": Template,
+                    "condition": Condition,
+                    "li": ConditionItem,
+                    "random": Random,
+                    "set": Set,
+                    "think": Think,
+                    "that": That,
+                    "oob": Oob,
+                    "robot": Robot,
+                    "options": Options,
+                    "option": Option,
+                    "image": Image,
+                    "video": Video,
+                    "filename": Filename}
+
+    def decode_tag(self, tag_type):
+        if tag_type in self.tag_list:
+            return self.tag_list[tag_type]()
+        return False
+
+
     def serialize(self):
         try:
             print("attempting to serialize tag")
             tags = []
-            acceptable_tags = []
             for tag in self.tags:
                 try:
                     tags.append(tag.serialize())
@@ -48,13 +72,15 @@ class Tag(Serializable):
             self.attrib = data['attrib']
 
             for tag in data['tags']:
-                tag.deserialize(data, hashmap, restore_id)
-                self.tags.append(tag)
-
-            for acceptable_tag in data['acceptable_tags']:
-                # acceptable_tag.deserialize(data, hashmap, restore_id)
-                self.acceptable_tags.append(acceptable_tag)
-
+                print("printing tag contents")
+                print(tag)
+                try:
+                    aTag = self.decode_tag(tag['type'])
+                    print(aTag)
+                    self.tags.append(aTag)
+                    aTag.deserialize(tag['tags'])
+                except:
+                    self.tags.append(str(tag))
             return True
         except Exception as ex:
             print(ex)

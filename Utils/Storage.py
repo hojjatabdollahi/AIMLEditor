@@ -41,8 +41,7 @@ def exportAIML(filename, aiml):
         print(ex)
 
 
-tag_list = {"category": Category,
-            "aiml": AIML,
+tag_list = {"aiml": AIML,
             "topic": Topic,
             "category": Category,
             "pattern": Pattern,

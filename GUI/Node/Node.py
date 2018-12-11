@@ -126,13 +126,18 @@ class Node(Serializable):
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
+        print("deserializing Node")
         if restore_id:
             self.objId = data['id']
         hashmap[data['id']] = self
 
         self.setPos(data['pos_x'], data['pos_y'])
         self.title = data['title']
-        self.category = data['category']
+        self.category = Tag(data['category']["type"])
+        print(self.category)
+        self.category.deserialize(data['category'])
+
+        self.content.wdg_label.imageLabel.setText(str(self.category))
 
         data['inputs'].sort(
             key=lambda socket: socket['index'] + socket['position'] * 10000)

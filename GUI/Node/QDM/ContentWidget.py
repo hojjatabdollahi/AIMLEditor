@@ -14,6 +14,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
     def __init__(self, node, parent=None):
         self.node = node
+        self.wdg_label = LabelClickable()
         super().__init__(parent)
 
         self.initUI()
@@ -24,7 +25,6 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.setLayout(self.layout)
 
         # self.wdg_label = QLabel("Category")
-        self.wdg_label = LabelClickable()
         self.layout.addWidget(self.wdg_label)
 
         # connecting label to allow signals to be sent to slot
@@ -43,7 +43,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
         ])
 
-    def deserialize(self, data, hashmap={}):
+    def deserialize(self, data, hashmap={}, restore_id=True):
         return False
 
     @pyqtSlot()
