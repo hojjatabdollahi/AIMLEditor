@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 class Tag(Serializable):
     def __init__(self, type, acceptable_tags=[], attrib={}):
+        super().__init__()
         self.type = type
         self.tags = []
         self.acceptable_tags = acceptable_tags
@@ -18,15 +19,21 @@ class Tag(Serializable):
             print("attempting to serialize tag")
             tags = []
             acceptable_tags = []
-            for tag in self.tags: tags.append(tag)
+            for tag in self.tags:
+                try:
+                    tags.append(tag.serialize())
+                except:
+                    tags.append(str(tag))
+
             print("created tags array")
-            for tag in self.acceptable_tags: acceptable_tags.append(tag)
-            print("created acceptable tags array")
+
+            print(tags)
+
+            print(self.attrib)
             return OrderedDict([
                 ('id', self.objId),
-                ('type', self.type),
+                ('type', str(self.type)),
                 ('tags', tags),
-                ('acceptable_tags', acceptable_tags),
                 ('attrib', self.attrib)
             ])
         except Exception as ex:
@@ -135,7 +142,7 @@ class Topic(Tag):
             super().__init__("topic", acceptable_tags=[Category])
 
 
-class Category(Tag, Serializable):
+class Category(Tag):
     def __init__(self, id=""):
         super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
