@@ -184,9 +184,12 @@ class DockerWidget(QDockWidget):
 
         self.categoryCreation()
 
-        self.aiml.update(self.cat)
-
         print("updated category\n" + str(self.cat))
+
+        if self.aiml.update(self.cat) is None:
+            self.aiml.append(self.cat)
+        else:
+            self.aiml.update(self.cat)
 
         self.catUpdated.emit(self.cat) # emitting signal to EditorWindow
         self.update.setVisible(False)
@@ -468,13 +471,20 @@ class DockerWidget(QDockWidget):
             root = root.find('body')
             tempRoot = root
             # appending text before table to template
+            print("appending text before table")
             newroot = root.findall('*')
             for child in newroot:
                 if child.tag == 'table':
                     break
                 elif child.tag == 'p':
-                    print("child.text: " + child.text)
-                    self.template.append(child.text)
+                    if child.text is None:
+                        print("string is empty")
+                        print("child.text: " + str(child.text))
+                        self.template.append("")
+                    else:
+                        print("string is not empty")
+                        print("child.text: " + str(child.text))
+                        self.template.append(child.text)
                 else:
                     print("do nothing")
 
@@ -490,8 +500,14 @@ class DockerWidget(QDockWidget):
             for child in tempRoot:
                 if child.tag == 'p':
                     if shouldAppend is True:
-                        print("child.text: " + child.text)
-                        self.template.append(child.text)
+                        if child.text is None:
+                            print("string is empty")
+                            print("child.text: " + str(child.text))
+                            self.template.append("")
+                        else:
+                            print("string is not empty")
+                            print("child.text: " + str(child.text))
+                            self.template.append(child.text)
                 if child.tag == 'table':
                     shouldAppend = True
         elif self.randomTableHTML is not None:
@@ -535,3 +551,4 @@ class DockerWidget(QDockWidget):
         self.oob.append(self.robot)
         self.template.append(self.oob)
         self.cat.append(self.template)
+        print("category creation successful")
