@@ -154,6 +154,7 @@ class DockerWidget(QDockWidget):
         print("slot in DockerWidget")
         print(cat)
         root = ET.fromstring(str(cat))
+        print("root tag: " + root.tag)
         self.update.setVisible(True)
         self.cat = cat
         try:
@@ -260,7 +261,7 @@ class DockerWidget(QDockWidget):
                 self.templateEdit.insertHtml(self.randomTableHTML.table)
                 self.templateEdit.append(child.tail)
             if child.tag == "condition":
-                self.conditionTableHTML = ConditionHTML(self.condition)
+                self.conditionTableHTML = ConditionHTML(child)
                 responses = child.findall("li")
                 for item in responses:
                     self.conditionTableHTML.appendConItem(item.get("value"), item.text)
