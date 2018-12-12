@@ -5,6 +5,7 @@ from GUI.Node.QDM.ContentWidget import QDMNodeContentWidget
 from GUI.Node.Utils.Socket import *
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QObject
 from Model.Data import *
+from GUI import EditorWidget
 
 DEBUG = False
 
@@ -146,11 +147,11 @@ class Node(Serializable):
             ('inputs', inputs),
             ('outputs', outputs),
             ('content', self.content.serialize()),
-            ('category', self.category.serialize()),
+            ('category', self.category.serialize())
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
-        print("deserializing Node")
+        print("Deserializing Node")
         if restore_id:
             self.objId = data['id']
         hashmap[data['id']] = self

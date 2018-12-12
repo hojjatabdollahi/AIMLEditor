@@ -60,6 +60,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
                 print(self.node.category.id)
                 try:
                     self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
+                    print("signal emitted")
                 except Exception as ex:
                     print("exception caught in Content Widget Slot")
                     print(ex)
@@ -68,6 +69,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
                 print(self.node.category.id)
                 try:
                     self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
+                    print("signal emitted")
                 except Exception as ex:
                     print("exception caught in Content Widget Slot")
                     print(ex)

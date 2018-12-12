@@ -71,6 +71,8 @@ class Tag(Serializable):
             self.type = data['type']
             self.attrib = data['attrib']
 
+            print("about to recursively decode tags")
+
             for tag in data['tags']:
                 print("printing tag contents")
                 print(tag)
@@ -84,6 +86,7 @@ class Tag(Serializable):
                     self.tags.append(tag)
             return True
         except Exception as ex:
+            print("Exception caught in deserialize Tag!")
             print(ex)
 
     def append(self, tag):

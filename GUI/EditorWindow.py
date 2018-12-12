@@ -179,10 +179,13 @@ class EditorWindow(QMainWindow):
                     print("found file")
                     self.filename = os.path.splitext(fname)[0]  # removing extension from path name
                     self.editSpace.scene.loadFromFile(self.filename)
+                    for node in self.editSpace.scene.nodes:
+                        self.editSpace.aiml.append(node.category)
+                        node.content.catClicked.connect(self.editSpace.categoryClicked)
                     print("Opened file successfully")
         except Exception as ex:
             handleError(ex)
-            print("Exception caught!")
+            print("Exception caught in onFileOpen!")
             print(ex)
 
     def onFileSave(self):
