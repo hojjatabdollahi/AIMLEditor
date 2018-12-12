@@ -521,8 +521,14 @@ class DockerWidget(QDockWidget):
                 if child.tag == 'table':
                     break
                 elif child.tag == 'p':
-                    print("child.text: " + child.text)
-                    self.template.append(child.text)
+                    if child.text is None:
+                        print("string is empty")
+                        print("child.text: " + str(child.text))
+                        self.template.append("")
+                    else:
+                        print("string is not empty")
+                        print("child.text: " + str(child.text))
+                        self.template.append(child.text)
                 else:
                     print("do nothing")
 
@@ -540,8 +546,14 @@ class DockerWidget(QDockWidget):
             for child in tempRoot:
                 if child.tag == 'p':
                     if shouldAppend is True:
-                        print("child.text: " + child.text)
-                        self.template.append(child.text)
+                        if child.text is None:
+                            print("string is empty")
+                            print("child.text: " + str(child.text))
+                            self.template.append("")
+                        else:
+                            print("string is not empty")
+                            print("child.text: " + str(child.text))
+                            self.template.append(child.text)
                 if child.tag == 'table':
                     shouldAppend = True
         else:
