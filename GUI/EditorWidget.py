@@ -78,7 +78,7 @@ class EditorWidget(QWidget):
                 node.category = cat
                 print(str(node.category))
                 node.content.wdg_label.imageLabel.clear()
-                node.content.wdg_label.imageLabel.setText(str(cat))
+                node.content.wdg_label.imageLabel.displayVisuals(cat)
 
     def addDebugContent(self):
         greenBrush = QBrush(Qt.green)
@@ -127,7 +127,7 @@ class EditorWidget(QWidget):
         print("category id: " + str(cat.id))
         try:
             aNode = Node(self.scene, "Category", cat)
-            aNode.content.wdg_label.imageLabel.setText(str(cat))
+            aNode.content.wdg_label.imageLabel.displayVisuals(cat)
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:
             print(ex)

@@ -165,7 +165,7 @@ class Node(Serializable):
 
         self.content.node = self
         self.content.node.category = self.category
-        self.content.wdg_label.imageLabel.setText(str(self.category))
+        self.content.wdg_label.imageLabel.displayVisuals(self.category)
 
         data['inputs'].sort(
             key=lambda socket: socket['index'] + socket['position'] * 10000)
