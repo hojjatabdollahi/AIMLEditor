@@ -49,10 +49,29 @@ class QDMNodeContentWidget(QWidget, Serializable):
     @pyqtSlot()
     def categoryClicked(self):
         print("slot in ContentWidget")
+        print(self.node.category)
         try:
-            self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
+            if self.node.category.id == "":
+                print("id is empty string")
+                id = QUuid()
+                id = id.createUuid()
+                id = id.toString()
+                self.node.category.id = id
+                print(self.node.category.id)
+                try:
+                    self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
+                except Exception as ex:
+                    print("exception caught in Content Widget Slot")
+                    print(ex)
+            else:
+                print("id exists")
+                print(self.node.category.id)
+                try:
+                    self.catClicked.emit(self.node.category) # emitting signal up to Editor Widget
+                except Exception as ex:
+                    print("exception caught in Content Widget Slot")
+                    print(ex)
         except Exception as ex:
-            print("exception caught in Content Widget Slot")
             print(ex)
 
 

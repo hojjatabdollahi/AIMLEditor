@@ -174,7 +174,7 @@ class Category(Tag):
         super().__init__("category", acceptable_tags=[
             Pattern, Template, Think, That])
         # id to distinguish categories within an AIML object
-        if id=="":
+        if id == "":
             newId = QUuid.createUuid()
             self.id = newId.toString()
         else:

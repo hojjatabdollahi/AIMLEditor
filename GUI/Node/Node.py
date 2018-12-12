@@ -42,6 +42,30 @@ class Node(Serializable):
             counter += 1
             self.outputs.append(socket)
 
+        self.tag_list = {"aiml": AIML,
+                         "topic": Topic,
+                         "category": Category,
+                         "pattern": Pattern,
+                         "template": Template,
+                         "condition": Condition,
+                         "li": ConditionItem,
+                         "random": Random,
+                         "set": Set,
+                         "think": Think,
+                         "that": That,
+                         "oob": Oob,
+                         "robot": Robot,
+                         "options": Options,
+                         "option": Option,
+                         "image": Image,
+                         "video": Video,
+                         "filename": Filename}
+
+    def decode_tag(self, tag_type):
+        if tag_type in self.tag_list:
+            return self.tag_list[tag_type]()
+        return False
+
     def __str__(self):
         return "<Node %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
 
@@ -133,7 +157,8 @@ class Node(Serializable):
 
         self.setPos(data['pos_x'], data['pos_y'])
         self.title = data['title']
-        self.category = Tag(data['category']["type"])
+        print("tag type: " + data['category']['type'])
+        self.category = self.decode_tag(data['category']['type'])
         print(self.category)
         self.category.deserialize(data['category'])
 
