@@ -13,7 +13,7 @@ class QLabelClickable(QLabel):
         super(QLabelClickable, self).__init__(parent)
         self.templateText = ""
         self. patternText = ""
-        self.patternFont = QFont("Ubuntu", 13, QFont.Bold)
+        self.patternFont = QFont("Ubuntu", 10)
         self.templateFont = QFont("Ubuntu", 13, True)
 
     def mousePressEvent(self, event):
@@ -42,11 +42,21 @@ class QLabelClickable(QLabel):
         self.pattern = Pattern()
         self.condition = Condition()
         self.random = Random()
+        self.that = That()
 
         self.template = self.parseTree(root)
+
         self.templateText = str(self.template)
         self.patternText = str(self.pattern)
-        text_to_set = 'pattern: ' + self.patternText + '\ntemplate: ' + self.templateText
+
+        self.setFont(self.patternFont)
+        if str(self.that) == "<that></that>":
+            print("no text in that")
+            self.thatText = ""
+        else:
+            print("text in that")
+            self.thatText = str(self.that)
+        text_to_set = 'pattern: ' + self.patternText + "\nthat: " + self.thatText + '\ntemplate: ' + self.templateText
         self.setText(text_to_set)
 
     def parseTree(self, root):
@@ -95,6 +105,8 @@ class QLabelClickable(QLabel):
                     conItem.append(child.text)
                     conItem.attrib = child.attrib
                     self.condition.append(conItem)
+            elif child.tag == "that":
+                self.that.append(child.text)
             else:
                 print("do nothing")
         self.template.attrib = []
