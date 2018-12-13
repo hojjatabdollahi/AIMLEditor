@@ -129,7 +129,8 @@ class EditorWidget(QWidget):
         # print("category id: " + str(cat.id))
         self.aiml.append(cat)
         try:
-            aNode = Node(self.scene, "Category", cat)
+            title = "Category: " + cat.id
+            aNode = Node(self.scene, title, cat)
             aNode.content.wdg_label.imageLabel.displayVisuals(cat)
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:

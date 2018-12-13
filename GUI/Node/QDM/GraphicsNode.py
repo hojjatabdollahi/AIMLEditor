@@ -19,17 +19,17 @@ class QDMGraphicsNode(QGraphicsItem):
         self.node = node
         self.content = self.node.content
 
-        self._title_color = Qt.white
+        self._title_color = Qt.green
         self._title_font = QFont("Ubuntu", 10)
 
         self.rect = QRectF(
             0,
             0,
-            370,
-            390
+            430,
+            420
         )
         self.edge_size = 10.0
-        self.title_height = 24.0
+        self.title_height = 35.0
         self._padding = 4.0
 
         self._pen_default = QPen(QColor("#7F000000"))
