@@ -59,6 +59,9 @@ class QLabelClickable(QLabel):
         patternStr = patternStr.join(self.patternText)
         thatStr = thatStr.join(self.thatText)
 
+        # making sure tags don't have unnecessary attributes
+        category.attrib = []
+
         # creating string of text to display
         text_to_set = 'pattern: ' + patternStr + \
                       "\nthat: " + thatStr + \
@@ -74,9 +77,11 @@ class QLabelClickable(QLabel):
                         print("child.text is None")
                         print("child.text for template: " + str(child.text))
                         self.templateText.append("")
+                        self.template.attrib = []
                     else:
                         print("child.text for template: " + child.text)
                         self.templateText.append(child.text)
+                        self.template.attrib = []
                 else:
                     self.templateText.append(child.text)
                     self.parseTree(child)
@@ -85,12 +90,14 @@ class QLabelClickable(QLabel):
                     print("child.text is None")
                     print("child.text for pattern: " + str(child.text))
                     self.patternText.append("")
+                    self.pattern.attrib = []
                 else:
                     print("child.text for pattern: " + child.text)
                     self.patternText.append(child.text)
+                    self.pattern.attrib = []
             elif child.tag == "condition":
                 self.parseTree(child)
-                self.condition.attrib['name'] = child.attrib['name']
+                self.condition.attrib = child.attrib
                 self.templateText.append(str(self.condition))
                 self.templateText.append(child.tail)
             elif child.tag == "random":
@@ -119,8 +126,7 @@ class QLabelClickable(QLabel):
                 self.thatText.append(child.text)
             else:
                 print("do nothing")
-        # self.template.attrib = []
-        # self.pattern.attrib = []
+
         return self.templateText
 
 class LabelClickable(QDialog):
