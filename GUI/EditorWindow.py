@@ -107,6 +107,7 @@ class EditorWindow(QMainWindow):
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
         print("slot in EditorWindow")
+        self.editSpace.aiml.append(cat)
         self.catClicked.emit(cat) # emitting signal to send category to docker to repopulate fields
 
     @pyqtSlot(Tag)
@@ -205,12 +206,22 @@ class EditorWindow(QMainWindow):
         Storage.exportAIML(fname, self.editSpace.aiml)  # save as an aiml file
 
     def onFileImport(self):
-        fname, filter = QFileDialog.getOpenFileName(self, "Import File")
-        print("fname: " + fname)
-        self.filename = os.path.splitext(fname)[0]  # removing extension from path name
-        self.editSpace.aiml = Storage.importAIML(self.filename) # import the aiml file
-        print("file import successful")
-        # self.editSpace.setPlainText(str(self.editSpace.aiml))
+        try:
+            fname, filter = QFileDialog.getOpenFileName(self, "Import File")
+            print("fname: " + fname)
+            self.filename = os.path.splitext(fname)[0]  # removing extension from path name
+            self.editSpace.aiml = Storage.importAIML(self.filename) # import the aiml file
+            # print(str(self.editSpace.aiml.tags))
+            for cat in self.editSpace.aiml.tags:
+                print("hi")
+                if cat.type == "category":
+                    print("tag is a category")
+                    self.catCreated.emit(cat)
+            print("file import successful")
+            # self.editSpace.setPlainText(str(self.editSpace.aiml))
+        except Exception as ex:
+            handleError(ex)
+            print(ex)
 
     def onFileSaveAs(self):
         fname, filter = QFileDialog.getSaveFileName(self, 'Save graph to file')

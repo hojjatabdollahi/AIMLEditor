@@ -120,11 +120,11 @@ class EditorWidget(QWidget):
     # slot function for a category being created and displaying on editSpace
     @pyqtSlot(Tag)
     def categoryCreated(self, cat):
-        print("slot in EditorWidget")
-        # print(str(cat))
-        print("new category, create a node")
-        self.aiml.append(cat)
-        print("category id: " + str(cat.id))
+        # print("slot in EditorWidget, categoryCreated")
+        print(str(cat))
+        # print("new category, create a node")
+        # self.aiml.append(cat)
+        # print("category id: " + str(cat.id))
         try:
             aNode = Node(self.scene, "Category", cat)
             aNode.content.wdg_label.imageLabel.displayVisuals(cat)

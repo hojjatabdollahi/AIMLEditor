@@ -36,7 +36,7 @@ class QLabelClickable(QLabel):
 
     def displayVisuals(self, category):
         self.clear()
-        print("creating visuals for the label")
+        # print("creating visuals for the label")
         root = ET.fromstring(str(category))
         self.template = Template()
         self.pattern = Pattern()
@@ -69,17 +69,17 @@ class QLabelClickable(QLabel):
         self.setText(text_to_set)
 
     def parseTree(self, root):
-        print("parsing through category tree to get desired text")
+        # print("parsing through category tree to get desired text")
         for child in root:
             if child.tag == "template":
                 if child.findall("*") is None:
                     if child.text is None:
-                        print("child.text is None")
-                        print("child.text for template: " + str(child.text))
+                        # print("child.text is None")
+                        # print("child.text for template: " + str(child.text))
                         self.templateText.append("")
                         self.template.attrib = []
                     else:
-                        print("child.text for template: " + child.text)
+                        # print("child.text for template: " + child.text)
                         self.templateText.append(child.text)
                         self.template.attrib = []
                 else:
@@ -87,12 +87,12 @@ class QLabelClickable(QLabel):
                     self.parseTree(child)
             elif child.tag == "pattern":
                 if child.text is None:
-                    print("child.text is None")
-                    print("child.text for pattern: " + str(child.text))
+                    # print("child.text is None")
+                    # print("child.text for pattern: " + str(child.text))
                     self.patternText.append("")
                     self.pattern.attrib = []
                 else:
-                    print("child.text for pattern: " + child.text)
+                    # print("child.text for pattern: " + child.text)
                     self.patternText.append(child.text)
                     self.pattern.attrib = []
             elif child.tag == "condition":
@@ -112,12 +112,12 @@ class QLabelClickable(QLabel):
             elif child.tag == "li":
                 print("child.attrib: " + str(child.attrib))
                 if child.attrib == {}:
-                    print("LI TAG IS FOR RANDOM!!!")
+                    # print("LI TAG IS FOR RANDOM!!!")
                     conItem = ConditionItem()
                     conItem.append(child.text)
                     self.random.append(conItem)
                 else:
-                    print("LI TAG IS FOR CONDITION!!!")
+                    # print("LI TAG IS FOR CONDITION!!!")
                     conItem = ConditionItem()
                     conItem.append(child.text)
                     conItem.attrib = child.attrib
