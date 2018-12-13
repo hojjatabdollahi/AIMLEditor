@@ -132,7 +132,6 @@ class EditorWindow(QMainWindow):
 
         self.setWindowTitle(title)
 
-
     def closeEvent(self, event):
         print("closeEvent")
         # if self.maybeSave():
@@ -208,6 +207,7 @@ class EditorWindow(QMainWindow):
     def onFileImport(self):
         try:
             fname, filter = QFileDialog.getOpenFileName(self, "Import File")
+            yoffset = 0
             print("fname: " + fname)
             self.filename = os.path.splitext(fname)[0]  # removing extension from path name
             aiml = Storage.importAIML(self.filename) # import the aiml file
@@ -216,6 +216,11 @@ class EditorWindow(QMainWindow):
                 if cat.type == "category":
                     print("tag is a category")
                     self.catCreated.emit(cat) # emitting signal to EditorWidget
+
+            for node in self.editSpace.scene.nodes:
+                x = node.grNode.x()
+                node.setPos(x, yoffset)
+                yoffset = yoffset + 450
             print("file import successful")
         except Exception as ex:
             handleError(ex)
