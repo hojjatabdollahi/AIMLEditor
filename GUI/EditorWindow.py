@@ -216,7 +216,7 @@ class EditorWindow(QMainWindow):
                 print("hi")
                 if cat.type == "category":
                     print("tag is a category")
-                    self.catCreated.emit(cat)
+                    self.catCreated.emit(cat) # emitting signal to EditorWidget
             print("file import successful")
             # self.editSpace.setPlainText(str(self.editSpace.aiml))
         except Exception as ex:

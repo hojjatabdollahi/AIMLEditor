@@ -125,9 +125,9 @@ class EditorWidget(QWidget):
     @pyqtSlot(Tag)
     def categoryCreated(self, cat):
         # print("slot in EditorWidget, categoryCreated")
-        print(str(cat))
+        # print(str(cat))
         # print("new category, create a node")
-        self.aiml.append(cat)
+        # self.aiml.append(cat)
         # print("category id: " + str(cat.id))
         try:
             aNode = Node(self.scene, "Category", cat)
@@ -145,7 +145,6 @@ class EditorWidget(QWidget):
             updatedCat = self.aiml.update(cat)
             print("updated category\n")
             print(str(updatedCat))
-
         except Exception as ex:
             print("Exception caught trying to update Node in EditorWidget")
             print(ex)
