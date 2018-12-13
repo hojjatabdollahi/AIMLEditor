@@ -44,19 +44,22 @@ class QLabelClickable(QLabel):
         self.random = Random()
         self.that = That()
 
-        self.template = self.parseTree(root)
+        self.templateText = []
+        self.patternText = []
+        self.thatText = []
 
-        self.templateText = str(self.template)
-        self.patternText = str(self.pattern)
+        self.templateText = self.parseTree(root)
 
-        self.setFont(self.patternFont)
-        if str(self.that) == "<that></that>":
-            print("no text in that")
-            self.thatText = ""
-        else:
-            print("text in that")
-            self.thatText = str(self.that)
-        text_to_set = 'pattern: ' + self.patternText + "\nthat: " + self.thatText + '\ntemplate: ' + self.templateText
+        templateStr = ""
+        patternStr = ""
+        thatStr = ""
+
+        # Converting list elements into a continuous string
+        templateStr = templateStr.join(self.templateText)
+        patternStr = patternStr.join(self.patternText)
+        thatStr = thatStr.join(self.thatText)
+
+        text_to_set = 'pattern: ' + patternStr + "\nthat: " + thatStr + '\ntemplate: ' + templateStr
         self.setText(text_to_set)
 
     def parseTree(self, root):
@@ -67,34 +70,35 @@ class QLabelClickable(QLabel):
                     if child.text is None:
                         print("child.text is None")
                         print("child.text for template: " + str(child.text))
-                        self.template.append("")
+                        self.templateText.append("")
                     else:
                         print("child.text for template: " + child.text)
-                        self.template.append(child.text)
+                        self.templateText.append(child.text)
                 else:
-                    self.template.append(child.text)
+                    self.templateText.append(child.text)
                     self.parseTree(child)
             elif child.tag == "pattern":
                 if child.text is None:
                     print("child.text is None")
                     print("child.text for pattern: " + str(child.text))
-                    self.pattern.append("")
+                    self.patternText.append("")
                 else:
                     print("child.text for pattern: " + child.text)
-                    self.pattern.append(child.text)
+                    self.patternText.append(child.text)
             elif child.tag == "condition":
                 self.parseTree(child)
                 self.condition.attrib['name'] = child.attrib['name']
-                self.template.append(self.condition)
-                self.template.append(child.tail)
+                self.templateText.append(str(self.condition))
+                self.templateText.append(child.tail)
             elif child.tag == "random":
                 self.parseTree(child)
-                self.template.append(self.random)
-                self.template.append(child.tail)
+                self.templateText.append(str(self.random))
+                self.templateText.append(child.tail)
             elif child.tag == "think":
                 think = Think()
                 think.append(child.text)
-                self.template.append(think)
+                self.templateText.append(str(think))
+                self.templateText.append(child.tail)
             elif child.tag == "li":
                 if child.attrib is None:
                     conItem = ConditionItem()
@@ -106,12 +110,12 @@ class QLabelClickable(QLabel):
                     conItem.attrib = child.attrib
                     self.condition.append(conItem)
             elif child.tag == "that":
-                self.that.append(child.text)
+                self.thatText.append(child.text)
             else:
                 print("do nothing")
-        self.template.attrib = []
-        self.pattern.attrib = []
-        return self.template
+        # self.template.attrib = []
+        # self.pattern.attrib = []
+        return self.templateText
 
 class LabelClickable(QDialog):
     def __init__(self, parent=None):
@@ -130,5 +134,5 @@ class LabelClickable(QDialog):
         self.imageLabel.setToolTip("Edit category")
         self.imageLabel.setCursor(Qt.PointingHandCursor)
 
-        self.imageLabel.setStyleSheet("QLabel {background-color: white; color: black; border: 1px solid "
+        self.imageLabel.setStyleSheet("QLabel {background-color: black; color: blue; border: 1px solid "
                                       "#01DFD7; border-radius: 5px;}")
