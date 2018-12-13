@@ -126,9 +126,8 @@ class EditorWidget(QWidget):
     def categoryCreated(self, cat):
         # print("slot in EditorWidget, categoryCreated")
         # print(str(cat))
-        # print("new category, create a node")
-        self.aiml.append(cat)
         # print("category id: " + str(cat.id))
+        self.aiml.append(cat)
         try:
             aNode = Node(self.scene, "Category", cat)
             aNode.content.wdg_label.imageLabel.displayVisuals(cat)
