@@ -13,8 +13,8 @@ class QLabelClickable(QLabel):
         super(QLabelClickable, self).__init__(parent)
         self.templateText = ""
         self. patternText = ""
-        self.patternFont = QFont("Ubuntu", 10)
-        self.templateFont = QFont("Ubuntu", 13, True)
+        self.labelFont = QFont("Ubuntu", 12)
+        self.setFont(self.labelFont)
 
     def mousePressEvent(self, event):
         self.last = "Click"
@@ -59,7 +59,10 @@ class QLabelClickable(QLabel):
         patternStr = patternStr.join(self.patternText)
         thatStr = thatStr.join(self.thatText)
 
-        text_to_set = 'pattern: ' + patternStr + "\nthat: " + thatStr + '\ntemplate: ' + templateStr
+        # creating string of text to display
+        text_to_set = 'pattern: ' + patternStr + \
+                      "\nthat: " + thatStr + \
+                      '\ntemplate: ' + templateStr
         self.setText(text_to_set)
 
     def parseTree(self, root):
@@ -100,11 +103,14 @@ class QLabelClickable(QLabel):
                 self.templateText.append(str(think))
                 self.templateText.append(child.tail)
             elif child.tag == "li":
-                if child.attrib is None:
+                print("child.attrib: " + str(child.attrib))
+                if child.attrib == {}:
+                    print("LI TAG IS FOR RANDOM!!!")
                     conItem = ConditionItem()
                     conItem.append(child.text)
                     self.random.append(conItem)
                 else:
+                    print("LI TAG IS FOR CONDITION!!!")
                     conItem = ConditionItem()
                     conItem.append(child.text)
                     conItem.attrib = child.attrib
