@@ -155,13 +155,33 @@ class DockerWidget(QDockWidget):
         print(cat)
         root = ET.fromstring(str(cat))
         print("root tag: " + root.tag)
-        self.update.setVisible(True)
-        self.cat = cat
-        try:
-            self.parseCategory(root)
-        except Exception as ex:
-            print("Error populatingFields")
-            print(ex)
+        if self.update.isVisible() is False:
+            self.update.setVisible(True)
+            self.cat = cat
+            try:
+                self.parseCategory(root)
+            except Exception as ex:
+                print("Error populatingFields")
+                print(ex)
+        else:
+            print("category is already populating docker")
+            # clear contents inside docker widget
+            self.patternEdit.clear()
+            self.thatEdit.clear()
+            self.patternEdit.clear()
+            self.thinkEdit.clear()
+            self.templateEdit.clear()
+            self.videoEdit.clear()
+            self.imageEdit.clear()
+
+            self.cat = cat
+            try:
+                self.parseCategory(root)
+            except Exception as ex:
+                print("Error populatingFields")
+                print(ex)
+
+
 
     def updateClicked(self):
         print("update button clicked")
@@ -183,16 +203,9 @@ class DockerWidget(QDockWidget):
         self.random = Random()
 
         self.categoryCreation()
-
         print("updated category\n" + str(self.cat))
 
-        # if self.aiml.update(self.cat) is None:
-        #     self.aiml.append(self.cat)
-        # else:
-        #     self.aiml.update(self.cat)
-        #     print("will update in EditorWidget")
-
-        self.aiml.update(self.cat)
+        # self.aiml.update(self.cat)
 
         self.catUpdated.emit(self.cat) # emitting signal to EditorWindow
         self.update.setVisible(False)
@@ -305,7 +318,7 @@ class DockerWidget(QDockWidget):
         self.conItem = ConditionItem()
         self.random = Random()
 
-        self.categoryCreation()
+        self.categoryCreation() # operates on self.cat
 
         # clear contents inside docker widget
         self.patternEdit.clear()
@@ -315,8 +328,6 @@ class DockerWidget(QDockWidget):
         self.templateEdit.clear()
         self.videoEdit.clear()
         self.imageEdit.clear()
-
-        self.aiml.append(self.cat)
 
         # emitting signal to EditorWindow to be sent to EditorWidget
         self.catCreated.emit(self.cat)

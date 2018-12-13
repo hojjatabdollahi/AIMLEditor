@@ -107,14 +107,13 @@ class EditorWindow(QMainWindow):
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
         print("slot in EditorWindow")
-        self.editSpace.aiml.append(cat)
         self.catClicked.emit(cat) # emitting signal to send category to docker to repopulate fields
 
     @pyqtSlot(Tag)
     def categoryUpdated(self, cat):
         print("slot in EditorWindow")
         try:
-            self.aiml.update(cat)
+            # self.aiml.update(cat)
             # self.editSpace.aiml.update(cat)
             self.catUpdated.emit(cat) # emitting signal to send to EditorWidget to update Node displaying category
         except Exception as ex:
@@ -211,14 +210,13 @@ class EditorWindow(QMainWindow):
             fname, filter = QFileDialog.getOpenFileName(self, "Import File")
             print("fname: " + fname)
             self.filename = os.path.splitext(fname)[0]  # removing extension from path name
-            self.editSpace.aiml = Storage.importAIML(self.filename) # import the aiml file
-            for cat in self.editSpace.aiml.tags:
+            aiml = Storage.importAIML(self.filename) # import the aiml file
+            for cat in aiml.tags:
                 print("hi")
                 if cat.type == "category":
                     print("tag is a category")
                     self.catCreated.emit(cat) # emitting signal to EditorWidget
             print("file import successful")
-            # self.editSpace.setPlainText(str(self.editSpace.aiml))
         except Exception as ex:
             handleError(ex)
             print(ex)

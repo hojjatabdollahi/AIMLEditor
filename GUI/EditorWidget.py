@@ -127,7 +127,7 @@ class EditorWidget(QWidget):
         # print("slot in EditorWidget, categoryCreated")
         # print(str(cat))
         # print("new category, create a node")
-        # self.aiml.append(cat)
+        self.aiml.append(cat)
         # print("category id: " + str(cat.id))
         try:
             aNode = Node(self.scene, "Category", cat)
