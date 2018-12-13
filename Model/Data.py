@@ -124,7 +124,8 @@ class Tag(Serializable):
         for cat in self.tags:
             if cat.type == "category":
                 if cat.id == newCat.id:
-                    self.tags[index] = newCat
+                    self.tags.pop(index)
+                    self.tags.append(newCat)
                     return newCat
             else:
                 print("tag type: " + cat.type)

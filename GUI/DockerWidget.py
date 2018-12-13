@@ -189,7 +189,8 @@ class DockerWidget(QDockWidget):
         if self.aiml.update(self.cat) is None:
             self.aiml.append(self.cat)
         else:
-            self.aiml.update(self.cat)
+            # self.aiml.update(self.cat)
+            print("will update in EditorWidget")
 
         self.catUpdated.emit(self.cat) # emitting signal to EditorWindow
         self.update.setVisible(False)

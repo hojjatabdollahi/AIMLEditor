@@ -72,13 +72,17 @@ class EditorWidget(QWidget):
         node1.setPos(posx, posy)
 
     def updateNode(self, cat):
-        for node in self.scene.nodes:
-            if node.category.id == cat.id:
-                print("found node to update")
-                node.category = cat
-                print(str(node.category))
-                node.content.wdg_label.imageLabel.clear()
-                node.content.wdg_label.imageLabel.displayVisuals(cat)
+        try:
+            print("updating node in display")
+            for node in self.scene.nodes:
+                if node.category.id == cat.id:
+                    print("found node to update")
+                    node.category = cat
+                    print(str(node.category))
+                    node.content.wdg_label.imageLabel.clear()
+                    node.content.wdg_label.imageLabel.displayVisuals(cat)
+        except Exception as ex:
+            print(ex)
 
     def addDebugContent(self):
         greenBrush = QBrush(Qt.green)
@@ -123,7 +127,7 @@ class EditorWidget(QWidget):
         # print("slot in EditorWidget, categoryCreated")
         print(str(cat))
         # print("new category, create a node")
-        # self.aiml.append(cat)
+        self.aiml.append(cat)
         # print("category id: " + str(cat.id))
         try:
             aNode = Node(self.scene, "Category", cat)
@@ -136,10 +140,12 @@ class EditorWidget(QWidget):
     def categoryUpdated(self, cat):
         print("slot in EditorWidget")
         try:
+            self.updateNode(cat)
+            print("display updated")
             updatedCat = self.aiml.update(cat)
             print("updated category\n")
             print(str(updatedCat))
-            self.updateNode(cat)
+
         except Exception as ex:
             print("Exception caught trying to update Node in EditorWidget")
             print(ex)
