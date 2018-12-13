@@ -124,15 +124,20 @@ class Tag(Serializable):
         for cat in self.tags:
             if cat.type == "category":
                 if cat.id == newCat.id:
-                    self.tags.pop(index)
-                    self.tags.append(newCat)
-                    return newCat
+                    print("category to be removed: " + str(cat))
+                    self.tags.remove(cat)
+                    # self.tags.append(newCat)
+                    # self.tags[index] = newCat
+                    # return newCat
             else:
                 print("tag type: " + cat.type)
             index = index + 1
 
-        print("No category found with id of: " + newCat.id)
-        return None
+        self.tags.append(newCat)
+        return newCat
+
+        # print("No category found with id of: " + newCat.id)
+        # return None
 
     """Finds first occurrence of Tag, type, in array tags of Parent Tag"""
     def findTag(self, type):

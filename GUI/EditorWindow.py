@@ -115,7 +115,7 @@ class EditorWindow(QMainWindow):
         print("slot in EditorWindow")
         try:
             self.aiml.update(cat)
-            self.editSpace.aiml.update(cat)
+            # self.editSpace.aiml.update(cat)
             self.catUpdated.emit(cat) # emitting signal to send to EditorWidget to update Node displaying category
         except Exception as ex:
             print("exception caught")
