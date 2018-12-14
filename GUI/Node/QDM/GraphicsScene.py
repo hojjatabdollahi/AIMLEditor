@@ -37,10 +37,8 @@ class QDMGraphicsScene(QGraphicsScene):
 
         self.addWidget(self.legendLabel)
 
-
     def setGrScene(self, width, height):
         self.setSceneRect(-width // 2, -height // 2, width, height)
-
 
     def drawBackground(self, painter, rect):
         super().drawBackground(painter, rect)
@@ -51,6 +49,7 @@ class QDMGraphicsScene(QGraphicsScene):
         top = int(math.floor(rect.top()))
         bottom = int(math.ceil(rect.bottom()))
 
+        # Make sure the legend is always in the top right corner of the screen
         self.legendLabel.setGeometry(left, top, 325, 70)
 
         first_left = left - (left % self.gridSize)
@@ -65,7 +64,6 @@ class QDMGraphicsScene(QGraphicsScene):
         for y in range(first_top, bottom, self.gridSize):
             if (y % (self.gridSize*self.gridSquares) != 0): lines_light.append(QLine(left, y, right, y))
             else: lines_dark.append(QLine(left, y, right, y))
-
 
         # draw the lines
         painter.setPen(self._pen_light)

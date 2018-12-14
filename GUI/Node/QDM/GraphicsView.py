@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsView, QApplication
+from PyQt5.QtWidgets import QGraphicsView, QApplication, QGraphicsSceneMouseEvent
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
@@ -49,8 +49,8 @@ class QDMGraphicsView(QGraphicsView):
 
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
 
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setDragMode(QGraphicsView.RubberBandDrag)
@@ -170,6 +170,13 @@ class QDMGraphicsView(QGraphicsView):
 
         item = self.getItemAtClick(event)
 
+        # moving the center of the screen to mouse coordinates
+        try:
+            coor = event.pos()
+            self.grScene.update(coor.x(), coor.y(), self.grScene.scene.scene_width, self.grScene.scene.scene_height)
+        except Exception as ex:
+            print(ex)
+
         if DEBUG:
             if isinstance(item, QDMGraphicsEdge): print('RMB DEBUG:', item.edge, ' connecting sockets:',
                                             item.edge.start_socket, '<-->', item.edge.end_socket)
@@ -181,6 +188,7 @@ class QDMGraphicsView(QGraphicsView):
                 for node in self.grScene.scene.nodes: print('    ', node)
                 print('  Edges:')
                 for edge in self.grScene.scene.edges: print('    ', edge)
+
 
     def rightMouseButtonRelease(self, event):
         super().mouseReleaseEvent(event)
