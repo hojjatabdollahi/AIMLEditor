@@ -29,6 +29,8 @@ class QDMNodeContentWidget(QWidget, Serializable):
 
         # connecting label to allow signals to be sent to slot
         self.wdg_label.templateLabel.catClicked.connect(self.categoryClicked)
+        self.wdg_label.patternLabel.catClicked.connect(self.categoryClicked)
+        self.wdg_label.thatLabel.catClicked.connect(self.categoryClicked)
 
         # self.layout.addWidget(QLabel("What Ryan Hears:"))
         # self.layout.addWidget(QDMTextEdit(""))

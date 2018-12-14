@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QColor
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox, QScrollArea, QVBoxLayout, QWidget
 import xml.etree.ElementTree as ET
 from Model.Data import *
 
@@ -12,7 +12,7 @@ class QLabelClickable(QLabel):
 
     def __init__(self, parent=None):
         super(QLabelClickable, self).__init__(parent)
-        self.labelFont = QFont("Ubuntu", 12)
+        self.labelFont = QFont("Ubuntu", 13)
         self.setFont(self.labelFont)
 
     def mousePressEvent(self, event):
@@ -35,6 +35,7 @@ class QLabelClickable(QLabel):
             print("label clicked")
             self.catClicked.emit()
 
+
 class LabelClickable(QDialog):
     def __init__(self, parent=None):
         super(LabelClickable, self).__init__(parent)
@@ -50,26 +51,26 @@ class LabelClickable(QDialog):
         self.initUI()
 
     def initUI(self):
-        self.templateLabel = QLabelClickable(self)
-        self.templateLabel.setGeometry(0, 230, 350, 150)
-        self.templateLabel.setToolTip("Edit category")
-        self.templateLabel.setCursor(Qt.PointingHandCursor)
-        self.templateLabel.setStyleSheet("QLabel {background-color: black; color: green; border: 1px solid "
-                                      "#01DFD7; border-radius: 5px;}")
-
         self.patternLabel = QLabelClickable(self)
-        self.patternLabel.setGeometry(0, 0, 350, 150)
+        self.patternLabel.setGeometry(0, 0, 350, 50)
         self.patternLabel.setCursor(Qt.PointingHandCursor)
         self.patternLabel.setStyleSheet("QLabel {background-color: black; color: red; border: 1px solid "
                                          "#01DFD7; border-radius: 5px;}")
 
         self.thatLabel = QLabelClickable(self)
-        self.thatLabel.setGeometry(0, 160, 350, 50)
+        self.thatLabel.setGeometry(0, 60, 350, 50)
         self.thatLabel.setCursor(Qt.PointingHandCursor)
         self.thatLabel.setStyleSheet("QLabel {background-color: black; color: blue; border: 1px solid "
                                          "#01DFD7; border-radius: 5px;}")
 
-
+        self.templateLabel = QLabelClickable(self)
+        self.templateLabel.setGeometry(0, 120, 350, 270)
+        self.templateLabel.setToolTip("Edit category")
+        self.templateLabel.setCursor(Qt.PointingHandCursor)
+        self.templateLabel.setStyleSheet("QLabel {background-color: black; color: green; border: 1px solid "
+                                         "#01DFD7; border-radius: 5px;}")
+        templateFont = QFont("Ubuntu", 9)
+        self.templateLabel.setFont(templateFont)
 
     def displayVisuals(self, category):
         self.clear()
@@ -96,12 +97,13 @@ class LabelClickable(QDialog):
         patternStr = patternStr.join(self.patternText)
         thatStr = thatStr.join(self.thatText)
 
-        # making sure tags don't have unnecessary attributes
-        category.attrib = []
-
+        # adding text to appropriate fields
         self.patternLabel.setText(patternStr)
         self.thatLabel.setText(thatStr)
         self.templateLabel.setText(templateStr)
+
+        # making sure tags don't have unnecessary attributes
+        category.attrib = []
 
     def parseTree(self, root):
         # print("parsing through category tree to get desired text")

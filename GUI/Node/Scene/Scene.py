@@ -8,6 +8,8 @@ from GUI.Node.Scene.SceneHistory import SceneHistory
 from GUI.Node.Scene.SceneClipboard import SceneClipboard
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from Model.Data import *
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtGui import QFont
 
 
 class Scene(Serializable):
