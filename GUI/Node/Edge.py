@@ -62,7 +62,6 @@ class Edge(Serializable):
         if self.start_socket is not None:
             self.updatePositions()
 
-
     def updatePositions(self):
         source_pos = self.start_socket.getSocketPosition()
         source_pos[0] += self.start_socket.node.grNode.pos().x()
@@ -77,7 +76,6 @@ class Edge(Serializable):
             self.grEdge.setDestination(*source_pos)
         self.grEdge.update()
 
-
     def remove_from_sockets(self):
         if self.start_socket is not None:
             self.start_socket.edge = None
@@ -85,7 +83,6 @@ class Edge(Serializable):
             self.end_socket.edge = None
         self.end_socket = None
         self.start_socket = None
-
 
     def remove(self):
         if DEBUG: print("# Removing Edge", self)
@@ -100,7 +97,6 @@ class Edge(Serializable):
         except ValueError:
             pass
         if DEBUG: print(" - everything is done.")
-
 
     def serialize(self):
         return OrderedDict([

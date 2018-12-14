@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox
 import xml.etree.ElementTree as ET
 from Model.Data import *
 
+
 class QLabelClickable(QLabel):
 
     # initializing signal for click or double click events
@@ -11,8 +12,6 @@ class QLabelClickable(QLabel):
 
     def __init__(self, parent=None):
         super(QLabelClickable, self).__init__(parent)
-        self.templateText = ""
-        self. patternText = ""
         self.labelFont = QFont("Ubuntu", 12)
         self.setFont(self.labelFont)
 
@@ -24,6 +23,7 @@ class QLabelClickable(QLabel):
             QTimer.singleShot(QApplication.instance().doubleClickInterval(), self.performSingleClickAction)
         else:
             # emmit to Editor Widget, Editor Widget sends cat to Window then to Docker
+            print("label clicked")
             self.catClicked.emit()
 
     def mouseDoubleClickEvent(self, event):
@@ -32,7 +32,44 @@ class QLabelClickable(QLabel):
     def performSingleClickAction(self):
         if self.last == "Click":
             # emmit to Editor Widget, Editor Widget sends cat to Window then to Docker
+            print("label clicked")
             self.catClicked.emit()
+
+class LabelClickable(QDialog):
+    def __init__(self, parent=None):
+        super(LabelClickable, self).__init__(parent)
+
+        self.setWindowTitle("Category")
+        self.setWindowIcon(QIcon("icon.png"))
+        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+        self.setFixedSize(350, 450)
+
+        self.templateText = ""
+        self.patternText = ""
+
+        self.initUI()
+
+    def initUI(self):
+        self.templateLabel = QLabelClickable(self)
+        self.templateLabel.setGeometry(0, 230, 350, 150)
+        self.templateLabel.setToolTip("Edit category")
+        self.templateLabel.setCursor(Qt.PointingHandCursor)
+        self.templateLabel.setStyleSheet("QLabel {background-color: black; color: green; border: 1px solid "
+                                      "#01DFD7; border-radius: 5px;}")
+
+        self.patternLabel = QLabelClickable(self)
+        self.patternLabel.setGeometry(0, 0, 350, 150)
+        self.patternLabel.setCursor(Qt.PointingHandCursor)
+        self.patternLabel.setStyleSheet("QLabel {background-color: black; color: red; border: 1px solid "
+                                         "#01DFD7; border-radius: 5px;}")
+
+        self.thatLabel = QLabelClickable(self)
+        self.thatLabel.setGeometry(0, 160, 350, 50)
+        self.thatLabel.setCursor(Qt.PointingHandCursor)
+        self.thatLabel.setStyleSheet("QLabel {background-color: black; color: blue; border: 1px solid "
+                                         "#01DFD7; border-radius: 5px;}")
+
+
 
     def displayVisuals(self, category):
         self.clear()
@@ -62,11 +99,9 @@ class QLabelClickable(QLabel):
         # making sure tags don't have unnecessary attributes
         category.attrib = []
 
-        # creating string of text to display
-        text_to_set = 'pattern: ' + patternStr + \
-                      "\nthat: " + thatStr + \
-                      '\ntemplate: ' + templateStr
-        self.setText(text_to_set)
+        self.patternLabel.setText(patternStr)
+        self.thatLabel.setText(thatStr)
+        self.templateLabel.setText(templateStr)
 
     def parseTree(self, root):
         # print("parsing through category tree to get desired text")
@@ -129,22 +164,7 @@ class QLabelClickable(QLabel):
 
         return self.templateText
 
-class LabelClickable(QDialog):
-    def __init__(self, parent=None):
-        super(LabelClickable, self).__init__(parent)
-
-        self.setWindowTitle("Category")
-        self.setWindowIcon(QIcon("icon.png"))
-        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(350, 350)
-
-        self.initUI()
-
-    def initUI(self):
-        self.imageLabel = QLabelClickable(self)
-        self.imageLabel.setGeometry(0, 0, 350, 350)
-        self.imageLabel.setToolTip("Edit category")
-        self.imageLabel.setCursor(Qt.PointingHandCursor)
-
-        self.imageLabel.setStyleSheet("QLabel {background-color: black; color: blue; border: 1px solid "
-                                      "#01DFD7; border-radius: 5px;}")
+    def clear(self):
+        self.templateLabel.clear()
+        self.patternLabel.clear()
+        self.thatLabel.clear()

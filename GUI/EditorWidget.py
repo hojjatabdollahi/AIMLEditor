@@ -79,8 +79,8 @@ class EditorWidget(QWidget):
                     print("found node to update")
                     node.category = cat
                     print(str(node.category))
-                    node.content.wdg_label.imageLabel.clear()
-                    node.content.wdg_label.imageLabel.displayVisuals(cat)
+                    node.content.wdg_label.clear()
+                    node.content.wdg_label.displayVisuals(cat)
         except Exception as ex:
             print(ex)
 
@@ -131,7 +131,7 @@ class EditorWidget(QWidget):
         try:
             title = "Category: " + cat.id
             aNode = Node(self.scene, title, cat)
-            aNode.content.wdg_label.imageLabel.displayVisuals(cat)
+            aNode.content.wdg_label.displayVisuals(cat)
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         except Exception as ex:
             print(ex)
