@@ -132,7 +132,27 @@ class EditorWidget(QWidget):
             print(str(template))
             tempString = template.findTag("text")
             print(tempString)
-            return tempString
+            tempArr = tempString.split()
+            index = 0
+            for word in reversed(tempArr):
+                if "." in word or "?" in word or "!" in word:
+                    if index == 0:
+                        print("Found last punctuation mark on very first word. Keep searching.")
+                        print(word)
+                    else:
+                        print("Found the start of the last sentence")
+                        print(word)
+                        # TODO: Fix the math of finding the last sentence in the string
+                        arrSize = len(tempArr)
+                        start = arrSize - (index)
+                        lastSentence = tempArr[start:arrSize]
+                        lastSentence = " ".join(lastSentence)
+                        print(lastSentence)
+                        return lastSentence
+                index = index + 1
+                # print("index: " + str(index))
+            print("had trouble finding last sentence")
+            return
         except Exception as ex:
             print(ex)
             handleError(ex)
