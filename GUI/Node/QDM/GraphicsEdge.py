@@ -63,7 +63,7 @@ class QDMGraphicsEdge(QGraphicsPathItem):
 
     def calcPath(self):
         """ Will handle drawing QPainterPath from Point A to B """
-        raise NotImplemented("This method has to be overriden in a child class")
+        raise NotImplemented("This method has to be overridden in a child class")
 
 
 class QDMGraphicsEdgeDirect(QDMGraphicsEdge):

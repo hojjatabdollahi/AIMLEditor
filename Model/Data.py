@@ -38,7 +38,6 @@ class Tag(Serializable):
             return self.tag_list[tag_type]()
         return False
 
-
     def serialize(self):
         try:
             print("attempting to serialize tag")
@@ -139,16 +138,22 @@ class Tag(Serializable):
         # print("No category found with id of: " + newCat.id)
         # return None
 
-    """Finds first occurrence of Tag, type, in array tags of Parent Tag"""
+    """
+    Finds first occurrence of Tag, type, in array tags of Parent Tag.
+    If wanting to find the text that the tag contains pass through text as the type.
+    """
     def findTag(self, type):
         if self.tags is None:
             print("This tag has no child tags")
             return None
 
         for child in self.tags:
-            if child.type == type:
-                return child
-
+            if type == "text":
+                if child not in self.tag_list:
+                    return child
+            else:
+                if child.type == type:
+                    return child
         return None
 
     def __str__(self):

@@ -11,6 +11,7 @@ from GUI.Node.Scene.Scene import Scene
 from GUI.Node.Edge import Edge, EDGE_TYPE_BEZIER
 from GUI.Node.QDM.GraphicsView import QDMGraphicsView
 from GUI.Node.QDM.GraphicsNode import *
+from GUI.Node.Utils.Socket import *
 
 
 class EditorWidget(QWidget):
@@ -18,6 +19,7 @@ class EditorWidget(QWidget):
     # Adding signal
     catCreated = pyqtSignal(Tag)
     catClicked = pyqtSignal(Tag)
+    childClicked = pyqtSignal(str)
 
     def __init__(self, window, parent=None):
         super().__init__(parent)
@@ -41,6 +43,7 @@ class EditorWidget(QWidget):
         ########## making connections to slots ################
         window.catCreated.connect(self.categoryCreated) # connecting signal from Editor Window that is sending created category
         window.catUpdated.connect(self.categoryUpdated) # connecting signal from EditorWindow to update Node
+
 
         # self.addNodes()
         # self.addDebugContent()
@@ -120,6 +123,39 @@ class EditorWidget(QWidget):
         stylesheet = file.readAll()
         QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
 
+    """
+    Function to find the sentence to be used for <that> tag of potential children
+    """
+    def getLastSentence(self, cat):
+        try:
+            template = cat.findTag("template")
+            print(str(template))
+            tempString = template.findTag("text")
+            print(tempString)
+            return tempString
+        except Exception as ex:
+            print(ex)
+            handleError(ex)
+
+    """
+    Find child nodes in the scene and add edges based off of <that> tags
+    """
+    def findChildNodes(self, newnode, thatStr):
+        for node in self.scene.nodes:
+            thatTag = node.category.findTag("that")
+            print(str(thatTag))
+            if thatTag is None:
+                print("no that tag found in category: " + str(node.category))
+            elif newnode == node:
+                print("looking at node just created. Do nothing")
+            else:
+                # That tag was found add an edge
+                print("that tag was found in category: " + str(node.category))
+                parentsocket = Socket(newnode)
+                newnode.outputs.append(parentsocket)
+                childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
+                node.inputs.append(childsocket)
+                edge = Edge(self.scene, parentsocket, childsocket)
 
     # slot function for a category being created and displaying on editSpace
     @pyqtSlot(Tag)
@@ -128,13 +164,23 @@ class EditorWidget(QWidget):
         # print(str(cat))
         # print("category id: " + str(cat.id))
         self.aiml.append(cat)
+        thatToCheck = self.getLastSentence(cat)
+        title = "Category: " + cat.id
+        aNode = Node(self.scene, title, cat)
+        aNode.content.wdg_label.displayVisuals(cat)
+        self.findChildNodes(aNode, thatToCheck)
+        aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         try:
-            title = "Category: " + cat.id
-            aNode = Node(self.scene, title, cat)
-            aNode.content.wdg_label.displayVisuals(cat)
-            aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
+            print("trying to connect addChild button")
+            aNode.content.childClicked.connect(self.addChildClicked) # connecting signals coming from Content Widget
         except Exception as ex:
             print(ex)
+
+    @pyqtSlot(Tag)
+    def addChildClicked(self, cat):
+        print("In slot of editor widget")
+        thatStr = self.getLastSentence(cat)
+        self.childClicked.emit(thatStr) # emitting to Editor Window
 
     @pyqtSlot(Tag)
     def categoryUpdated(self, cat):

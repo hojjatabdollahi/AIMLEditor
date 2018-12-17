@@ -128,6 +128,7 @@ class DockerWidget(QDockWidget):
 
         # Making connection to incoming signals
         self.window.catClicked.connect(self.categoryClicked)
+        self.window.childClicked.connect(self.addChildClicked)
 
         # Click events
         self.create.clicked.connect(self.createClicked)
@@ -148,6 +149,11 @@ class DockerWidget(QDockWidget):
 
         if self.update.isVisible() is True:
             self.update.setVisible(False)
+
+    @pyqtSlot(str)
+    def addChildClicked(self, thatStr):
+        print("In slot in Docker Widget")
+        self.thatEdit.setText(thatStr)
 
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
@@ -180,8 +186,6 @@ class DockerWidget(QDockWidget):
             except Exception as ex:
                 print("Error populatingFields")
                 print(ex)
-
-
 
     def updateClicked(self):
         print("update button clicked")

@@ -11,6 +11,7 @@ from PyQt5 import QtCore
 class QDMNodeContentWidget(QWidget, Serializable):
 
     catClicked = pyqtSignal(Tag)
+    childClicked = pyqtSignal(Tag)
 
     def __init__(self, node, parent=None):
         self.node = node
@@ -27,15 +28,24 @@ class QDMNodeContentWidget(QWidget, Serializable):
         # self.wdg_label = QLabel("Category")
         self.layout.addWidget(self.wdg_label)
 
+        # add child button
+        self.addChild = QPushButton("Add child")
+        self.layout.addWidget(self.addChild)
+
         # connecting label to allow signals to be sent to slot
         self.wdg_label.templateLabel.catClicked.connect(self.categoryClicked)
         self.wdg_label.patternLabel.catClicked.connect(self.categoryClicked)
         self.wdg_label.thatLabel.catClicked.connect(self.categoryClicked)
+        self.addChild.clicked.connect(self.addChildClicked)
 
         # self.layout.addWidget(QLabel("What Ryan Hears:"))
         # self.layout.addWidget(QDMTextEdit(""))
         # self.layout.addWidget(QLabel("What Ryan Says:"))
         # self.layout.addWidget(QDMTextEdit(""))
+
+    def addChildClicked(self):
+        print("add child clicked")
+        self.childClicked.emit(self.node.category) #emitting signal to editor widget
 
     def setEditingFlag(self, value):
         self.node.scene.grScene.views()[0].editingFlag = value

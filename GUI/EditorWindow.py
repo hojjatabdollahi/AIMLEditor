@@ -19,6 +19,7 @@ class EditorWindow(QMainWindow):
     catCreated = pyqtSignal(Tag)
     catClicked = pyqtSignal(Tag)
     catUpdated = pyqtSignal(Tag)
+    childClicked = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -85,6 +86,7 @@ class EditorWindow(QMainWindow):
         docker.catCreated.connect(self.categoryCreated) # connecting signal from docker to slot
         docker.catUpdated.connect(self.categoryUpdated) # connecting signal from docker
         self.editSpace.catClicked.connect(self.categoryClicked) # connecting signal from EditorWidget to slot
+        self.editSpace.childClicked.connect(self.addChildClicked) # connecting signal from EditorWidget
 
 
         # status bar
@@ -103,6 +105,11 @@ class EditorWindow(QMainWindow):
         print("slot in EditorWindow")
         print(str(cat))
         self.catCreated.emit(cat) # emitting signal to send category received from docker to EditorWidget slot
+
+    @pyqtSlot(str)
+    def addChildClicked(self, thatStr):
+        print("In slot in Editor Window")
+        self.childClicked.emit(thatStr) # Emitting signal to Docker Widget
 
     @pyqtSlot(Tag)
     def categoryClicked(self, cat):
