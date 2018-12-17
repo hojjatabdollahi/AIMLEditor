@@ -157,6 +157,36 @@ class EditorWidget(QWidget):
                 node.inputs.append(childsocket)
                 edge = Edge(self.scene, parentsocket, childsocket)
 
+    """
+    Find parent nodes in the scene and add edges based off of <that> tags
+    """
+    def findParentNodes(self, newnode):
+        try:
+            print("looking for parent nodes")
+            mythatTag = newnode.category.findTag("that")
+            if mythatTag is None:
+                print("no that tag so node will not have any parents")
+                return
+            thatText = mythatTag.findTag("text")
+            print("Text of That Tag to look for: " + thatText)
+            for node in self.scene.nodes:
+                if node == newnode:
+                    print("looking at node just created, do nothing")
+                else:
+                    print("looking at node with category: " + str(node.category))
+                    # template = node.category.findTag("template")
+                    templateText = self.getLastSentence(node.category)
+                    if thatText == templateText:
+                        print("Found child node")
+                        parentsocket = Socket(node)
+                        node.outputs.append(parentsocket)
+                        childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
+                        newnode.inputs.append(childsocket)
+                        edge = Edge(self.scene, parentsocket, childsocket)
+        except Exception as ex:
+            print(ex)
+            handleError(ex)
+
     # slot function for a category being created and displaying on editSpace
     @pyqtSlot(Tag)
     def categoryCreated(self, cat):
@@ -169,6 +199,7 @@ class EditorWidget(QWidget):
         aNode = Node(self.scene, title, cat)
         aNode.content.wdg_label.displayVisuals(cat)
         self.findChildNodes(aNode, thatToCheck)
+        self.findParentNodes(aNode)
         aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         try:
             print("trying to connect addChild button")
