@@ -136,9 +136,12 @@ class EditorWidget(QWidget):
                     print("found string")
                     continue
                 elif tag.type == "condition" or tag.type == "random":
-                    if template.tags[index+1] not in template.tag_list:
+                    print("next item in tags list: " + str(template.tags[index+1]))
+                    if isinstance(template.tags[index+1], str) is True:
+                        print("returning true")
                         return True
                     else:
+                        print("returning false")
                         return False
                 index = index + 1
         except Exception as ex:
@@ -207,6 +210,8 @@ class EditorWidget(QWidget):
                                 print(lastSentence)
                                 return lastSentence
                         index = index + 1
+                else:
+                    print("Random or Condition tag is the last thing in the template")
         except Exception as ex:
             print("Exception caught in getLastSentence")
             print(ex)
