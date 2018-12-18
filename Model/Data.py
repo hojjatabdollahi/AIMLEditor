@@ -135,26 +135,38 @@ class Tag(Serializable):
         self.tags.append(newCat)
         return newCat
 
-        # print("No category found with id of: " + newCat.id)
-        # return None
-
     """
-    Finds first occurrence of Tag, type, in array tags of Parent Tag.
+    Finds nth occurrence (if no parameter given for n the finds the first occurence) of Tag, type, in array tags of Parent Tag.
     If wanting to find the text that the tag contains pass through text as the type.
     """
-    def findTag(self, type):
-        if self.tags is None:
-            print("This tag has no child tags")
+    def findTag(self, tagType, n=1):
+        try:
+            if self.tags is None:
+                print("This tag has no child tags")
+                return None
+            occurrence = 1
+            for child in self.tags:
+                print("current Child in findTag: " + str(child))
+                if tagType == "text":
+                    if isinstance(child, str) is True:
+                        if n == occurrence:
+                            return child
+                        else:
+                            occurrence = occurrence + 1
+                else:
+                    print("Inside else of findTag")
+                    if isinstance(child, str) is True:
+                        print("looking at string there is no type to check")
+                    else:
+                        if child.type == tagType:
+                            if n == occurrence:
+                                return child
+                            else:
+                                occurrence = occurrence + 1
             return None
-
-        for child in self.tags:
-            if type == "text":
-                if child not in self.tag_list:
-                    return child
-            else:
-                if child.type == type:
-                    return child
-        return None
+        except Exception as ex:
+            print("Exception caught in findTag!")
+            print(ex)
 
     def __str__(self):
         attrib = (' ' + ' '.join('{}=\"{}\"'.format(

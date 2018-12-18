@@ -123,37 +123,92 @@ class EditorWidget(QWidget):
         stylesheet = file.readAll()
         QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
 
+
+    """
+    Determine if the condition or random table has text afterwards
+    """
+    def tableContainsTail(self, template):
+        try:
+            index = 0
+            for tag in template.tags:
+                print("Beginning of for loop")
+                if isinstance(tag, str) is True:
+                    print("found string")
+                    continue
+                elif tag.type == "condition" or tag.type == "random":
+                    if template.tags[index+1] not in template.tag_list:
+                        return True
+                    else:
+                        return False
+                index = index + 1
+        except Exception as ex:
+            print("Exception caught in tableContainsTail!")
+            print(ex)
+            handleError(ex)
+
     """
     Function to find the sentence to be used for <that> tag of potential children
     """
     def getLastSentence(self, cat):
         try:
             template = cat.findTag("template")
-            print(str(template))
-            tempString = template.findTag("text")
-            print(tempString)
-            tempArr = tempString.split()
-            index = 0
-            for word in reversed(tempArr):
-                if "." in word or "?" in word or "!" in word:
-                    if index == 0:
-                        print("Found last punctuation mark on very first word. Keep searching.")
-                        print(word)
-                    else:
-                        print("Found the start of the last sentence")
-                        print(word)
-                        # TODO: Fix the math of finding the last sentence in the string
-                        arrSize = len(tempArr)
-                        start = arrSize - (index)
-                        lastSentence = tempArr[start:arrSize]
-                        lastSentence = " ".join(lastSentence)
-                        print(lastSentence)
-                        return lastSentence
-                index = index + 1
-                # print("index: " + str(index))
-            print("had trouble finding last sentence")
-            return
+            if template is None:
+                print("Template is empty")
+                return
+            condition = template.findTag("condition")
+            random = template.findTag("random")
+            print("Before logic")
+            if condition is None and random is None:
+                print("no random or condition tag found in template")
+                print(str(template))
+                tempString = template.findTag("text")
+                print(tempString)
+                tempArr = tempString.split()
+                index = 0
+                for word in reversed(tempArr):
+                    if "." in word or "?" in word or "!" in word:
+                        if index == 0:
+                            print("Found last punctuation mark on very first word. Keep searching.")
+                            print(word)
+                        else:
+                            print("Found the start of the last sentence")
+                            print(word)
+                            arrSize = len(tempArr)
+                            start = arrSize - (index)
+                            lastSentence = tempArr[start:arrSize]
+                            lastSentence = " ".join(lastSentence)
+                            print(lastSentence)
+                            return lastSentence
+                    index = index + 1
+                    # print("index: " + str(index))
+                print("had trouble finding last sentence")
+                return
+            else:
+                print("template contains either a random or condition tag")
+                print(str(template))
+                if self.tableContainsTail(template) is True:
+                    print("Random or Condition tag has text after")
+                    tempString = template.findTag("text", 2)
+                    print(tempString)
+                    tempArr = tempString.split()
+                    index = 0
+                    for word in reversed(tempArr):
+                        if "." in word or "?" in word or "!" in word:
+                            if index == 0:
+                                print("Found last punctuation mark on very first word. Keep searching.")
+                                print(word)
+                            else:
+                                print("Found the start of the last sentence")
+                                print(word)
+                                arrSize = len(tempArr)
+                                start = arrSize - (index)
+                                lastSentence = tempArr[start:arrSize]
+                                lastSentence = " ".join(lastSentence)
+                                print(lastSentence)
+                                return lastSentence
+                        index = index + 1
         except Exception as ex:
+            print("Exception caught in getLastSentence")
             print(ex)
             handleError(ex)
 
@@ -210,7 +265,7 @@ class EditorWidget(QWidget):
     # slot function for a category being created and displaying on editSpace
     @pyqtSlot(Tag)
     def categoryCreated(self, cat):
-        # print("slot in EditorWidget, categoryCreated")
+        print("slot in EditorWidget, categoryCreated")
         # print(str(cat))
         # print("category id: " + str(cat.id))
         self.aiml.append(cat)
@@ -231,6 +286,7 @@ class EditorWidget(QWidget):
     def addChildClicked(self, cat):
         print("In slot of editor widget")
         thatStr = self.getLastSentence(cat)
+        print(thatStr)
         self.childClicked.emit(thatStr) # emitting to Editor Window
 
     @pyqtSlot(Tag)

@@ -153,6 +153,7 @@ class DockerWidget(QDockWidget):
     @pyqtSlot(str)
     def addChildClicked(self, thatStr):
         print("In slot in Docker Widget")
+        print("String to append to <that> field: " + thatStr)
         self.thatEdit.setText(thatStr)
 
     @pyqtSlot(Tag)
