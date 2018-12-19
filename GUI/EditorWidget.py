@@ -226,6 +226,7 @@ class EditorWidget(QWidget):
                             print("text inside condition: " + liText)
                             liArr = liText.split()
                             index = 0
+                            punctuationExists = False
                             for word in reversed(liArr):
                                 if "." in word or "?" in word or "!" in word:
                                     if index == 0:
@@ -240,11 +241,12 @@ class EditorWidget(QWidget):
                                         lastSentence = " ".join(lastSentence)
                                         print(lastSentence)
                                         sentences.append(lastSentence)
+                                        punctuationExists = True
                                         break
                                 index = index + 1
-
                             # If made it to end of array without finding another punctiation mark. return full text in tag
-                            sentences.append(liText)
+                            if punctuationExists is False:
+                                sentences.append(liText)
                         return sentences
                         print("done goofed")
                     else:
@@ -254,6 +256,7 @@ class EditorWidget(QWidget):
                             print("text inside random: " + liText)
                             liArr = liText.split()
                             index = 0
+                            punctuationExists = False
                             for word in reversed(liArr):
                                 if "." in word or "?" in word or "!" in word:
                                     if index == 0:
@@ -268,10 +271,12 @@ class EditorWidget(QWidget):
                                         lastSentence = " ".join(lastSentence)
                                         print(lastSentence)
                                         sentences.append(lastSentence)
+                                        punctuationExists = True
                                         break
                                 index = index + 1
                             # If made it to end of array without finding another punctiation mark. return full text in tag
-                            sentences.append(liText)
+                            if punctuationExists is False:
+                                sentences.append(liText)
                         return sentences
                         print("done goofed")
         except Exception as ex:

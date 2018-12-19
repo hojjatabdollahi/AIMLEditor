@@ -50,6 +50,7 @@ class ResponseSelection(QMainWindow):
         rownum = 0
         tableWidget.setRowCount(len(self.tag.tags))
         sentences = self.editspace.getLastSentence(self.category)
+        print(str(sentences))
         for sentence in sentences:
             print("text to append to cell: " + sentence)
             item = QTableWidgetItem()
