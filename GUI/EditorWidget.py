@@ -84,6 +84,7 @@ class EditorWidget(QWidget):
                     print(str(node.category))
                     node.content.wdg_label.clear()
                     node.content.wdg_label.displayVisuals(cat)
+                    return node
         except Exception as ex:
             print(ex)
 
@@ -212,6 +213,11 @@ class EditorWidget(QWidget):
                         index = index + 1
                 else:
                     print("Random or Condition tag is the last thing in the template")
+                    # TODO: Look through <li> tags of condition and random tags to get last sentences.
+                    if condition is not None:
+                        print("table contains condition table")
+                    else:
+                        print("table contains random table")
         except Exception as ex:
             print("Exception caught in getLastSentence")
             print(ex)
@@ -231,11 +237,15 @@ class EditorWidget(QWidget):
             else:
                 # That tag was found add an edge
                 print("that tag was found in category: " + str(node.category))
-                parentsocket = Socket(newnode)
-                newnode.outputs.append(parentsocket)
-                childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
-                node.inputs.append(childsocket)
-                edge = Edge(self.scene, parentsocket, childsocket)
+                thatText = thatTag.findTag("text")
+                if thatText == thatStr:
+                    parentsocket = Socket(newnode)
+                    newnode.outputs.append(parentsocket)
+                    childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
+                    node.inputs.append(childsocket)
+                    edge = Edge(self.scene, parentsocket, childsocket)
+                else:
+                    print("Not a match for a child")
 
     """
     Find parent nodes in the scene and add edges based off of <that> tags
@@ -290,16 +300,30 @@ class EditorWidget(QWidget):
     @pyqtSlot(Tag)
     def addChildClicked(self, cat):
         print("In slot of editor widget")
-        thatStr = self.getLastSentence(cat)
-        print(thatStr)
-        self.childClicked.emit(thatStr) # emitting to Editor Window
+        if cat.findTag("condition") is None and cat.findTag("random") is None:
+            thatStr = self.getLastSentence(cat)
+            print(thatStr)
+            self.childClicked.emit(thatStr)  # emitting to Editor Window
+        else:
+            if self.tableContainsTail(cat) is False:
+                # TODO: Create pop up window of table with possible choices. return string of selected response
+                print("table is last thing in template. Must choose response to use for that")
+            else:
+                thatStr = self.getLastSentence(cat)
+                print(thatStr)
+                self.childClicked.emit(thatStr) # emitting to Editor Window
 
     @pyqtSlot(Tag)
     def categoryUpdated(self, cat):
         print("slot in EditorWidget")
         try:
             updatedCat = self.aiml.update(cat)
-            self.updateNode(cat)
+            updatedNode = self.updateNode(cat)
+            thatStr = self.getLastSentence(cat)
+            self.findParentNodes(updatedNode)
+            that = cat.findTag("that")
+            if that is not None:
+                self.findChildNodes(updatedNode, thatStr)
             print("display updated")
             print("updated category\n")
             print(str(updatedCat))
