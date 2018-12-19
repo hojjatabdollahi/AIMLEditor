@@ -133,7 +133,7 @@ class EditorWidget(QWidget):
             index = 0
             for tag in template.tags:
                 print("Beginning of for loop")
-                if isinstance(tag, str) is True:
+                if isinstance(tag, str) is True and tag is not " ":
                     print("found string")
                     continue
                 elif tag.type == "condition" or tag.type == "random":
@@ -218,7 +218,6 @@ class EditorWidget(QWidget):
                     return sentences
                 else:
                     print("Random or Condition tag is the last thing in the template")
-                    # TODO: Look through <li> tags of condition and random tags to get last sentences.
                     if condition is not None:
                         print("table contains condition table")
                         for li in condition.tags:
@@ -243,8 +242,8 @@ class EditorWidget(QWidget):
                                         break
                                 index = index + 1
 
-                        # If made it to end of array without finding another punctiation mark. return full text in tag
-                        sentences.append(liText)
+                            # If made it to end of array without finding another punctiation mark. return full text in tag
+                            sentences.append(liText)
                         return sentences
                         print("done goofed")
                     else:
@@ -270,8 +269,8 @@ class EditorWidget(QWidget):
                                         sentences.append(lastSentence)
                                         break
                                 index = index + 1
-                        # If made it to end of array without finding another punctiation mark. return full text in tag
-                        sentences.append(liText)
+                            # If made it to end of array without finding another punctiation mark. return full text in tag
+                            sentences.append(liText)
                         return sentences
                         print("done goofed")
         except Exception as ex:
@@ -361,13 +360,14 @@ class EditorWidget(QWidget):
         try:
             print("In slot of editor widget")
             template = cat.findTag("template")
+            print("template tags list: " + str(template.tags))
             if template.findTag("condition") is None and template.findTag("random") is None:
                 print("no table inside template")
                 thatStr = self.getLastSentence(cat)
                 print(thatStr)
                 self.childClicked.emit(thatStr[0])  # emitting to Editor Window
             else:
-                if self.tableContainsTail(cat) is False:
+                if self.tableContainsTail(template) is False:
                     # TODO: Create pop up window of table with possible choices. return string of selected response
                     print("table is last thing in template. Must choose response to use for that")
                 else:
