@@ -185,8 +185,9 @@ class EditorWidget(QWidget):
                             print(lastSentence)
                             sentences.append(lastSentence)
                     index = index + 1
-                    # print("index: " + str(index))
-                # print("had trouble finding last sentence")
+
+                # If made it to end of array without finding another punctiation mark. return full text in template
+                sentences.append(tempString)
                 return sentences
             else:
                 print("template contains either a random or condition tag")
@@ -212,6 +213,8 @@ class EditorWidget(QWidget):
                                 print(lastSentence)
                                 sentences.append(lastSentence)
                         index = index + 1
+                    # If made it to end of array without finding another punctiation mark. return full text in template
+                    sentences.append(tempString)
                     return sentences
                 else:
                     print("Random or Condition tag is the last thing in the template")
@@ -239,6 +242,9 @@ class EditorWidget(QWidget):
                                         sentences.append(lastSentence)
                                         break
                                 index = index + 1
+
+                        # If made it to end of array without finding another punctiation mark. return full text in tag
+                        sentences.append(liText)
                         return sentences
                         print("done goofed")
                     else:
@@ -264,6 +270,8 @@ class EditorWidget(QWidget):
                                         sentences.append(lastSentence)
                                         break
                                 index = index + 1
+                        # If made it to end of array without finding another punctiation mark. return full text in tag
+                        sentences.append(liText)
                         return sentences
                         print("done goofed")
         except Exception as ex:
@@ -352,7 +360,9 @@ class EditorWidget(QWidget):
     def addChildClicked(self, cat):
         try:
             print("In slot of editor widget")
-            if cat.findTag("condition") is None and cat.findTag("random") is None:
+            template = cat.findTag("template")
+            if template.findTag("condition") is None and template.findTag("random") is None:
+                print("no table inside template")
                 thatStr = self.getLastSentence(cat)
                 print(thatStr)
                 self.childClicked.emit(thatStr[0])  # emitting to Editor Window
@@ -361,6 +371,7 @@ class EditorWidget(QWidget):
                     # TODO: Create pop up window of table with possible choices. return string of selected response
                     print("table is last thing in template. Must choose response to use for that")
                 else:
+                    print("table contains tail, there is only one possible sentence to use for that")
                     thatStr = self.getLastSentence(cat)
                     print(thatStr[0])
                     self.childClicked.emit(thatStr[0]) # emitting to Editor Window
