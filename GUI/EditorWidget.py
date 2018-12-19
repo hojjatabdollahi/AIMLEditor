@@ -156,6 +156,7 @@ class EditorWidget(QWidget):
     def getLastSentence(self, cat):
         try:
             template = cat.findTag("template")
+            sentences = []
             if template is None:
                 print("Template is empty")
                 return
@@ -182,11 +183,11 @@ class EditorWidget(QWidget):
                             lastSentence = tempArr[start:arrSize]
                             lastSentence = " ".join(lastSentence)
                             print(lastSentence)
-                            return lastSentence
+                            sentences.append(lastSentence)
                     index = index + 1
                     # print("index: " + str(index))
-                print("had trouble finding last sentence")
-                return
+                # print("had trouble finding last sentence")
+                return sentences
             else:
                 print("template contains either a random or condition tag")
                 print(str(template))
@@ -209,15 +210,62 @@ class EditorWidget(QWidget):
                                 lastSentence = tempArr[start:arrSize]
                                 lastSentence = " ".join(lastSentence)
                                 print(lastSentence)
-                                return lastSentence
+                                sentences.append(lastSentence)
                         index = index + 1
+                    return sentences
                 else:
                     print("Random or Condition tag is the last thing in the template")
                     # TODO: Look through <li> tags of condition and random tags to get last sentences.
                     if condition is not None:
                         print("table contains condition table")
+                        for li in condition.tags:
+                            liText = li.findTag("text")
+                            print("text inside condition: " + liText)
+                            liArr = liText.split()
+                            index = 0
+                            for word in reversed(liArr):
+                                if "." in word or "?" in word or "!" in word:
+                                    if index == 0:
+                                        print("Found last punctuation mark on very first word. Keep searching.")
+                                        print(word)
+                                    else:
+                                        print("Found the start of the last sentence")
+                                        print(word)
+                                        arrSize = len(liArr)
+                                        start = arrSize - (index)
+                                        lastSentence = liArr[start:arrSize]
+                                        lastSentence = " ".join(lastSentence)
+                                        print(lastSentence)
+                                        sentences.append(lastSentence)
+                                        break
+                                index = index + 1
+                        return sentences
+                        print("done goofed")
                     else:
                         print("table contains random table")
+                        for li in random.tags:
+                            liText = li.findTag("text")
+                            print("text inside random: " + liText)
+                            liArr = liText.split()
+                            index = 0
+                            for word in reversed(liArr):
+                                if "." in word or "?" in word or "!" in word:
+                                    if index == 0:
+                                        print("Found last punctuation mark on very first word. Keep searching.")
+                                        print(word)
+                                    else:
+                                        print("Found the start of the last sentence")
+                                        print(word)
+                                        arrSize = len(liArr)
+                                        start = arrSize - (index)
+                                        lastSentence = liArr[start:arrSize]
+                                        lastSentence = " ".join(lastSentence)
+                                        print(lastSentence)
+                                        sentences.append(lastSentence)
+                                        break
+                                index = index + 1
+                        return sentences
+                        print("done goofed")
         except Exception as ex:
             print("Exception caught in getLastSentence")
             print(ex)
@@ -227,6 +275,7 @@ class EditorWidget(QWidget):
     Find child nodes in the scene and add edges based off of <that> tags
     """
     def findChildNodes(self, newnode, thatStr):
+        print("looking for child nodes")
         for node in self.scene.nodes:
             thatTag = node.category.findTag("that")
             print(str(thatTag))
@@ -266,13 +315,14 @@ class EditorWidget(QWidget):
                     print("looking at node with category: " + str(node.category))
                     # template = node.category.findTag("template")
                     templateText = self.getLastSentence(node.category)
-                    if thatText == templateText:
-                        print("Found child node")
-                        parentsocket = Socket(node)
-                        node.outputs.append(parentsocket)
-                        childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
-                        newnode.inputs.append(childsocket)
-                        edge = Edge(self.scene, parentsocket, childsocket)
+                    for text in templateText:
+                        if thatText == text:
+                            print("Found child node")
+                            parentsocket = Socket(node)
+                            node.outputs.append(parentsocket)
+                            childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
+                            newnode.inputs.append(childsocket)
+                            edge = Edge(self.scene, parentsocket, childsocket)
         except Exception as ex:
             print(ex)
             handleError(ex)
@@ -288,7 +338,8 @@ class EditorWidget(QWidget):
         title = "Category: " + cat.id
         aNode = Node(self.scene, title, cat)
         aNode.content.wdg_label.displayVisuals(cat)
-        self.findChildNodes(aNode, thatToCheck)
+        for that in thatToCheck:
+            self.findChildNodes(aNode, that)
         self.findParentNodes(aNode)
         aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
         try:
@@ -299,19 +350,23 @@ class EditorWidget(QWidget):
 
     @pyqtSlot(Tag)
     def addChildClicked(self, cat):
-        print("In slot of editor widget")
-        if cat.findTag("condition") is None and cat.findTag("random") is None:
-            thatStr = self.getLastSentence(cat)
-            print(thatStr)
-            self.childClicked.emit(thatStr)  # emitting to Editor Window
-        else:
-            if self.tableContainsTail(cat) is False:
-                # TODO: Create pop up window of table with possible choices. return string of selected response
-                print("table is last thing in template. Must choose response to use for that")
-            else:
+        try:
+            print("In slot of editor widget")
+            if cat.findTag("condition") is None and cat.findTag("random") is None:
                 thatStr = self.getLastSentence(cat)
                 print(thatStr)
-                self.childClicked.emit(thatStr) # emitting to Editor Window
+                self.childClicked.emit(thatStr[0])  # emitting to Editor Window
+            else:
+                if self.tableContainsTail(cat) is False:
+                    # TODO: Create pop up window of table with possible choices. return string of selected response
+                    print("table is last thing in template. Must choose response to use for that")
+                else:
+                    thatStr = self.getLastSentence(cat)
+                    print(thatStr[0])
+                    self.childClicked.emit(thatStr[0]) # emitting to Editor Window
+        except Exception as ex:
+            print(ex)
+            handleError(ex)
 
     @pyqtSlot(Tag)
     def categoryUpdated(self, cat):
