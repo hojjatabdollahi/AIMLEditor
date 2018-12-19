@@ -5,7 +5,7 @@ from PyQt5.QtCore import QFile, Qt, pyqtSlot, pyqtSignal
 from Utils.ErrorMessage import *
 from Model.Data import *
 from GUI.QLabel_Clickable import *
-
+from GUI.ResponseSelection import *
 from GUI.Node.Node import Node
 from GUI.Node.Scene.Scene import Scene
 from GUI.Node.Edge import Edge, EDGE_TYPE_BEZIER
@@ -27,6 +27,7 @@ class EditorWidget(QWidget):
         self.stylesheet_filename = 'GUI/style/nodestyle.qss'
         self.loadStylesheet(self.stylesheet_filename)
         self.aiml = AIML()
+        self.responseTable = None
 
 
         self.initUI(window)
@@ -370,6 +371,15 @@ class EditorWidget(QWidget):
                 if self.tableContainsTail(template) is False:
                     # TODO: Create pop up window of table with possible choices. return string of selected response
                     print("table is last thing in template. Must choose response to use for that")
+                    template = cat.findTag("template")
+                    condition = template.findTag("condition")
+                    random = template.findTag("random")
+                    if condition is not None:
+                        print("create response table out of condition items")
+                        self.responseTable = ResponseSelection(tag=condition, category=cat, editspace=self)
+                    else:
+                        print("create response table out of random items")
+                        self.responseTable = ResponseSelection(tag=random, category=cat, editspace=self)
                 else:
                     print("table contains tail, there is only one possible sentence to use for that")
                     thatStr = self.getLastSentence(cat)
@@ -391,7 +401,7 @@ class EditorWidget(QWidget):
             if that is not None:
                 self.findChildNodes(updatedNode, thatStr)
             print("display updated")
-            print("updated category\n")
+            print("updated category")
             print(str(updatedCat))
         except Exception as ex:
             print("Exception caught trying to update Node in EditorWidget")
@@ -402,4 +412,4 @@ class EditorWidget(QWidget):
         print("slot in EditorWidget")
         cat = self.aiml.find(cat.id)
         print(cat)
-        self.catClicked.emit(cat) # emmitting signal to be sent to EditorWindow
+        self.catClicked.emit(cat) # emitting signal to be sent to EditorWindow

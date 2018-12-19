@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 from Model.Data import *
 from Utils.ErrorMessage import *
 
+
 class ConditionTableWidget(QMainWindow):
 
     # initializing signal for creating condition

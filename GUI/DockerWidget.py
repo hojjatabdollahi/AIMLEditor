@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 from GUI.QLabel_Clickable import *
 from GUI.EditorWindow import *
 
+
 class DockerWidget(QDockWidget):
 
     # Adding signal
