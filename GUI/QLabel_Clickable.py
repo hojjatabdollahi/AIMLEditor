@@ -159,8 +159,11 @@ class LabelClickable(QDialog):
                     for set in setArr:
                         star = set.find("star")
                         setTag = Set()
+                        setTag.attrib = set.attrib
                         if star is not None:
                             setTag.append("<"+str(star.tag)+"/>")
+                        else:
+                            setTag.append(set.text)
                         think.append(setTag)
                         self.templateText.append(str(think))
                     self.templateText.append(child.tail)
