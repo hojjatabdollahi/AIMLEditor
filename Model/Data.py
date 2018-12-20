@@ -60,6 +60,7 @@ class Tag(Serializable):
                 ('attrib', self.attrib)
             ])
         except Exception as ex:
+            print("Exception caught in serializing tag!")
             print(ex)
 
     def deserialize(self, data, hashmap={}, restore_id=True):

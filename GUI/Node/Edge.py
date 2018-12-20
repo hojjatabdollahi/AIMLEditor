@@ -102,8 +102,8 @@ class Edge(Serializable):
         return OrderedDict([
             ('id', self.objId),
             ('edge_type', self.edge_type),
-            ('start', self.start_socket.id),
-            ('end', self.end_socket.id),
+            ('start', self.start_socket.objId),
+            ('end', self.end_socket.objId),
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
