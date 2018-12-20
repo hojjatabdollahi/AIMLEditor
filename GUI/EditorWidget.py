@@ -138,6 +138,10 @@ class EditorWidget(QWidget):
                     print("found string")
                     continue
                 elif tag.type == "condition" or tag.type == "random":
+                    # Check to see if we are at end of array
+                    if index == len(template.tags) - 1:
+                        return False
+
                     print("next item in tags list: " + str(template.tags[index+1]))
                     if isinstance(template.tags[index+1], str) is True:
                         print("returning true")

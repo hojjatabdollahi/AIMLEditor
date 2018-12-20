@@ -212,7 +212,7 @@ class EditorWindow(QMainWindow):
     def onFileImport(self):
         try:
             fname, filter = QFileDialog.getOpenFileName(self, "Import File")
-            yoffset = 0
+            yoffset = -4000
             print("fname: " + fname)
             self.filename = os.path.splitext(fname)[0]  # removing extension from path name
             aiml = Storage.importAIML(self.filename) # import the aiml file
