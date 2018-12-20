@@ -234,10 +234,10 @@ class EditorWindow(QMainWindow):
                 numCats = numCats + 1
             print("Finished creating " + str(numCats) + " categories")
 
-            for node in self.editSpace.scene.nodes:
-                x = node.grNode.x()
-                node.setPos(x, yoffset)
-                yoffset = yoffset + 450
+            # for node in self.editSpace.scene.nodes:
+            #     x = node.grNode.x()
+            #     node.setPos(x, yoffset)
+            #     yoffset = yoffset + 500
             print("file import successful")
         except Exception as ex:
             handleError(ex)

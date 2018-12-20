@@ -239,7 +239,7 @@ class DockerWidget(QDockWidget):
         self.conditionTableHTML = None
         self.randomTableHTML = None
 
-    def parseCategory(self, root):
+    def parseCategory(self, root, parent=None):
         print("parsing category")
         for child in root:
             if child.tag == "pattern":
@@ -258,12 +258,17 @@ class DockerWidget(QDockWidget):
             if child.tag == "think":
                 if child.find("set") is not None:
                     print("think has child tags")
-                    self.parseCategory(child)
+                    self.parseCategory(child, child)
+                    self.templateEdit.append(child.tail)
                 else:
                     self.thinkEdit.setText(child.text)
                     self.templateEdit.append(child.tail)
             if child.tag == "set":
-                self.templateEdit.setText("<"+set.tag+" "+"name=\""+set.attrib+"\">"+set.text+"</"+set.tag+">")
+                print("at set")
+                if parent.tag == "think":
+                    self.thinkEdit.setText("<"+child.tag+" "+"name=\""+child.attrib['name']+"\">"+child.text+"</"+child.tag+">")
+                else:
+                    self.templateEdit.setText("<"+child.tag+" "+"name=\""+child.attrib['name']+"\">"+child.text+"</"+child.tag+">")
             if child.tag == "oob":
                 print("at oob")
                 self.parseCategory(child)
@@ -292,7 +297,6 @@ class DockerWidget(QDockWidget):
                     self.conditionTableHTML.appendConItem(item.get("value"), item.text)
                 self.templateEdit.insertHtml(self.conditionTableHTML.table)
                 self.templateEdit.append(child.tail)
-
 
     def conditionClicked(self):
         self.conditionTableWidget = ConditionTableWidget()

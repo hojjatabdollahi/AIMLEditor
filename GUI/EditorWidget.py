@@ -294,6 +294,7 @@ class EditorWidget(QWidget):
     def findChildNodes(self, newnode, thatStr):
         try:
             print("looking for child nodes")
+            xOffset = 0
             for node in self.scene.nodes:
                 thatTag = node.category.findTag("that")
                 print(str(thatTag))
@@ -312,6 +313,11 @@ class EditorWidget(QWidget):
                         childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
                         node.inputs.append(childsocket)
                         edge = Edge(self.scene, parentsocket, childsocket)
+                        # grouping children and parent nodes near eachother
+                        x = newnode.grNode.x()
+                        y = newnode.grNode.y()
+                        node.setPos(x+xOffset, y+700)
+                        xOffset = xOffset + 700
                     else:
                         print("Not a match for a child")
         except Exception as ex:
@@ -331,6 +337,7 @@ class EditorWidget(QWidget):
                 return
             thatText = mythatTag.findTag("text")
             print("Text of That Tag to look for: " + thatText)
+            xOffset = 0
             for node in self.scene.nodes:
                 if node == newnode:
                     print("looking at node just created, do nothing")
@@ -346,6 +353,11 @@ class EditorWidget(QWidget):
                             childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
                             newnode.inputs.append(childsocket)
                             edge = Edge(self.scene, parentsocket, childsocket)
+                            # grouping children and parent nodes near eachother
+                            x = node.grNode.x()
+                            y = node.grNode.y()
+                            newnode.setPos(x+xOffset, y+700)
+                            xOffset = xOffset + 700
                         else:
                             print("Not a match for a parent")
         except Exception as ex:
