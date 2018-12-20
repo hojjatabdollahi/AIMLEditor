@@ -374,7 +374,6 @@ class EditorWidget(QWidget):
                 self.childClicked.emit(thatStr[0])  # emitting to Editor Window
             else:
                 if self.tableContainsTail(template) is False:
-                    # TODO: Create pop up window of table with possible choices. return string of selected response
                     print("table is last thing in template. Must choose response to use for that")
                     template = cat.findTag("template")
                     condition = template.findTag("condition")

@@ -45,6 +45,8 @@ class ResponseSelection(QMainWindow):
         item = self.mainSpace.tableWidget.currentItem()
         itemText = item.text()
         print(itemText)
+        self.editspace.childClicked.emit(itemText)
+        self.close()
 
     def setRowContent(self, tableWidget):
         rownum = 0
