@@ -109,5 +109,5 @@ def importAIML(filename):
         return aiml3
     except Exception as ex:
         handleError(ex)
-        print("exception caught!")
+        print("exception caught in import of file (storage)!")
         print(ex)

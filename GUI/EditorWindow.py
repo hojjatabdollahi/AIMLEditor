@@ -216,12 +216,23 @@ class EditorWindow(QMainWindow):
             print("fname: " + fname)
             self.filename = os.path.splitext(fname)[0]  # removing extension from path name
             aiml = Storage.importAIML(self.filename) # import the aiml file
+            numCats = 0
+            print("aiml tags: " + str(aiml.tags))
             for cat in aiml.tags:
-                print("hi")
+                if cat.type == "topic":
+                    print("found topic!")
+
+                    for tag in cat.tags:
+                        if tag.type == "category":
+                            print("tag is a category")
+                            self.catCreated.emit(tag)  # emitting signal to EditorWidget
+                            numCats = numCats + 1
+                    self.editSpace.aiml.append(cat)
                 if cat.type == "category":
                     print("tag is a category")
                     self.catCreated.emit(cat) # emitting signal to EditorWidget
-            print("Finished creating categories")
+                numCats = numCats + 1
+            print("Finished creating " + str(numCats) + " categories")
 
             for node in self.editSpace.scene.nodes:
                 x = node.grNode.x()

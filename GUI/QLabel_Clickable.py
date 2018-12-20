@@ -3,8 +3,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox, QScrollArea, QVBoxLayout, QWidget
 import xml.etree.ElementTree as ET
 from Model.Data import *
-
-
+from Utils.ErrorMessage import *
 class QLabelClickable(QLabel):
 
     # initializing signal for click or double click events
@@ -73,37 +72,43 @@ class LabelClickable(QDialog):
         self.templateLabel.setFont(templateFont)
 
     def displayVisuals(self, category):
-        self.clear()
-        # print("creating visuals for the label")
-        root = ET.fromstring(str(category))
-        self.template = Template()
-        self.pattern = Pattern()
-        self.condition = Condition()
-        self.random = Random()
-        self.that = That()
+        try:
+            self.clear()
+            # print("creating visuals for the label")
+            root = ET.fromstring(str(category))
+            self.template = Template()
+            self.pattern = Pattern()
+            self.condition = Condition()
+            self.random = Random()
+            self.that = That()
 
-        self.templateText = []
-        self.patternText = []
-        self.thatText = []
+            self.templateText = []
+            self.patternText = []
+            self.thatText = []
 
-        self.templateText = self.parseTree(root)
+            self.templateText = self.parseTree(root)
 
-        templateStr = ""
-        patternStr = ""
-        thatStr = ""
+            templateStr = ""
+            patternStr = ""
+            thatStr = ""
 
-        # Converting list elements into a continuous string
-        templateStr = templateStr.join(self.templateText)
-        patternStr = patternStr.join(self.patternText)
-        thatStr = thatStr.join(self.thatText)
+            # Converting list elements into a continuous string
+            templateStr = templateStr.join(self.templateText)
+            patternStr = patternStr.join(self.patternText)
+            thatStr = thatStr.join(self.thatText)
 
-        # adding text to appropriate fields
-        self.patternLabel.setText(patternStr)
-        self.thatLabel.setText(thatStr)
-        self.templateLabel.setText(templateStr)
+            # adding text to appropriate fields
+            self.patternLabel.setText(patternStr)
+            self.thatLabel.setText(thatStr)
+            self.templateLabel.setText(templateStr)
 
-        # making sure tags don't have unnecessary attributes
-        category.attrib = []
+            # making sure tags don't have unnecessary attributes
+            category.attrib = []
+        except Exception as ex:
+            print("exception caught in display visuals!")
+            print(ex)
+            handleError(ex)
+
 
     def parseTree(self, root):
         # print("parsing through category tree to get desired text")
@@ -143,9 +148,19 @@ class LabelClickable(QDialog):
                 self.templateText.append(child.tail)
             elif child.tag == "think":
                 think = Think()
-                think.append(child.text)
-                self.templateText.append(str(think))
-                self.templateText.append(child.tail)
+                if child.find("*") is None:
+                    print("No children think tag")
+                    think.append(child.text)
+                    self.templateText.append(str(think))
+                    self.templateText.append(child.tail)
+                else:
+                    print("think has children")
+                    set = child.find("set")
+                    setTag = Set()
+                    setTag.append(set.text)
+                    think.append(setTag)
+                    self.templateText.append(str(think))
+                    self.templateText.append(child.tail)
             elif child.tag == "li":
                 print("child.attrib: " + str(child.attrib))
                 if child.attrib == {}:
