@@ -221,6 +221,7 @@ class EditorWindow(QMainWindow):
                 if cat.type == "category":
                     print("tag is a category")
                     self.catCreated.emit(cat) # emitting signal to EditorWidget
+            print("Finished creating categories")
 
             for node in self.editSpace.scene.nodes:
                 x = node.grNode.x()

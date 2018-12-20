@@ -288,26 +288,32 @@ class EditorWidget(QWidget):
     Find child nodes in the scene and add edges based off of <that> tags
     """
     def findChildNodes(self, newnode, thatStr):
-        print("looking for child nodes")
-        for node in self.scene.nodes:
-            thatTag = node.category.findTag("that")
-            print(str(thatTag))
-            if thatTag is None:
-                print("no that tag found in category: " + str(node.category))
-            elif newnode == node:
-                print("looking at node just created. Do nothing")
-            else:
-                # That tag was found add an edge
-                print("that tag was found in category: " + str(node.category))
-                thatText = thatTag.findTag("text")
-                if thatText == thatStr:
-                    parentsocket = Socket(newnode)
-                    newnode.outputs.append(parentsocket)
-                    childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
-                    node.inputs.append(childsocket)
-                    edge = Edge(self.scene, parentsocket, childsocket)
+        try:
+            print("looking for child nodes")
+            for node in self.scene.nodes:
+                thatTag = node.category.findTag("that")
+                print(str(thatTag))
+                if thatTag is None:
+                    print("no that tag found in category: " + str(node.category))
+                elif newnode == node:
+                    print("looking at node just created. Do nothing")
                 else:
-                    print("Not a match for a child")
+                    # That tag was found, add an edge
+                    print("that tag was found in category: " + str(node.category))
+                    thatText = thatTag.findTag("text")
+                    if thatText.lower() == thatStr.lower():
+                        print("found child!")
+                        parentsocket = Socket(newnode)
+                        newnode.outputs.append(parentsocket)
+                        childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
+                        node.inputs.append(childsocket)
+                        edge = Edge(self.scene, parentsocket, childsocket)
+                    else:
+                        print("Not a match for a child")
+        except Exception as ex:
+            print("Exception caught in EditorWidget when looking for child nodes")
+            print(ex)
+            handleError(ex)
 
     """
     Find parent nodes in the scene and add edges based off of <that> tags
@@ -329,13 +335,15 @@ class EditorWidget(QWidget):
                     # template = node.category.findTag("template")
                     templateText = self.getLastSentence(node.category)
                     for text in templateText:
-                        if thatText == text:
-                            print("Found child node")
+                        if thatText.lower() == text.lower():
+                            print("Found parent node!")
                             parentsocket = Socket(node)
                             node.outputs.append(parentsocket)
                             childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
                             newnode.inputs.append(childsocket)
                             edge = Edge(self.scene, parentsocket, childsocket)
+                        else:
+                            print("Not a match for a parent")
         except Exception as ex:
             print(ex)
             handleError(ex)
