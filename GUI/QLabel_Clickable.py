@@ -157,11 +157,13 @@ class LabelClickable(QDialog):
                     print("think has children")
                     setArr = child.findall("set")
                     for set in setArr:
+                        star = set.find("star")
                         setTag = Set()
-                        setTag.append(set.text)
+                        if star is not None:
+                            setTag.append("<"+str(star.tag)+"/>")
                         think.append(setTag)
                         self.templateText.append(str(think))
-                        self.templateText.append(child.tail)
+                    self.templateText.append(child.tail)
             elif child.tag == "li":
                 print("child.attrib: " + str(child.attrib))
                 if child.attrib == {}:
