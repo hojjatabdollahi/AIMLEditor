@@ -28,9 +28,9 @@ class QDMGraphicsScene(QGraphicsScene):
         # Creating legend to clarify what fields in nodes mean
         self.legendLabel = QLabel()
         self.legendLabel.setFont(QFont("ubuntu", 10))
-        self.legendLabel.setText("Red text represents the Pattern Tag\n"
-                                 "Blue text represents the That Tag\n"
-                                 "Green text represents the Template Tag")
+        self.legendLabel.setText("1st textbox represents the Pattern Tag\n"
+                                 "2nd textbox represents the That Tag\n"
+                                 "3rd textbox represents the Template Tag")
 
         self.legendLabel.setStyleSheet("QLabel {background-color: black; color: white; border: 1px solid "
                                        "#01DFD7; border-radius: 5px;}")

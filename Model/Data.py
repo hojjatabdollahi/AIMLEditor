@@ -181,6 +181,20 @@ class Tag(Serializable):
             tags = ""
         return "<{}{}>{}</{}>".format(str(self.type), attrib, tags, str(self.type))
 
+    def getContents(self):
+        attrib = (' ' + ' '.join('{}=\"{}\"'.format(
+            key, val) for key, val in self.attrib.items())) if len(self.attrib) > 0 else ""
+        if len(self.tags) > 1:
+            tags = '\n' + indent('\n'.join(map(str, self.tags)),
+                                 Common.indentation) + '\n'
+            tags = tags.strip()
+        elif len(self.tags) > 0:
+            tags = '\n'.join(map(str, self.tags))
+            tags = tags.strip()
+        else:
+            tags = ""
+        return "{}".format(tags)
+
 
 class AIML(Tag):
     def __init__(self, version="2.0"):
