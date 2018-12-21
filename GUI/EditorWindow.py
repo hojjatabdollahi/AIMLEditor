@@ -44,8 +44,8 @@ class EditorWindow(QMainWindow):
         
         # initialize Menu
         fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(self.createAct('&New', 'Ctrl+N', "Create new graph", self.onFileNew))
-        fileMenu.addSeparator()
+        # fileMenu.addAction(self.createAct('&New', 'Ctrl+N', "Create new graph", self.onFileNew))
+        # fileMenu.addSeparator()
         fileMenu.addAction(self.createAct('&Open', 'Ctrl+O', "Open file", self.onFileOpen))
         fileMenu.addAction(self.createAct('&Save', 'Ctrl+S', "Save file", self.onFileSave))
         fileMenu.addAction(self.createAct('Save &As...', 'Ctrl+Shift+S', "Save file as...", self.onFileSaveAs))
