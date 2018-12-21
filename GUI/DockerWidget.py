@@ -265,10 +265,17 @@ class DockerWidget(QDockWidget):
                     self.templateEdit.append(child.tail)
             if child.tag == "set":
                 print("at set")
-                if parent.tag == "think":
-                    self.thinkEdit.setText("<"+child.tag+" "+"name=\""+child.attrib['name']+"\">"+child.text+"</"+child.tag+">")
+                star = child.find("star")
+                if star is None:
+                    if parent.tag == "think":
+                        self.thinkEdit.setText("<"+child.tag+" "+"name=\""+str(child.attrib['name'])+"\">"+child.text+"</"+child.tag+">")
+                    else:
+                        self.templateEdit.setText("<"+child.tag+" "+"name=\""+str(child.attrib['name'])+"\">"+child.text+"</"+child.tag+">")
                 else:
-                    self.templateEdit.setText("<"+child.tag+" "+"name=\""+child.attrib['name']+"\">"+child.text+"</"+child.tag+">")
+                    if parent.tag == "think":
+                        self.thinkEdit.setText("<"+child.tag+" "+"name=\""+str(child.attrib['name'])+"\">"+"<"+star.tag+"/>"+"</"+child.tag+">")
+                    else:
+                        self.templateEdit.setText("<"+child.tag+" "+"name=\""+str(child.attrib['name'])+"\">"+"<"+star.tag+"/>"+"</"+child.tag+">")
             if child.tag == "oob":
                 print("at oob")
                 self.parseCategory(child)
