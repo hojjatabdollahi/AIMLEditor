@@ -247,7 +247,7 @@ class DockerWidget(QDockWidget):
                     self.patternEdit.setText(child.text)
                 else:
                     set = child.find("set")
-                    self.patternEdit.setText("<"+set.tag+">"+set.text+"</"+set.tag+">")
+                    self.patternEdit.setText(child.text+"<"+set.tag+">"+set.text+"</"+set.tag+">"+set.tail)
             if child.tag == "that":
                 self.thatEdit.setText(child.text)
             if child.tag == "template":

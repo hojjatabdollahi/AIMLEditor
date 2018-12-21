@@ -313,11 +313,11 @@ class EditorWidget(QWidget):
                         childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
                         node.inputs.append(childsocket)
                         edge = Edge(self.scene, parentsocket, childsocket)
-                        # grouping children and parent nodes near eachother
-                        x = newnode.grNode.x()
-                        y = newnode.grNode.y()
-                        node.setPos(x+xOffset, y+700)
-                        xOffset = xOffset + 700
+                        # group parent and child nodes
+                        x = node.grNode.x()
+                        y = node.grNode.y()
+                        node.setPos(x - xOffset, y-700)
+                        xOffset = xOffset - 700
                     else:
                         print("Not a match for a child")
         except Exception as ex:
@@ -353,10 +353,10 @@ class EditorWidget(QWidget):
                             childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
                             newnode.inputs.append(childsocket)
                             edge = Edge(self.scene, parentsocket, childsocket)
-                            # grouping children and parent nodes near eachother
+                            # group parent and child nodes
                             x = node.grNode.x()
                             y = node.grNode.y()
-                            newnode.setPos(x+xOffset, y+700)
+                            node.setPos(x+xOffset, y+700)
                             xOffset = xOffset + 700
                         else:
                             print("Not a match for a parent")
@@ -379,9 +379,10 @@ class EditorWidget(QWidget):
             print("created node")
             aNode.content.wdg_label.displayVisuals(cat)
             print("displayed contents on node")
+            self.findParentNodes(aNode)
             for that in thatToCheck:
                 self.findChildNodes(aNode, that)
-            self.findParentNodes(aNode)
+
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
             print("trying to connect addChild button")
             aNode.content.childClicked.connect(self.addChildClicked) # connecting signals coming from Content Widget
