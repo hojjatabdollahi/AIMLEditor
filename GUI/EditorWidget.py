@@ -399,7 +399,7 @@ class EditorWidget(QWidget):
                 yOffset = 0
                 if node.parents is None:
                     print("node has no parents place to the left.")
-                    node.setPos(-90, -90 + yOffset)
+                    node.setPos(-900, -900 + yOffset)
                     yOffset = yOffset + 300
                 else:
                     print("node has parents")
@@ -437,6 +437,9 @@ class EditorWidget(QWidget):
             self.findParentNodes(aNode)
 
             self.placeNodes(self.scene.nodes)
+
+            for node in self.scene.nodes:
+                node.updateConnectedEdges()
 
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
             print("trying to connect addChild button")
