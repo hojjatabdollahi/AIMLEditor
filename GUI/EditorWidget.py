@@ -308,15 +308,24 @@ class EditorWidget(QWidget):
                     thatText = thatTag.findTag("text")
                     if thatText.lower() == thatStr.lower():
                         print("found child!")
-                        parentsocket = Socket(newnode)
+                        parentsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
                         newnode.inputs.append(parentsocket) # outputs is children
-                        childsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
+
+                        if node not in newnode.children:
+                            newnode.children.append(node)
+
+                        childsocket = Socket(node)
                         node.outputs.append(childsocket)
+
+                        if newnode not in node.parents:
+                            node.parents.append(newnode)
+
                         # group parent and child nodes
-                        x = node.grNode.x()
-                        y = node.grNode.y()
-                        node.setPos(x - xOffset, y-700)
-                        xOffset = xOffset - 700
+                        # x = node.grNode.x()
+                        # y = node.grNode.y()
+                        # node.setPos(x - xOffset, y-700)
+                        # xOffset = xOffset - 700
+
                         edge = Edge(self.scene, parentsocket, childsocket)
                     else:
                         print("Not a match for a child")
@@ -348,19 +357,62 @@ class EditorWidget(QWidget):
                     for text in templateText:
                         if thatText.lower() == text.lower():
                             print("Found parent node!")
-                            parentsocket = Socket(node)
+                            parentsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
                             node.inputs.append(parentsocket)
-                            childsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
+
+                            # need to check if node exists in list before appending
+                            if newnode not in node.children:
+                                node.children.append(newnode)
+
+                            childsocket = Socket(newnode)
                             newnode.outputs.append(childsocket)
+
+                            if node not in newnode.parents:
+                                newnode.parents.append(node)
+
                             # group parent and child nodes
-                            x = node.grNode.x()
-                            y = node.grNode.y()
-                            node.setPos(x+xOffset, y+700)
-                            xOffset = xOffset + 700
+                            # x = node.grNode.x()
+                            # y = node.grNode.y()
+                            # node.setPos(x+xOffset, y+700)
+                            # xOffset = xOffset + 700
+
                             edge = Edge(self.scene, parentsocket, childsocket)
                         else:
                             print("Not a match for a parent")
         except Exception as ex:
+            print(ex)
+            handleError(ex)
+
+    """
+    Function to organize nodes based on parents and children
+    """
+    def placeNodes(self, nodes, depth=0):
+        # TODO: Recursively look through children. place parents on left, children on the right.
+        try:
+            print("placing nodes")
+            if depth > 5:
+                print("reached max depth")
+                return
+
+            xOffset = 500
+            for node in nodes:
+                yOffset = 0
+                if node.parents is None:
+                    print("node has no parents place to the left.")
+                    node.setPos(-90, -90 + yOffset)
+                    yOffset = yOffset + 300
+                else:
+                    print("node has parents")
+                    for child in node.children:
+                        depth = depth + 1
+                        y = node.grNode.y()
+                        child.setPos(xOffset, y + yOffset)
+                        xOffset = xOffset + 50
+                        yOffset = yOffset + 300
+                        self.placeNodes(child.children, depth)
+                    xOffset = xOffset + 300
+        except Exception as ex:
+            print("Exception caught placing nodes!")
             print(ex)
             handleError(ex)
 
@@ -383,6 +435,8 @@ class EditorWidget(QWidget):
             for that in thatToCheck:
                 self.findChildNodes(aNode, that)
             self.findParentNodes(aNode)
+
+            self.placeNodes(self.scene.nodes)
 
             aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
             print("trying to connect addChild button")

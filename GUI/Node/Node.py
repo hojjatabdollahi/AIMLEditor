@@ -29,6 +29,10 @@ class Node(Serializable):
         self.inputs = []
         self.outputs = []
 
+        # list of parent and children
+        self.parents = []
+        self.children = []
+
         counter = 0
         for item in inputs:
             socket = Socket(node=self, index=counter,
