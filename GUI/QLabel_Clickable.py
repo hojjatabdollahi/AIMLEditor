@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QMessageBox, QScrollA
 import xml.etree.ElementTree as ET
 from Model.Data import *
 from Utils.ErrorMessage import *
+
+
 class QLabelClickable(QLabel):
 
     # initializing signal for click or double click events
@@ -37,7 +39,7 @@ class QLabelClickable(QLabel):
             self.catClicked.emit()
 
 
-class LabelClickable(QDialog):
+class LabelClickable(QWidget):
     def __init__(self, parent=None):
         super(LabelClickable, self).__init__(parent)
 
@@ -70,6 +72,26 @@ class LabelClickable(QDialog):
         self.templateLabel.setCursor(Qt.PointingHandCursor)
         self.templateLabel.setStyleSheet("QLabel {background-color: black; color: white; border: 1px solid "
                                          "#01DFD7; border-radius: 5px;}")
+
+        # Making labels scrollable
+        layout = QVBoxLayout()
+        # patternArea = QScrollArea()
+        # patternArea.setWidget(self.patternLabel)
+        # thatArea = QScrollArea()
+        # thatArea.setWidget(self.thatLabel)
+        templateArea = QScrollArea()
+        # templateArea.setMinimumSize(350, 270)
+        templateArea.setMaximumSize(350, 270)
+        templateArea.setWidget(self.templateLabel)
+
+        # layout.addWidget(patternArea)
+        # layout.addWidget(thatArea)
+        layout.addWidget(self.patternLabel)
+        layout.addWidget(self.thatLabel)
+        layout.addWidget(templateArea)
+
+        self.setLayout(layout)
+
         # templateFont = QFont("Sans", 9)
         # self.templateLabel.setFont(templateFont)
 
@@ -104,6 +126,7 @@ class LabelClickable(QDialog):
             # thatStr = thatStr.join(self.thatText)
 
             # adding text to appropriate fields
+
             self.patternLabel.setText(pattern.getContents())
             if that is not None:
                 self.thatLabel.setText(that.getContents())

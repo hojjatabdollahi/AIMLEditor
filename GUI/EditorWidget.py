@@ -320,12 +320,6 @@ class EditorWidget(QWidget):
                         if newnode not in node.parents:
                             node.parents.append(newnode)
 
-                        # group parent and child nodes
-                        # x = node.grNode.x()
-                        # y = node.grNode.y()
-                        # node.setPos(x - xOffset, y-700)
-                        # xOffset = xOffset - 700
-
                         edge = Edge(self.scene, parentsocket, childsocket)
                     else:
                         print("Not a match for a child")
@@ -370,12 +364,6 @@ class EditorWidget(QWidget):
                             if node not in newnode.parents:
                                 newnode.parents.append(node)
 
-                            # group parent and child nodes
-                            # x = node.grNode.x()
-                            # y = node.grNode.y()
-                            # node.setPos(x+xOffset, y+700)
-                            # xOffset = xOffset + 700
-
                             edge = Edge(self.scene, parentsocket, childsocket)
                         else:
                             print("Not a match for a parent")
@@ -407,8 +395,8 @@ class EditorWidget(QWidget):
                         depth = depth + 1
                         y = node.grNode.y()
                         child.setPos(xOffset, y + yOffset)
-                        xOffset = xOffset + 50
-                        yOffset = yOffset + 300
+                        xOffset = xOffset + 100
+                        yOffset = yOffset + 575
                         self.placeNodes(child.children, depth)
                     xOffset = xOffset + 300
         except Exception as ex:
