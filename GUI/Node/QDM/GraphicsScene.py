@@ -25,6 +25,17 @@ class QDMGraphicsScene(QGraphicsScene):
 
         self.setBackgroundBrush(self._color_background)
 
+        # Creating legend to clarify what fields in nodes mean
+        self.legendLabel = QLabel()
+        self.legendLabel.setFont(QFont("Sanserif", 10))
+        self.legendLabel.setText("1st textbox represents the Pattern Tag\n"
+                                 "2nd textbox represents the That Tag\n"
+                                 "3rd textbox represents the Template Tag")
+
+        self.legendLabel.setStyleSheet("QLabel {background-color: black; color: white; border: 1px solid "
+                                       "#01DFD7; border-radius: 5px;}")
+
+        self.addWidget(self.legendLabel)
 
     def setGrScene(self, width, height):
         self.setSceneRect(-width // 2, -height // 2, width, height)
@@ -38,6 +49,9 @@ class QDMGraphicsScene(QGraphicsScene):
         top = int(math.floor(rect.top()))
         bottom = int(math.ceil(rect.bottom()))
 
+        # Make sure the legend is always in the top right corner of the screen
+        self.legendLabel.setGeometry(left, top, 325, 70)
+
         first_left = left - (left % self.gridSize)
         first_top = top - (top % self.gridSize)
 
@@ -50,7 +64,6 @@ class QDMGraphicsScene(QGraphicsScene):
         for y in range(first_top, bottom, self.gridSize):
             if (y % (self.gridSize*self.gridSquares) != 0): lines_light.append(QLine(left, y, right, y))
             else: lines_dark.append(QLine(left, y, right, y))
-
 
         # draw the lines
         painter.setPen(self._pen_light)

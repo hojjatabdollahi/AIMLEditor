@@ -3,18 +3,22 @@ from GUI.Node.Utils.Serializable import Serializable
 from GUI.Node.QDM.GraphicsNode import QDMGraphicsNode
 from GUI.Node.QDM.ContentWidget import QDMNodeContentWidget
 from GUI.Node.Utils.Socket import *
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QObject
+from Model.Data import *
+from GUI import EditorWidget
 
 DEBUG = False
 
 
 class Node(Serializable):
-    def __init__(self, scene, title="Undefined Node", inputs=[], outputs=[]):
+    def __init__(self, scene, title="Undefined Node", category=None, inputs=[], outputs=[]):
         super().__init__()
         self._title = title
         self.scene = scene
         self.content = QDMNodeContentWidget(self)
         self.grNode = QDMGraphicsNode(self)
         self.title = title
+        self.category = category
 
         self.scene.addNode(self)
         self.scene.grScene.addItem(self.grNode)
@@ -24,6 +28,10 @@ class Node(Serializable):
         # create socket for inputs and outputs
         self.inputs = []
         self.outputs = []
+
+        # list of parent and children
+        self.parents = []
+        self.children = []
 
         counter = 0
         for item in inputs:
@@ -38,6 +46,30 @@ class Node(Serializable):
                             position=RIGHT_TOP, socket_type=item)
             counter += 1
             self.outputs.append(socket)
+
+        self.tag_list = {"aiml": AIML,
+                         "topic": Topic,
+                         "category": Category,
+                         "pattern": Pattern,
+                         "template": Template,
+                         "condition": Condition,
+                         "li": ConditionItem,
+                         "random": Random,
+                         "set": Set,
+                         "think": Think,
+                         "that": That,
+                         "oob": Oob,
+                         "robot": Robot,
+                         "options": Options,
+                         "option": Option,
+                         "image": Image,
+                         "video": Video,
+                         "filename": Filename}
+
+    def decode_tag(self, tag_type):
+        if tag_type in self.tag_list:
+            return self.tag_list[tag_type]()
+        return False
 
     def __str__(self):
         return "<Node %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
@@ -105,28 +137,39 @@ class Node(Serializable):
             print(" - everything was done.")
 
     def serialize(self):
+        print("Serializing Node")
         inputs, outputs = [], []
         for socket in self.inputs:
             inputs.append(socket.serialize())
         for socket in self.outputs:
             outputs.append(socket.serialize())
         return OrderedDict([
-            ('id', self.id),
+            ('id', self.objId),
             ('title', self.title),
             ('pos_x', self.grNode.scenePos().x()),
             ('pos_y', self.grNode.scenePos().y()),
             ('inputs', inputs),
             ('outputs', outputs),
             ('content', self.content.serialize()),
+            ('category', self.category.serialize())
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
+        print("Deserializing Node")
         if restore_id:
-            self.id = data['id']
+            self.objId = data['id']
         hashmap[data['id']] = self
 
         self.setPos(data['pos_x'], data['pos_y'])
         self.title = data['title']
+        print("tag type: " + data['category']['type'])
+        self.category = self.decode_tag(data['category']['type'])
+        print(self.category)
+        self.category.deserialize(data['category'])
+
+        self.content.node = self
+        self.content.node.category = self.category
+        self.content.wdg_label.displayVisuals(self.category)
 
         data['inputs'].sort(
             key=lambda socket: socket['index'] + socket['position'] * 10000)

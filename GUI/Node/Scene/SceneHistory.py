@@ -64,9 +64,9 @@ class SceneHistory():
         }
         for item in self.scene.grScene.selectedItems():
             if hasattr(item, 'node'):
-                sel_obj['nodes'].append(item.node.id)
+                sel_obj['nodes'].append(item.node.objId)
             elif isinstance(item, QDMGraphicsEdge):
-                sel_obj['edges'].append(item.edge.id)
+                sel_obj['edges'].append(item.edge.objId)
 
         history_stamp = {
             'desc': desc,
@@ -84,12 +84,12 @@ class SceneHistory():
         # restore selection
         for edge_id in history_stamp['selection']['edges']:
             for edge in self.scene.edges:
-                if edge.id == edge_id:
+                if edge.objId == edge_id:
                     edge.grEdge.setSelected(True)
                     break
 
         for node_id in history_stamp['selection']['nodes']:
             for node in self.scene.nodes:
-                if node.id == node_id:
+                if node.objId == node_id:
                     node.grNode.setSelected(True)
                     break

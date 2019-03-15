@@ -51,6 +51,7 @@ print(aiml)
 
 Storage.save('test2', aiml)  # save as a pickle file
 aiml2 = Storage.restore('test2')  # restore the pickle
+print("####################restored pickle file#######################")
 print(aiml2)  # print for validation
 
 Storage.exportAIML('test2', aiml2)  # save as an aiml file

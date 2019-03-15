@@ -1,37 +1,57 @@
 from PyQt5.QtWidgets import QWidget, QTextEdit, QGraphicsItem,\
-    QApplication, QVBoxLayout, QPushButton
+    QApplication, QVBoxLayout, QPushButton, QBoxLayout, QMainWindow
 from PyQt5.QtGui import QBrush, QPen, QFont, QColor
-from PyQt5.QtCore import QFile, Qt
-
+from PyQt5.QtCore import QFile, Qt, pyqtSlot, pyqtSignal
+from Utils.ErrorMessage import *
+from Model.Data import *
+from GUI.QLabel_Clickable import *
+from GUI.ResponseSelection import *
 from GUI.Node.Node import Node
 from GUI.Node.Scene.Scene import Scene
 from GUI.Node.Edge import Edge, EDGE_TYPE_BEZIER
 from GUI.Node.QDM.GraphicsView import QDMGraphicsView
+from GUI.Node.QDM.GraphicsNode import *
+from GUI.Node.Utils.Socket import *
 
 
 class EditorWidget(QWidget):
-    def __init__(self, parent=None):
+
+    # Adding signal
+    catCreated = pyqtSignal(Tag)
+    catClicked = pyqtSignal(Tag)
+    childClicked = pyqtSignal(str)
+
+    def __init__(self, window, parent=None):
         super().__init__(parent)
 
         self.stylesheet_filename = 'GUI/style/nodestyle.qss'
         self.loadStylesheet(self.stylesheet_filename)
+        self.aiml = AIML()
+        self.responseTable = None
 
-        self.initUI()
 
-    def initUI(self):
-        self.layout = QVBoxLayout()
+        self.initUI(window)
+
+    def initUI(self, window):
+        self.layout = QBoxLayout(QBoxLayout.LeftToRight)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
         # crate graphics scene
         self.scene = Scene()
-        # self.grScene = self.scene.grScene
+        self.grScene = self.scene.grScene
 
-        self.addNodes()
+        ########## making connections to slots ################
+        window.catCreated.connect(self.categoryCreated) # connecting signal from Editor Window that is sending created category
+        window.catUpdated.connect(self.categoryUpdated) # connecting signal from EditorWindow to update Node
+
+
+        # self.addNodes()
         # self.addDebugContent()
         # create graphics view
         self.view = QDMGraphicsView(self.scene.grScene, self)
         self.layout.addWidget(self.view)
+
 
     def addNodes(self):
         node1 = Node(self.scene, "My Awesome Node 1",
@@ -54,6 +74,20 @@ class EditorWidget(QWidget):
     def addNode(self, title, inputs, outputs, posx, posy):
         node1 = Node(self.scene, title=title, inputs=inputs, outputs=outputs)
         node1.setPos(posx, posy)
+
+    def updateNode(self, cat):
+        try:
+            print("updating node in display")
+            for node in self.scene.nodes:
+                if node.category.id == cat.id:
+                    print("found node to update")
+                    node.category = cat
+                    print(str(node.category))
+                    node.content.wdg_label.clear()
+                    node.content.wdg_label.displayVisuals(cat)
+                    return node
+        except Exception as ex:
+            print(ex)
 
     def addDebugContent(self):
         greenBrush = QBrush(Qt.green)
@@ -90,3 +124,372 @@ class EditorWidget(QWidget):
         file.open(QFile.ReadOnly | QFile.Text)
         stylesheet = file.readAll()
         QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
+
+
+    """
+    Determine if the condition or random table has text afterwards
+    """
+    def tableContainsTail(self, template):
+        try:
+            index = 0
+            for tag in template.tags:
+                print("Beginning of for loop")
+                if isinstance(tag, str) is True and tag is not " ":
+                    print("found string")
+                    continue
+                elif tag.type == "condition" or tag.type == "random":
+                    # Check to see if we are at end of array
+                    if index == len(template.tags) - 1:
+                        return False
+
+                    print("next item in tags list: " + str(template.tags[index+1]))
+                    if isinstance(template.tags[index+1], str) is True:
+                        print("returning true")
+                        return True
+                    else:
+                        print("returning false")
+                        return False
+                index = index + 1
+        except Exception as ex:
+            print("Exception caught in tableContainsTail!")
+            print(ex)
+            handleError(ex)
+
+    """
+    Function to find the sentence to be used for <that> tag of potential children
+    """
+    def getLastSentence(self, cat):
+        try:
+            template = cat.findTag("template")
+            sentences = []
+            if template is None:
+                print("Template is empty")
+                return
+            condition = template.findTag("condition")
+            random = template.findTag("random")
+            print("Before logic")
+            if condition is None and random is None:
+                print("no random or condition tag found in template")
+                print(str(template))
+                tempString = template.findTag("text")
+                print(tempString)
+                tempArr = tempString.split()
+                index = 0
+                for word in reversed(tempArr):
+                    if "." in word or "?" in word or "!" in word:
+                        if index == 0:
+                            print("Found last punctuation mark on very first word. Keep searching.")
+                            print(word)
+                        else:
+                            print("Found the start of the last sentence")
+                            print(word)
+                            arrSize = len(tempArr)
+                            start = arrSize - (index)
+                            lastSentence = tempArr[start:arrSize]
+                            lastSentence = " ".join(lastSentence)
+                            print(lastSentence)
+                            sentences.append(lastSentence)
+                    index = index + 1
+
+                # If made it to end of array without finding another punctiation mark. return full text in template
+                sentences.append(tempString)
+                return sentences
+            else:
+                print("template contains either a random or condition tag")
+                print(str(template))
+                if self.tableContainsTail(template) is True:
+                    print("Random or Condition tag has text after")
+                    tempString = template.findTag("text", 2)
+                    print(tempString)
+                    tempArr = tempString.split()
+                    index = 0
+                    for word in reversed(tempArr):
+                        if "." in word or "?" in word or "!" in word:
+                            if index == 0:
+                                print("Found last punctuation mark on very first word. Keep searching.")
+                                print(word)
+                            else:
+                                print("Found the start of the last sentence")
+                                print(word)
+                                arrSize = len(tempArr)
+                                start = arrSize - (index)
+                                lastSentence = tempArr[start:arrSize]
+                                lastSentence = " ".join(lastSentence)
+                                print(lastSentence)
+                                sentences.append(lastSentence)
+                        index = index + 1
+                    # If made it to end of array without finding another punctiation mark. return full text in template
+                    sentences.append(tempString)
+                    return sentences
+                else:
+                    print("Random or Condition tag is the last thing in the template")
+                    if condition is not None:
+                        print("table contains condition table")
+                        for li in condition.tags:
+                            liText = li.findTag("text")
+                            print("text inside condition: " + liText)
+                            liArr = liText.split()
+                            index = 0
+                            punctuationExists = False
+                            for word in reversed(liArr):
+                                if "." in word or "?" in word or "!" in word:
+                                    if index == 0:
+                                        print("Found last punctuation mark on very first word. Keep searching.")
+                                        print(word)
+                                    else:
+                                        print("Found the start of the last sentence")
+                                        print(word)
+                                        arrSize = len(liArr)
+                                        start = arrSize - (index)
+                                        lastSentence = liArr[start:arrSize]
+                                        lastSentence = " ".join(lastSentence)
+                                        print(lastSentence)
+                                        sentences.append(lastSentence)
+                                        punctuationExists = True
+                                        break
+                                index = index + 1
+                            # If made it to end of array without finding another punctiation mark. return full text in tag
+                            if punctuationExists is False:
+                                sentences.append(liText)
+                        return sentences
+                        print("done goofed")
+                    else:
+                        print("table contains random table")
+                        for li in random.tags:
+                            liText = li.findTag("text")
+                            print("text inside random: " + liText)
+                            liArr = liText.split()
+                            index = 0
+                            punctuationExists = False
+                            for word in reversed(liArr):
+                                if "." in word or "?" in word or "!" in word:
+                                    if index == 0:
+                                        print("Found last punctuation mark on very first word. Keep searching.")
+                                        print(word)
+                                    else:
+                                        print("Found the start of the last sentence")
+                                        print(word)
+                                        arrSize = len(liArr)
+                                        start = arrSize - (index)
+                                        lastSentence = liArr[start:arrSize]
+                                        lastSentence = " ".join(lastSentence)
+                                        print(lastSentence)
+                                        sentences.append(lastSentence)
+                                        punctuationExists = True
+                                        break
+                                index = index + 1
+                            # If made it to end of array without finding another punctiation mark. return full text in tag
+                            if punctuationExists is False:
+                                sentences.append(liText)
+                        return sentences
+                        print("done goofed")
+        except Exception as ex:
+            print("Exception caught in getLastSentence")
+            print(ex)
+            handleError(ex)
+
+    """
+    Find child nodes in the scene and add edges based off of <that> tags
+    """
+    def findChildNodes(self, newnode, thatStr):
+        try:
+            print("looking for child nodes")
+            xOffset = 0
+            for node in self.scene.nodes:
+                thatTag = node.category.findTag("that")
+                print(str(thatTag))
+                if thatTag is None:
+                    print("no that tag found in category: " + str(node.category))
+                elif newnode == node:
+                    print("looking at node just created. Do nothing")
+                else:
+                    # That tag was found, add an edge
+                    print("that tag was found in category: " + str(node.category))
+                    thatText = thatTag.findTag("text")
+                    if thatText.lower() == thatStr.lower():
+                        print("found child!")
+                        parentsocket = Socket(newnode, position=RIGHT_BOTTOM, socket_type=2)
+                        newnode.inputs.append(parentsocket) # outputs is children
+
+                        if node not in newnode.children:
+                            newnode.children.append(node)
+
+                        childsocket = Socket(node)
+                        node.outputs.append(childsocket)
+
+                        if newnode not in node.parents:
+                            node.parents.append(newnode)
+
+                        edge = Edge(self.scene, parentsocket, childsocket)
+                    else:
+                        print("Not a match for a child")
+        except Exception as ex:
+            print("Exception caught in EditorWidget when looking for child nodes")
+            print(ex)
+            handleError(ex)
+
+    """
+    Find parent nodes in the scene and add edges based off of <that> tags
+    """
+    def findParentNodes(self, newnode):
+        try:
+            print("looking for parent nodes")
+            mythatTag = newnode.category.findTag("that")
+            if mythatTag is None:
+                print("no that tag so node will not have any parents")
+                return
+            thatText = mythatTag.findTag("text")
+            print("Text of That Tag to look for: " + thatText)
+            xOffset = 0
+            for node in self.scene.nodes:
+                if node == newnode:
+                    print("looking at node just created, do nothing")
+                else:
+                    print("looking at node with category: " + str(node.category))
+                    # template = node.category.findTag("template")
+                    templateText = self.getLastSentence(node.category)
+                    for text in templateText:
+                        if thatText.lower() == text.lower():
+                            print("Found parent node!")
+                            parentsocket = Socket(node, position=RIGHT_BOTTOM, socket_type=2)
+                            node.inputs.append(parentsocket)
+
+                            # need to check if node exists in list before appending
+                            if newnode not in node.children:
+                                node.children.append(newnode)
+
+                            childsocket = Socket(newnode)
+                            newnode.outputs.append(childsocket)
+
+                            if node not in newnode.parents:
+                                newnode.parents.append(node)
+
+                            edge = Edge(self.scene, parentsocket, childsocket)
+                        else:
+                            print("Not a match for a parent")
+        except Exception as ex:
+            print(ex)
+            handleError(ex)
+
+    """
+    Function to organize nodes based on parents and children
+    """
+    def placeNodes(self, nodes, depth=0):
+        # TODO: Recursively look through children. place parents on left, children on the right.
+        try:
+            print("placing nodes")
+            if depth > 5:
+                print("reached max depth")
+                return
+
+            xOffset = 500
+            for node in nodes:
+                yOffset = 0
+                if node.parents is None:
+                    print("node has no parents place to the left.")
+                    node.setPos(-900, -900 + yOffset)
+                    yOffset = yOffset + 300
+                else:
+                    print("node has parents")
+                    for child in node.children:
+                        depth = depth + 1
+                        y = node.grNode.y()
+                        child.setPos(xOffset, y + yOffset)
+                        xOffset = xOffset + 100
+                        yOffset = yOffset + 575
+                        self.placeNodes(child.children, depth)
+                    xOffset = xOffset + 300
+        except Exception as ex:
+            print("Exception caught placing nodes!")
+            print(ex)
+            handleError(ex)
+
+    # slot function for a category being created and displaying on editSpace
+    @pyqtSlot(Tag)
+    def categoryCreated(self, cat):
+        try:
+            print("slot in EditorWidget, categoryCreated")
+            # print(str(cat))
+            # print("category id: " + str(cat.id))
+            self.aiml.append(cat)
+            thatToCheck = self.getLastSentence(cat)
+            print("got last sentence of category")
+            title = "Category: " + cat.id
+            aNode = Node(self.scene, title, cat)
+            print("created node")
+            aNode.content.wdg_label.displayVisuals(cat)
+            print("displayed contents on node")
+
+            for that in thatToCheck:
+                self.findChildNodes(aNode, that)
+            self.findParentNodes(aNode)
+
+            self.placeNodes(self.scene.nodes)
+
+            for node in self.scene.nodes:
+                node.updateConnectedEdges()
+
+            aNode.content.catClicked.connect(self.categoryClicked) # connecting signals coming from Content Widget
+            print("trying to connect addChild button")
+            aNode.content.childClicked.connect(self.addChildClicked) # connecting signals coming from Content Widget
+        except Exception as ex:
+            print("Exception caught in EditorWidget when creating category!")
+            print(ex)
+            handleError(ex)
+
+    @pyqtSlot(Tag)
+    def addChildClicked(self, cat):
+        try:
+            print("In slot of editor widget")
+            template = cat.findTag("template")
+            print("template tags list: " + str(template.tags))
+            if template.findTag("condition") is None and template.findTag("random") is None:
+                print("no table inside template")
+                thatStr = self.getLastSentence(cat)
+                print(thatStr)
+                self.childClicked.emit(thatStr[0])  # emitting to Editor Window
+            else:
+                if self.tableContainsTail(template) is False:
+                    print("table is last thing in template. Must choose response to use for that")
+                    template = cat.findTag("template")
+                    condition = template.findTag("condition")
+                    random = template.findTag("random")
+                    if condition is not None:
+                        print("create response table out of condition items")
+                        self.responseTable = ResponseSelection(tag=condition, category=cat, editspace=self)
+                    else:
+                        print("create response table out of random items")
+                        self.responseTable = ResponseSelection(tag=random, category=cat, editspace=self)
+                else:
+                    print("table contains tail, there is only one possible sentence to use for that")
+                    thatStr = self.getLastSentence(cat)
+                    print(thatStr[0])
+                    self.childClicked.emit(thatStr[0]) # emitting to Editor Window
+        except Exception as ex:
+            print(ex)
+            handleError(ex)
+
+    @pyqtSlot(Tag)
+    def categoryUpdated(self, cat):
+        print("slot in EditorWidget")
+        try:
+            updatedCat = self.aiml.update(cat)
+            updatedNode = self.updateNode(cat)
+            thatStr = self.getLastSentence(cat)
+            self.findParentNodes(updatedNode)
+            that = cat.findTag("that")
+            if that is not None:
+                self.findChildNodes(updatedNode, thatStr)
+            print("display updated")
+            print("updated category")
+            print(str(updatedCat))
+        except Exception as ex:
+            print("Exception caught trying to update Node in EditorWidget")
+            print(ex)
+
+    @pyqtSlot(Tag)
+    def categoryClicked(self, cat):
+        print("slot in EditorWidget")
+        cat = self.aiml.find(cat.id)
+        print(cat)
+        self.catClicked.emit(cat) # emitting signal to be sent to EditorWindow

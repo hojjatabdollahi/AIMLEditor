@@ -6,6 +6,10 @@ from GUI.Node.Node import Node
 from GUI.Node.Edge import Edge
 from GUI.Node.Scene.SceneHistory import SceneHistory
 from GUI.Node.Scene.SceneClipboard import SceneClipboard
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from Model.Data import *
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtGui import QFont
 
 
 class Scene(Serializable):
@@ -39,7 +43,6 @@ class Scene(Serializable):
 
         self._has_been_modified = value
 
-
     def addHasBeenModifiedListener(self, callback):
         self._has_been_modified_listeners.append(callback)
 
@@ -53,13 +56,11 @@ class Scene(Serializable):
     def addEdge(self, edge):
         self.edges.append(edge)
 
-
     def removeNode(self, node):
         self.nodes.remove(node)
 
     def removeEdge(self, edge):
         self.edges.remove(edge)
-
 
     def clear(self):
         while len(self.nodes) > 0:
@@ -67,29 +68,28 @@ class Scene(Serializable):
 
         self.has_been_modified = False
 
-
     def saveToFile(self, filename):
-        with open(filename, "w") as file:
+        with open(filename+'.aib', "w") as file:
             file.write( json.dumps( self.serialize(), indent=4 ) )
-            print("saving to", filename, "was successfull.")
+            print("saving to ", filename, " was successful.")
 
             self.has_been_modified = False
 
     def loadFromFile(self, filename):
-        with open(filename, "r") as file:
+        with open(filename+'.aib', "r") as file:
             raw_data = file.read()
             data = json.loads(raw_data, encoding='utf-8')
             self.deserialize(data)
-
+            
             self.has_been_modified = False
 
-
     def serialize(self):
+        print("Serializing Scene")
         nodes, edges = [], []
         for node in self.nodes: nodes.append(node.serialize())
         for edge in self.edges: edges.append(edge.serialize())
         return OrderedDict([
-            ('id', self.id),
+            ('id', self.objId),
             ('scene_width', self.scene_width),
             ('scene_height', self.scene_height),
             ('nodes', nodes),
@@ -97,10 +97,11 @@ class Scene(Serializable):
         ])
 
     def deserialize(self, data, hashmap={}, restore_id=True):
+        print("Deserializing scene")
         self.clear()
         hashmap = {}
 
-        if restore_id: self.id = data['id']
+        if restore_id: self.objId = data['id']
 
         # create nodes
         for node_data in data['nodes']:
